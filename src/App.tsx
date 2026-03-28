@@ -1,0 +1,147 @@
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import { CommandPaletteProvider } from './hooks/useCommandPalette';
+
+const Landing = lazy(() => import('./routes/Landing'));
+const Auth = lazy(() => import('./routes/Auth'));
+const AuthCallback = lazy(() => import('./routes/AuthCallback'));
+const Dashboard = lazy(() => import('./routes/Dashboard'));
+const Explorer = lazy(() => import('./routes/Explorer'));
+const TemplateMarketplace = lazy(() => import('./routes/TemplateMarketplace'));
+const UpdatePassword = lazy(() => import('./routes/UpdatePassword'));
+const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
+const Insights = lazy(() => import('./routes/Insights'));
+
+const RouteLoader = () => (
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 transition-colors duration-300">
+    <div className="relative w-12 h-12">
+      <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
+      <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
+    </div>
+    <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">
+      Loading Experience...
+    </p>
+  </div>
+);
+
+/**
+ * Protected Route Wrapper
+ * Checks if the user is authenticated. 
+ * If not, redirects securely to the /auth page.
+ */
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 transition-colors duration-300">
+        <div className="relative w-12 h-12">
+          {/* Premium Startup Spinner */}
+          <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
+          <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
+        </div>
+        <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">
+          Authenticating Vault...
+        </p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+/**
+ * Auth Route Wrapper
+ * Ensures that logged-in users cannot access the login/signup page.
+ * Redirects them straight to their Dashboard.
+ */
+const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen bg-background transition-colors duration-300" />; // Premium blank state while checking
+  }
+
+  if (session) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+function App() {
+  return (
+    <Router>
+      <CommandPaletteProvider>
+      <Suspense fallback={<RouteLoader />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Landing />} />
+          
+          {/* Auth Route (Only for logged-out users) */}
+          <Route 
+            path="/auth" 
+            element={
+              <AuthRoute>
+                <Auth />
+              </AuthRoute>
+            } 
+          />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          
+          {/* Protected Routes: Sirf Login ke baad dikhenge */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/explorer" 
+            element={
+              <ProtectedRoute>
+                <Explorer />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
+            path="/templates"
+            element={
+              <ProtectedRoute>
+                <TemplateMarketplace />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/blueprint" element={<BlueprintImport />} />
+
+          <Route
+            path="/insights"
+            element={
+              <ProtectedRoute>
+                <Insights />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Password Reset Page (Standalone route) */}
+          <Route path="/update-password" element={<UpdatePassword />} />
+
+          {/* Catch-all: Agar koi galat URL dale toh Landing par bhej do */}
+          {/* FIX: Ye hamesha sabse last mein hona chahiye! */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+      </CommandPaletteProvider>
+    </Router>
+  );
+}
+
+export default App;

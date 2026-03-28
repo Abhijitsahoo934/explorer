@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  /* Syncing Tailwind v4 with our CSS Variables */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar: var(--sidebar);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-glass: var(--glass);
+  
+  --shadow-premium: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-glow-lg: 0 0 40px rgba(99, 102, 241, 0.25);
+}
+
+:root {
+  /* --- LIGHT MODE --- */
+  --background: #f6f8fc;
+  --foreground: #0f172a;
+  --sidebar: rgba(255, 255, 255, 0.82);
+  --card: rgba(255, 255, 255, 0.82);
+  --card-hover: rgba(255, 255, 255, 0.96);
+  --border: rgba(148, 163, 184, 0.22);
+  --border-hover: rgba(99, 102, 241, 0.26);
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --muted: #64748b;
+  --glass: rgba(255, 255, 255, 0.7);
+  --surface-strong: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.7);
+  --panel-shadow: 0 24px 60px -28px rgba(15, 23, 42, 0.18);
+  --hero-glow: rgba(79, 70, 229, 0.14);
+  --hero-glow-secondary: rgba(14, 165, 233, 0.1);
+  
+  --gradient-start: #4f46e5;
+  --gradient-end: #0ea5e9;
+}
+
+.dark {
+  /* --- DARK MODE --- */
+  --background: #050816;
+  --foreground: #f8fafc;
+  --sidebar: rgba(8, 11, 24, 0.92);
+  --card: rgba(15, 23, 42, 0.74);
+  --card-hover: rgba(30, 41, 59, 0.82);
+  --border: rgba(148, 163, 184, 0.14);
+  --border-hover: rgba(129, 140, 248, 0.34);
+  --accent: #818cf8;
+  --accent-hover: #a5b4fc;
+  --muted: #94a3b8;
+  --glass: rgba(15, 23, 42, 0.5);
+  --surface-strong: #0b1220;
+  --surface-soft: rgba(15, 23, 42, 0.72);
+  --panel-shadow: 0 30px 80px -38px rgba(2, 6, 23, 0.85);
+  --hero-glow: rgba(99, 102, 241, 0.18);
+  --hero-glow-secondary: rgba(56, 189, 248, 0.1);
+  
+  --gradient-start: #818cf8;
+  --gradient-end: #38bdf8;
+}
+
+@layer base {
+  *, ::after, ::before, ::backdrop {
+    border-color: var(--border);
+  }
+
+  html {
+    background: var(--background);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, var(--hero-glow), transparent 30%),
+      radial-gradient(circle at bottom right, var(--hero-glow-secondary), transparent 28%),
+      linear-gradient(180deg, color-mix(in srgb, var(--background) 96%, white 4%), var(--background));
+    color: var(--foreground);
+    margin: 0;
+    padding: 0;
+    font-family: 'Sora', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    /* Smooth theme transition */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, background 0.4s ease;
+  }
+
+  /* Smooth Scrolling for Lenis */
+  html.lenis { height: auto; }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
+  .lenis.lenis-scrolling iframe { pointer-events: none; }
+}
+
+/* Custom Selection */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: var(--accent);
+}
+
+/* Premium Thin Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #334155;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: var(--panel-shadow);
+}
+
+/* Noise/Grain Texture Overlay */
+.grain {
+  position: relative;
+  overflow: hidden;
+}
+
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dark .grain::before {
+  opacity: 0.04;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow Effects */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.dark .glow-accent {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+}
+
+.app-shell {
+  background:
+    radial-gradient(circle at top left, var(--hero-glow), transparent 26%),
+    radial-gradient(circle at 80% 20%, var(--hero-glow-secondary), transparent 22%),
+    linear-gradient(180deg, color-mix(in srgb, var(--background) 96%, transparent), var(--background));
+}
+
+.surface-panel {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Simple utility to hide scrollbar but allow scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
