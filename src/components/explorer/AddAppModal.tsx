@@ -4,6 +4,7 @@ import { explorerService } from '../../lib/explorerService';
 import { notificationService } from '../../lib/notificationService';
 import { Button } from '../ui/Button';
 import { trackFunnelEvent } from '../../lib/analyticsService';
+import { getErrorMessage } from '../../lib/errorMessage';
 import { logger } from '../../platform/observability/logger';
 import { buildFaviconUrl, normalizeExternalUrl } from '../../platform/security/url';
 import { X, Globe, Link2, CornerDownLeft, Sparkles, Loader2 } from 'lucide-react';
@@ -109,7 +110,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
       onClose();
     } catch (error) {
       logger.error('add_app', error, { folderId });
-      setError(error instanceof Error ? error.message : 'Unable to save app.');
+      setError(getErrorMessage(error, 'Unable to save app.'));
       try {
         await notificationService.createNotification(
           'Action failed',

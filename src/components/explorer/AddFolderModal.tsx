@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { explorerService } from '../../lib/explorerService';
 import { notificationService } from '../../lib/notificationService'; // Added for real-time bell updates!
+import { getErrorMessage } from '../../lib/errorMessage';
 import { Button } from '../ui/Button';
 import { logger } from '../../platform/observability/logger';
 import { X, FolderPlus, Folder as FolderIcon, CornerDownLeft } from 'lucide-react';
@@ -67,7 +68,7 @@ export const AddFolderModal: React.FC<AddFolderModalProps> = ({
       onClose();
     } catch (error) {
       logger.error('add_folder', error, { parentId });
-      setError(error instanceof Error ? error.message : 'Could not create folder.');
+      setError(getErrorMessage(error, 'Could not create folder.'));
       // Optional: Send error notification
       try {
         await notificationService.createNotification(

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { explorerService } from '../../lib/explorerService';
+import { getErrorMessage } from '../../lib/errorMessage';
 import { Button } from '../ui/Button';
 import { logger } from '../../platform/observability/logger';
 import { buildFaviconUrl, normalizeExternalUrl } from '../../platform/security/url';
@@ -92,7 +93,7 @@ export const RenameModal: React.FC<RenameModalProps> = ({
       onClose();
     } catch (error) {
       logger.error('rename_item', error, { itemType, itemId });
-      setError(error instanceof Error ? error.message : `Unable to update ${itemType}.`);
+      setError(getErrorMessage(error, `Unable to update ${itemType}.`));
     } finally {
       setLoading(false);
     }

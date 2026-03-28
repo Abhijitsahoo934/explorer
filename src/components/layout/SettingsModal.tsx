@@ -4,6 +4,7 @@ import { X, Moon, Sun, Monitor, User, Shield, Key, Database, AlertTriangle, Chec
 import { useTheme } from '../ThemeProvider';
 import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
+import { getErrorMessage } from '../../lib/errorMessage';
 import { APP_LOCAL_STORAGE_KEYS, APP_SESSION_STORAGE_KEYS } from '../../platform/storage/keys';
 import { clearStorageKeys } from '../../platform/storage/browserStorage';
 
@@ -14,9 +15,6 @@ interface SettingsModalProps {
 
 type TabType = 'appearance' | 'privacy';
 type ThemeOption = 'light' | 'dark' | 'system';
-
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : 'Unexpected error';
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { theme, setTheme } = useTheme();
