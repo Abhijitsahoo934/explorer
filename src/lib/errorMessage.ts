@@ -10,6 +10,10 @@ function isErrorWithMessage(value: unknown): value is ErrorWithMessage {
 }
 
 export function getErrorMessage(error: unknown, fallback = 'Unexpected error'): string {
+  if (isErrorWithMessage(error) && error.code === 'PGRST205') {
+    return 'Workspace database is not fully updated yet. Run the Supabase migration or create the apps table, then try again.';
+  }
+
   if (error instanceof Error && error.message.trim()) {
     return error.message;
   }

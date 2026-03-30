@@ -1,17 +1,9 @@
 import type { Folder, App } from '../types/explorer';
 import type { CommandPaletteItem } from './commandPaletteUtils';
 import type { TopContextItems } from './contextEngine';
+import { buildFaviconUrl, getHostnameFromUrl } from '../platform/security/url';
 
 export type { CommandContext } from './commandPaletteUtils';
-
-function faviconFromUrl(url: string): string | undefined {
-  try {
-    const host = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-  } catch {
-    return undefined;
-  }
-}
 
 function aiItem(
   partial: Omit<CommandPaletteItem, 'type' | 'actionType' | 'subtext'> & { subtext?: string }
@@ -85,11 +77,8 @@ export function generateAIActions(
     } else {
       for (const app of recentApps.slice(0, 6)) {
         const host = (() => {
-          try {
-            return new URL(app.url).hostname.replace(/^www\./, '');
-          } catch {
-            return app.url;
-          }
+          const hostname = getHostnameFromUrl(app.url);
+          return hostname ? hostname.replace(/^www\./, '') : app.url;
         })();
         push(
           aiItem({
@@ -97,7 +86,7 @@ export function generateAIActions(
             name: `Resume ${app.name}`,
             description: 'Recently opened in your workspace',
             subtext: host,
-            icon: app.icon ?? faviconFromUrl(app.url),
+            icon: app.icon ?? buildFaviconUrl(app.url, 64) ?? undefined,
             url: app.url,
             keywords: ['continue', 'resume', 'recent', app.name.toLowerCase()],
             meta: { kind: 'open-app', appId: app.id },
@@ -113,7 +102,7 @@ export function generateAIActions(
           name: `Resume your ${app.name} workflow`,
           description: 'Frequently used in your workspace',
           subtext: 'Behavioral memory suggestion',
-          icon: app.icon ?? faviconFromUrl(app.url),
+          icon: app.icon ?? buildFaviconUrl(app.url, 64) ?? undefined,
           url: app.url,
           keywords: ['resume', 'workflow', 'context', app.name.toLowerCase()],
           meta: { kind: 'open-app', appId: app.id },

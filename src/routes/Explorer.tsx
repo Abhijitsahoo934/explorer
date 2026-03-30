@@ -27,6 +27,8 @@ import { Button } from '../components/ui/Button';
 import { cn } from '../lib/utils';
 import { useAuth } from '../hooks/useAuth';
 import { recordFolderUsage } from '../lib/contextEngine';
+import { logger } from '../platform/observability/logger';
+import { getErrorMessage } from '../lib/errorMessage';
 
 // --- MAIN WORKSPACE DROPPABLE FOLDER CARD ---
 const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () => void }) => {
@@ -83,6 +85,7 @@ const Explorer: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [contentLoading, setContentLoading] = useState(false);
   const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
 
   const folderIdRef = useRef<string | null>(currentFolderId);
   const loadGenerationRef = useRef(0);
@@ -124,6 +127,7 @@ const Explorer: React.FC = () => {
       setLoading(true);
     }
     try {
+      setWorkspaceError(null);
       const fetchedFolders = await explorerService.getFolders();
       if (gen !== loadGenerationRef.current) return;
       setFolders(fetchedFolders);
@@ -132,7 +136,8 @@ const Explorer: React.FC = () => {
       if (gen !== loadGenerationRef.current) return;
       setApps(fetchedApps);
     } catch (error) {
-      console.error("Error loading explorer data:", error);
+      logger.error('explorer_load', error, { folderId: folderForLoad });
+      setWorkspaceError(getErrorMessage(error, 'Unable to load workspace.'));
     } finally {
       if (gen === loadGenerationRef.current) {
         setLoading(false);
@@ -155,7 +160,7 @@ const Explorer: React.FC = () => {
           const nextApps = await explorerService.getApps(fid);
           setApps(nextApps);
         } catch (e) {
-          console.error('Realtime workspace refresh failed:', e);
+          logger.warn('explorer_realtime_refresh', 'Realtime workspace refresh failed', { error: e });
         }
       })();
     });
@@ -228,7 +233,7 @@ const Explorer: React.FC = () => {
       }
       setTimeout(loadData, 50); 
     } catch (error) {
-      console.error("Drag Drop Action Failed:", error);
+      logger.error('explorer_drag_drop', error, { activeId: active.id, overId: over.id });
       loadData();
     }
   };
@@ -354,6 +359,12 @@ const Explorer: React.FC = () => {
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black mb-6 flex items-center gap-3">
                       Resources <span className="h-px flex-1 bg-border" />
                     </p>
+
+                    {workspaceError && !contentLoading && (
+                      <div className="mb-6 rounded-3xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm font-medium text-amber-700 dark:text-amber-300">
+                        {workspaceError}
+                      </div>
+                    )}
                     
                     {contentLoading && (
                       <div className="absolute inset-0 top-10 z-10 flex items-start justify-center pt-16 bg-background/40 backdrop-blur-[2px] rounded-3xl pointer-events-none">

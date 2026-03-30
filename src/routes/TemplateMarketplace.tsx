@@ -16,6 +16,8 @@ import {
 } from '../lib/workspaceTemplates';
 import { Briefcase, CheckCircle2, Code2, Filter, Rocket, Sparkles, BookmarkPlus, Trash2, Share2, Copy, X } from 'lucide-react';
 import { trackFunnelEvent } from '../lib/analyticsService';
+import { getErrorMessage } from '../lib/errorMessage';
+import { logger } from '../platform/observability/logger';
 
 const FILTERS = [
   { id: 'all', label: 'All Templates', icon: Sparkles },
@@ -30,6 +32,7 @@ export default function TemplateMarketplace() {
   const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]['id']>('all');
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<'success' | 'warning'>('success');
   const [customTemplates, setCustomTemplates] = useState(getStoredWorkspaceTemplates());
   const [isSavingCurrentWorkspace, setIsSavingCurrentWorkspace] = useState(false);
 
@@ -73,10 +76,12 @@ export default function TemplateMarketplace() {
         source: 'marketplace',
         title: selectedTemplate.title,
       });
+      setFeedbackTone('success');
       setFeedback(`${selectedTemplate.title} installed successfully. Your workspace is ready to explore.`);
     } catch (error) {
-      console.error('Template marketplace install failed:', error);
-      setFeedback('Template installation failed. Please try again.');
+      logger.error('template_marketplace_install', error, { templateId });
+      setFeedbackTone('warning');
+      setFeedback(getErrorMessage(error, 'Template installation failed. Please try again.'));
     } finally {
       setActiveTemplateId(null);
     }
@@ -94,6 +99,7 @@ export default function TemplateMarketplace() {
 
       const nonRootFolders = folders.filter((folder) => folder.parent_id === null);
       if (nonRootFolders.length === 0) {
+        setFeedbackTone('warning');
         setFeedback('Create at least one top-level folder before saving a workspace template.');
         return;
       }
@@ -108,10 +114,12 @@ export default function TemplateMarketplace() {
       saveWorkspaceTemplateDefinition(nextTemplate);
       setCustomTemplates(getStoredWorkspaceTemplates());
       setActiveFilter('custom');
+      setFeedbackTone('success');
       setFeedback(`${nextTemplate.title} saved. You now have a reusable template based on your own workspace.`);
     } catch (error) {
-      console.error('Save current workspace failed:', error);
-      setFeedback('We could not save the current workspace as a template. Please try again.');
+      logger.error('save_current_workspace_template', error);
+      setFeedbackTone('warning');
+      setFeedback(getErrorMessage(error, 'We could not save the current workspace as a template. Please try again.'));
     } finally {
       setIsSavingCurrentWorkspace(false);
     }
@@ -128,6 +136,7 @@ export default function TemplateMarketplace() {
 
       const topLevelFolders = folders.filter((folder) => folder.parent_id === null);
       if (topLevelFolders.length === 0) {
+        setFeedbackTone('warning');
         setFeedback('Create at least one top-level folder before sharing a blueprint.');
         return;
       }
@@ -146,9 +155,11 @@ export default function TemplateMarketplace() {
 
       setShareLink(link);
       setShareModalOpen(true);
+      setFeedbackTone('success');
     } catch (error) {
-      console.error('Share blueprint failed:', error);
-      setFeedback('Could not create a share link. Please try again.');
+      logger.error('share_blueprint', error);
+      setFeedbackTone('warning');
+      setFeedback(getErrorMessage(error, 'Could not create a share link. Please try again.'));
     } finally {
       setIsCreatingShare(false);
     }
@@ -158,8 +169,10 @@ export default function TemplateMarketplace() {
     if (!shareLink) return;
     try {
       await navigator.clipboard.writeText(shareLink);
+      setFeedbackTone('success');
       setFeedback('Share link copied. Send it to your team/founders.');
     } catch {
+      setFeedbackTone('warning');
       setFeedback('Copy failed. Please manually copy the link.');
     }
   };
@@ -167,6 +180,7 @@ export default function TemplateMarketplace() {
   const handleDeleteCustomTemplate = (templateId: string) => {
     deleteStoredWorkspaceTemplate(templateId);
     setCustomTemplates(getStoredWorkspaceTemplates());
+    setFeedbackTone('success');
     setFeedback('Custom template deleted from your local marketplace.');
   };
 
@@ -244,7 +258,13 @@ export default function TemplateMarketplace() {
             </div>
 
             {feedback && (
-              <div className="flex items-start gap-3 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-emerald-700 dark:text-emerald-300">
+              <div
+                className={`flex items-start gap-3 rounded-3xl border p-4 ${
+                  feedbackTone === 'success'
+                    ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300'
+                    : 'border-amber-500/20 bg-amber-500/5 text-amber-700 dark:text-amber-300'
+                }`}
+              >
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
                 <p className="text-sm font-medium leading-relaxed">{feedback}</p>
               </div>

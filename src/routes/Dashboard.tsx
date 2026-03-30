@@ -18,6 +18,9 @@ import { trackFunnelEvent } from '../lib/analyticsService';
 import { recordAppUsage, recordFolderUsage } from '../lib/contextEngine';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { buildFaviconUrl, openExternalUrl } from '../platform/security/url';
+import { getErrorMessage } from '../lib/errorMessage';
+import { logger } from '../platform/observability/logger';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
@@ -34,6 +37,7 @@ export default function Dashboard() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [templateFeedback, setTemplateFeedback] = useState<string | null>(null);
+  const [templateFeedbackTone, setTemplateFeedbackTone] = useState<'success' | 'warning'>('success');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0].id);
 
@@ -52,23 +56,22 @@ export default function Dashboard() {
         setUserName(user.email?.split('@')[0] || 'Explorer');
       }
 
-      const [
-        { count: folderCount },
-        { count: appCount },
-        { data: recent }
-      ] = await Promise.all([
-        supabase.from('folders').select('*', { count: 'exact', head: true }),
-        supabase.from('apps').select('*', { count: 'exact', head: true }),
-        supabase.from('apps').select('*').order('created_at', { ascending: false }).limit(4)
+      const [folders, allApps] = await Promise.all([
+        explorerService.getFolders(),
+        explorerService.getAllApps(),
       ]);
 
       setStats({
-        folders: folderCount || 0,
-        apps: appCount || 0
+        folders: folders.length,
+        apps: allApps.length,
       });
-      setRecentApps(recent || []);
+      setRecentApps(
+        [...allApps]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 4)
+      );
     } catch (error) {
-      console.error("Dashboard fetch error:", error);
+      logger.error('dashboard_fetch', error);
     } finally {
       setLoading(false);
     }
@@ -96,14 +99,7 @@ export default function Dashboard() {
     navigate('/explorer');
   };
 
-  const getFavicon = (url: string) => {
-    try {
-      const domain = new URL(url).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-    } catch {
-      return null;
-    }
-  };
+  const getFavicon = (url: string) => buildFaviconUrl(url, 64);
 
   // --- Animation Variants ---
   const containerVariants: Variants = {
@@ -132,10 +128,12 @@ export default function Dashboard() {
       await explorerService.seedWorkspaceTemplate(selectedTemplate.template);
       trackFunnelEvent('template_installed', { template_id: templateId, source: 'dashboard' });
       await fetchDashboardData();
+      setTemplateFeedbackTone('success');
       setTemplateFeedback(`${selectedTemplate.title} installed. Your workspace now starts with a real operating setup.`);
     } catch (error) {
-      console.error('Template launch failed:', error);
-      setTemplateFeedback('Template setup failed. Please try again.');
+      logger.error('template_launch', error, { templateId });
+      setTemplateFeedbackTone('warning');
+      setTemplateFeedback(getErrorMessage(error, 'Template setup failed. Please try again.'));
     } finally {
       setActiveTemplateId(null);
     }
@@ -268,7 +266,13 @@ export default function Dashboard() {
                     </div>
 
                     {templateFeedback && (
-                      <div className="flex items-start gap-3 rounded-[1.5rem] border border-emerald-500/20 bg-emerald-500/5 p-4 text-emerald-700 dark:text-emerald-300">
+                      <div
+                        className={`flex items-start gap-3 rounded-[1.5rem] border p-4 ${
+                          templateFeedbackTone === 'success'
+                            ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300'
+                            : 'border-amber-500/20 bg-amber-500/5 text-amber-700 dark:text-amber-300'
+                        }`}
+                      >
                         <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
                         <p className="text-sm font-medium leading-relaxed">{templateFeedback}</p>
                       </div>
@@ -346,7 +350,7 @@ export default function Dashboard() {
                               <div className="flex items-center gap-3 mb-6">
                                 <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center overflow-hidden border border-border shadow-sm group-hover:scale-105 group-hover:border-accent/30 transition-all">
                                   {getFavicon(site.url) ? (
-                                    <img src={getFavicon(site.url)!} alt="" className="w-6 h-6 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                                    <img src={getFavicon(site.url) ?? undefined} alt="" className="w-6 h-6 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                                   ) : (
                                     <Globe size={18} className="text-muted group-hover:text-accent" />
                                   )}
@@ -356,18 +360,17 @@ export default function Dashboard() {
                                   <p className="text-[10px] text-muted truncate font-medium mt-0.5">{new Date(site.created_at).toLocaleDateString()}</p>
                                 </div>
                               </div>
-                              <a 
-                                href={site.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
+                              <button
+                                type="button"
                                 onClick={() => {
                                   recordAppUsage(site.id);
                                   void explorerService.recordAppOpened(site.id);
+                                  openExternalUrl(site.url);
                                 }}
-                                className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-muted group-hover:text-foreground transition-colors"
+                                className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-muted group-hover:text-foreground transition-colors cursor-pointer"
                               >
                                 Access URL <ExternalLink size={12} className="group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                              </a>
+                              </button>
                             </SpotlightCard>
                           </motion.div>
                         ))}

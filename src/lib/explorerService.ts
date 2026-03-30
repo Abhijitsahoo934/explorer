@@ -3,6 +3,7 @@ import type { Folder, App } from '../types/explorer';
 import { normalizeExternalUrl } from '../platform/security/url';
 
 export type SearchResult = App & { folders: { name: string } | null };
+type WorkspaceAppsTable = 'apps' | 'websites';
 
 export interface WorkspaceTemplateFolder {
   name: string;
@@ -23,6 +24,67 @@ function templateApps(folder: WorkspaceTemplateFolder): ReadonlyArray<{ name: st
   return folder.apps?.length ? folder.apps : legacy.websites ?? [];
 }
 
+let workspaceAppsTablePromise: Promise<WorkspaceAppsTable> | null = null;
+
+function isMissingAppsTableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const maybeError = error as { code?: string; message?: string };
+  return (
+    maybeError.code === 'PGRST205' ||
+    maybeError.message?.includes("Could not find the table 'public.apps'") === true
+  );
+}
+
+function normalizeAppRecord(record: Record<string, unknown>): App {
+  return {
+    id: String(record.id ?? ''),
+    name: String(record.name ?? ''),
+    url: String(record.url ?? ''),
+    icon: typeof record.icon === 'string' ? record.icon : null,
+    description: typeof record.description === 'string' ? record.description : null,
+    folder_id: typeof record.folder_id === 'string' ? record.folder_id : null,
+    user_id: String(record.user_id ?? ''),
+    created_at: typeof record.created_at === 'string' ? record.created_at : new Date().toISOString(),
+    last_opened_at: typeof record.last_opened_at === 'string' ? record.last_opened_at : null,
+    is_pinned: typeof record.is_pinned === 'boolean' ? record.is_pinned : false,
+  };
+}
+
+async function resolveWorkspaceAppsTable(): Promise<WorkspaceAppsTable> {
+  if (!workspaceAppsTablePromise) {
+    workspaceAppsTablePromise = (async () => {
+      const { error } = await supabase.from('apps').select('id', { head: true, count: 'exact' }).limit(1);
+      if (!error) return 'apps';
+      if (isMissingAppsTableError(error)) return 'websites';
+      throw error;
+    })();
+  }
+
+  return workspaceAppsTablePromise;
+}
+
+function resetWorkspaceAppsTableCache() {
+  workspaceAppsTablePromise = null;
+}
+
+async function withWorkspaceAppsTable<T>(
+  run: (table: WorkspaceAppsTable) => Promise<T>,
+  options?: { retryOnMissingAppsTable?: boolean }
+): Promise<T> {
+  const retryOnMissingAppsTable = options?.retryOnMissingAppsTable ?? true;
+  const table = await resolveWorkspaceAppsTable();
+
+  try {
+    return await run(table);
+  } catch (error) {
+    if (retryOnMissingAppsTable && table === 'apps' && isMissingAppsTableError(error)) {
+      resetWorkspaceAppsTableCache();
+      return run('websites');
+    }
+    throw error;
+  }
+}
+
 export const explorerService = {
   async getFolders(): Promise<Folder[]> {
     const { data, error } = await supabase
@@ -34,22 +96,26 @@ export const explorerService = {
   },
 
   async getApps(folderId: string | null): Promise<App[]> {
-    const query = supabase.from('apps').select('*');
-    if (folderId) query.eq('folder_id', folderId);
-    else query.is('folder_id', null);
+    return withWorkspaceAppsTable(async (table) => {
+      const query = supabase.from(table).select('*');
+      if (folderId) query.eq('folder_id', folderId);
+      else query.is('folder_id', null);
 
-    const { data, error } = await query.order('created_at', { ascending: true });
-    if (error) throw error;
-    return (data || []) as App[];
+      const { data, error } = await query.order('created_at', { ascending: true });
+      if (error) throw error;
+      return ((data || []) as Record<string, unknown>[]).map(normalizeAppRecord);
+    });
   },
 
   async getAllApps(): Promise<App[]> {
-    const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .order('created_at', { ascending: true });
-    if (error) throw error;
-    return (data || []) as App[];
+    return withWorkspaceAppsTable(async (table) => {
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return ((data || []) as Record<string, unknown>[]).map(normalizeAppRecord);
+    });
   },
 
   async createFolder(name: string, parentId: string | null): Promise<Folder> {
@@ -73,24 +139,30 @@ export const explorerService = {
     if (!name.trim()) throw new Error('App name is required.');
     if (!safeUrl) throw new Error('Enter a valid HTTP(S) URL.');
 
-    const { data, error } = await supabase
-      .from('apps')
-      .insert([
-        {
-          name,
-          url: safeUrl,
-          folder_id: folderId,
-          user_id: user.id,
-          icon: null,
-          description: null,
-          last_opened_at: null,
-          is_pinned: false,
-        },
-      ])
-      .select()
-      .single();
-    if (error) throw error;
-    return data as App;
+    return withWorkspaceAppsTable(async (table) => {
+      const payload =
+        table === 'apps'
+          ? {
+              name,
+              url: safeUrl,
+              folder_id: folderId,
+              user_id: user.id,
+              icon: null,
+              description: null,
+              last_opened_at: null,
+              is_pinned: false,
+            }
+          : {
+              name,
+              url: safeUrl,
+              folder_id: folderId,
+              user_id: user.id,
+            };
+
+      const { data, error } = await supabase.from(table).insert([payload]).select().single();
+      if (error) throw error;
+      return normalizeAppRecord((data || {}) as Record<string, unknown>);
+    });
   },
 
   async seedWorkspaceTemplate(template: WorkspaceTemplate): Promise<void> {
@@ -137,8 +209,9 @@ export const explorerService = {
       const appsInTemplate = templateApps(folderTemplate);
       if (appsInTemplate.length === 0) continue;
 
+      const table = await resolveWorkspaceAppsTable();
       const { data: existingApps, error: existingAppsError } = await supabase
-        .from('apps')
+        .from(table)
         .select('id, url')
         .eq('user_id', user.id)
         .eq('folder_id', folderId);
@@ -148,20 +221,29 @@ export const explorerService = {
       const existingUrlSet = new Set((existingApps || []).map((w) => w.url));
       const appsPayload = appsInTemplate
         .filter((website) => website.url && !existingUrlSet.has(website.url))
-        .map((website) => ({
-          name: website.name,
-          url: website.url,
-          folder_id: folderId,
-          user_id: user.id,
-          icon: null,
-          description: null,
-          last_opened_at: null,
-          is_pinned: false,
-        }));
+        .map((website) =>
+          table === 'apps'
+            ? {
+                name: website.name,
+                url: website.url,
+                folder_id: folderId,
+                user_id: user.id,
+                icon: null,
+                description: null,
+                last_opened_at: null,
+                is_pinned: false,
+              }
+            : {
+                name: website.name,
+                url: website.url,
+                folder_id: folderId,
+                user_id: user.id,
+              }
+        );
 
       if (appsPayload.length === 0) continue;
 
-      const { error: appsError } = await supabase.from('apps').insert(appsPayload);
+      const { error: appsError } = await supabase.from(table).insert(appsPayload);
 
       if (appsError) throw appsError;
     }
@@ -188,35 +270,45 @@ export const explorerService = {
       updateData.url = safeUrl;
     }
 
-    const { data, error } = await supabase
-      .from('apps')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data as App;
+    return withWorkspaceAppsTable(async (table) => {
+      const { data, error } = await supabase
+        .from(table)
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return normalizeAppRecord((data || {}) as Record<string, unknown>);
+    });
   },
 
   async setAppPinned(id: string, isPinned: boolean): Promise<void> {
-    const { error } = await supabase.from('apps').update({ is_pinned: isPinned }).eq('id', id);
-    if (error) throw error;
+    await withWorkspaceAppsTable(async (table) => {
+      if (table === 'websites') return;
+      const { error } = await supabase.from(table).update({ is_pinned: isPinned }).eq('id', id);
+      if (error) throw error;
+    });
   },
 
   async recordAppOpened(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('apps')
-      .update({ last_opened_at: new Date().toISOString() })
-      .eq('id', id);
-    if (error) throw error;
+    await withWorkspaceAppsTable(async (table) => {
+      if (table === 'websites') return;
+      const { error } = await supabase
+        .from(table)
+        .update({ last_opened_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+    });
   },
 
   async moveApp(id: string, newFolderId: string | null): Promise<void> {
-    const { error } = await supabase
-      .from('apps')
-      .update({ folder_id: newFolderId })
-      .eq('id', id);
-    if (error) throw error;
+    await withWorkspaceAppsTable(async (table) => {
+      const { error } = await supabase
+        .from(table)
+        .update({ folder_id: newFolderId })
+        .eq('id', id);
+      if (error) throw error;
+    });
   },
 
   async moveFolder(id: string, newParentId: string | null): Promise<void> {
@@ -237,21 +329,28 @@ export const explorerService = {
   },
 
   async deleteApp(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('apps')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await withWorkspaceAppsTable(async (table) => {
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    });
   },
 
   async searchApps(query: string): Promise<SearchResult[]> {
-    const { data, error } = await supabase
-      .from('apps')
-      .select('*, folders(name)')
-      .ilike('name', `%${query}%`)
-      .limit(10);
-    if (error) throw error;
-    return data as unknown as SearchResult[];
+    return withWorkspaceAppsTable(async (table) => {
+      const { data, error } = await supabase
+        .from(table)
+        .select('*, folders(name)')
+        .ilike('name', `%${query}%`)
+        .limit(10);
+      if (error) throw error;
+      return ((data || []) as Array<Record<string, unknown> & { folders?: { name: string } | null }>).map((row) => ({
+        ...normalizeAppRecord(row),
+        folders: row.folders ?? null,
+      }));
+    });
   },
 
   /**
@@ -268,6 +367,11 @@ export const explorerService = {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'apps', filter: `user_id=eq.${userId}` },
+        () => callback()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'websites', filter: `user_id=eq.${userId}` },
         () => callback()
       )
       .subscribe();

@@ -1,6 +1,7 @@
 import type { Folder, App } from '../types/explorer';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { buildFaviconUrl, getHostnameFromUrl } from '../platform/security/url';
 
 /** Passed to optional `onRun` for static / AI automations. */
 export interface CommandContext {
@@ -96,15 +97,6 @@ export function getRecentAppIds(): string[] {
   return readRecents(RECENT_APPS_KEY).map((e) => e.id);
 }
 
-function faviconFromUrl(url: string): string | undefined {
-  try {
-    const host = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-  } catch {
-    return undefined;
-  }
-}
-
 function folderByIdMap(folders: Folder[]): Map<string, Folder> {
   return new Map(folders.map((f) => [f.id, f]));
 }
@@ -139,18 +131,15 @@ export function normalizeCommandItems(folders: Folder[], apps: App[]): CommandPa
   const appItems: CommandPaletteItem[] = apps.map((a) => {
     const loc = folderPathSegments(a.folder_id, byId);
     const host = (() => {
-      try {
-        return new URL(a.url).hostname.replace(/^www\./, '');
-      } catch {
-        return a.url;
-      }
+      const hostname = getHostnameFromUrl(a.url);
+      return hostname ? hostname.replace(/^www\./, '') : a.url;
     })();
     return {
       id: a.id,
       type: 'app',
       name: a.name,
       description: a.description ?? undefined,
-      icon: a.icon ?? faviconFromUrl(a.url),
+      icon: a.icon ?? buildFaviconUrl(a.url, 64) ?? undefined,
       url: a.url,
       folder_id: a.folder_id,
       subtext: `${loc} · ${host}`,
