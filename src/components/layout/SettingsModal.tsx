@@ -29,14 +29,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
     const removedLocal = clearStorageKeys(localStorage, APP_LOCAL_STORAGE_KEYS);
     const removedSession = clearStorageKeys(sessionStorage, APP_SESSION_STORAGE_KEYS);
+    setTheme('system');
 
-    setLoadingAction(null);
     setFeedback({
       type: 'success',
       message: removedLocal + removedSession > 0
-        ? 'Local app preferences cleared. Your signed-in session was preserved.'
+        ? 'Local app preferences cleared. Refreshing the workspace now while preserving your signed-in session.'
         : 'No app-scoped cache was found to clear.',
     });
+    setLoadingAction(null);
+
+    if (removedLocal + removedSession > 0) {
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 900);
+    }
   };
 
   const handlePasswordReset = async () => {

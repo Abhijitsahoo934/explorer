@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [greeting, setGreeting] = useState({ text: 'Welcome back', icon: Sun });
+  const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
 
   // Modal States
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
@@ -70,6 +71,7 @@ export default function Dashboard() {
           .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           .slice(0, 4)
       );
+      setFolderTreeSyncKey((value) => value + 1);
     } catch (error) {
       logger.error('dashboard_fetch', error);
     } finally {
@@ -160,6 +162,7 @@ export default function Dashboard() {
         onFolderSelect={handleFolderSelect}
         onAddFolder={() => setIsFolderModalOpen(true)} 
         onAddApp={() => setIsAppModalOpen(true)}
+        folderTreeSyncKey={folderTreeSyncKey}
       />
       
       <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/40 border-l border-border backdrop-blur-3xl">

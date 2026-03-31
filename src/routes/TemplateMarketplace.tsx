@@ -33,6 +33,7 @@ export default function TemplateMarketplace() {
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<'success' | 'warning'>('success');
+  const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
   const [customTemplates, setCustomTemplates] = useState(getStoredWorkspaceTemplates());
   const [isSavingCurrentWorkspace, setIsSavingCurrentWorkspace] = useState(false);
 
@@ -78,6 +79,7 @@ export default function TemplateMarketplace() {
       });
       setFeedbackTone('success');
       setFeedback(`${selectedTemplate.title} installed successfully. Your workspace is ready to explore.`);
+      setFolderTreeSyncKey((value) => value + 1);
     } catch (error) {
       logger.error('template_marketplace_install', error, { templateId });
       setFeedbackTone('warning');
@@ -116,6 +118,7 @@ export default function TemplateMarketplace() {
       setActiveFilter('custom');
       setFeedbackTone('success');
       setFeedback(`${nextTemplate.title} saved. You now have a reusable template based on your own workspace.`);
+      setFolderTreeSyncKey((value) => value + 1);
     } catch (error) {
       logger.error('save_current_workspace_template', error);
       setFeedbackTone('warning');
@@ -195,6 +198,7 @@ export default function TemplateMarketplace() {
         onFolderSelect={handleFolderSelect}
         onAddFolder={() => navigate('/explorer')}
         onAddApp={() => navigate('/explorer')}
+        folderTreeSyncKey={folderTreeSyncKey}
       />
 
       <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/40 border-l border-border backdrop-blur-3xl">
