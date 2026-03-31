@@ -7,6 +7,9 @@ import { supabase } from '../../lib/supabase';
 import { useTheme } from '../ThemeProvider';
 import { SettingsModal } from './SettingsModal';
 import { useCommandPalette } from '../../hooks/useCommandPalette';
+import { useAuth } from '../../hooks/useAuth';
+import { getUserDisplayName, getUserInitials } from '../../lib/authProfile';
+import { logger } from '../../platform/observability/logger';
 
 interface AppNotification {
   id: string;
@@ -27,12 +30,12 @@ export const Topbar: React.FC = () => {
   // Profile & Settings States
   const [showProfile, setShowProfile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   
   const notifDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   
   const { resolvedTheme, setTheme } = useTheme();
+  const { user } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
@@ -40,10 +43,8 @@ export const Topbar: React.FC = () => {
 
     const fetchAndSubscribe = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.auth.getUser();
         if (!isMounted) return;
-
-        if (user) setUserEmail(user.email ?? null);
 
         const notifs = await notificationService.getNotifications();
         if (!isMounted) return;
@@ -56,14 +57,14 @@ export const Topbar: React.FC = () => {
             .then((next) => {
               if (isMounted) setNotifications(next as AppNotification[]);
             })
-            .catch((e) => console.error('Notification refresh failed:', e));
+            .catch((e) => logger.warn('notification_refresh', 'Notification refresh failed', { error: e }));
         };
 
         subscription = (await notificationService.subscribeToNotifications(refetch)) as {
           unsubscribe: () => void;
         };
       } catch (error) {
-        console.error("Topbar init error:", error);
+        logger.error('topbar_init', error);
       }
     };
 
@@ -80,7 +81,7 @@ export const Topbar: React.FC = () => {
       await notificationService.markAllAsRead();
       setNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
     } catch (error) {
-      console.error('Mark all as read failed:', error);
+      logger.error('notifications_mark_all_read', error);
     }
   };
 
@@ -95,7 +96,7 @@ export const Topbar: React.FC = () => {
         )
       );
     } catch (error) {
-      console.error('Mark as read failed:', error);
+      logger.error('notifications_mark_read', error, { notificationId });
     }
   };
 
@@ -119,6 +120,8 @@ export const Topbar: React.FC = () => {
   };
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
+  const userDisplayName = getUserDisplayName(user);
+  const userInitials = getUserInitials(user);
 
   return (
     <>
@@ -219,8 +222,8 @@ export const Topbar: React.FC = () => {
             )}
           </AnimatePresence>
 
-          <div id="profile-btn" onClick={() => setShowProfile(!showProfile)} className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-105 transition-all ml-2">
-            <User size={16} strokeWidth={3} />
+          <div id="profile-btn" onClick={() => setShowProfile(!showProfile)} className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-105 transition-all ml-2 text-xs font-black tracking-wide uppercase">
+            {userInitials || <User size={16} strokeWidth={3} />}
           </div>
 
           {/* Profile Dropdown Placeholder (Re-use your existing profile logic here) */}
@@ -229,7 +232,8 @@ export const Topbar: React.FC = () => {
               <motion.div ref={profileDropdownRef} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+16px)] right-0 w-64 bg-card border border-border rounded-2xl shadow-premium p-2 z-50 backdrop-blur-2xl">
                 <div className="p-3 bg-background/50 rounded-xl mb-2">
                     <p className="text-[10px] uppercase font-black text-muted tracking-widest mb-1">User Instance</p>
-                    <p className="text-xs font-bold truncate text-foreground">{userEmail}</p>
+                    <p className="text-sm font-bold truncate text-foreground">{userDisplayName}</p>
+                    <p className="text-xs truncate text-muted mt-1">{user?.email}</p>
                 </div>
                 <button onClick={() => { setIsSettingsOpen(true); setShowProfile(false); }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted hover:text-foreground hover:bg-card-hover transition-all">
                   <Settings size={14} /> Preferences

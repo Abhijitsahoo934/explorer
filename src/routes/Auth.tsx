@@ -10,13 +10,16 @@ import { Button } from '../components/ui/Button';
 import { Grain } from '../components/ui/Grain';
 import { LayoutGrid, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { GoogleLogo } from '../components/ui/GoogleLogo';
+import { getErrorMessage } from '../lib/errorMessage';
 
 const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnTo = searchParams.get('returnTo') ?? null;
@@ -32,13 +35,24 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setFeedback(null);
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const displayName = fullName.trim();
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: displayName,
+              display_name: displayName,
+            },
+          },
+        });
         if (error) throw error;
         trackFunnelEvent('signup_submitted');
-        setError('Verification link sent. Check your inbox to activate your workspace.');
+        setFeedback('Verification link sent. Check your inbox to activate your workspace.');
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -47,7 +61,33 @@ const Auth: React.FC = () => {
         navigate(returnTo || '/dashboard');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unable to authenticate.');
+      setError(getErrorMessage(err, 'Unable to authenticate.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setError('Enter your email first, then click Forgot password.');
+      setFeedback(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setFeedback(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/auth/callback?flow=recovery&next=${encodeURIComponent('/update-password')}`,
+      });
+
+      if (error) throw error;
+
+      setFeedback(`Password reset link sent to ${email.trim()}. Open that email to continue securely.`);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Unable to send reset email.'));
     } finally {
       setLoading(false);
     }
@@ -130,6 +170,22 @@ const Auth: React.FC = () => {
 
             {/* Form */}
             <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <label className="block text-[10px] uppercase tracking-widest text-muted font-bold ml-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
+                    placeholder="Abhijit Sahoo"
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
                 <label className="block text-[10px] uppercase tracking-widest text-muted font-bold ml-1">
                   Email Address
@@ -162,10 +218,33 @@ const Auth: React.FC = () => {
                     placeholder="••••••••"
                   />
                 </div>
+                {!isSignUp && (
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      disabled={loading}
+                      className="text-[10px] uppercase tracking-widest font-black text-accent hover:text-accent/80 transition-colors disabled:opacity-60"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Error State */}
               <AnimatePresence mode="wait">
+                {feedback && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                    animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                    className="flex items-center gap-2 text-emerald-600 dark:text-emerald-300 text-xs bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl font-medium overflow-hidden"
+                  >
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>{feedback}</span>
+                  </motion.div>
+                )}
                 {error && (
                   <motion.div 
                     initial={{ opacity: 0, height: 0, marginTop: 0 }}
@@ -196,6 +275,7 @@ const Auth: React.FC = () => {
                 onClick={() => {
                   setIsSignUp(!isSignUp);
                   setError(null);
+                  setFeedback(null);
                 }}
                 className="group text-muted hover:text-foreground text-xs font-bold transition-colors focus:outline-none"
               >

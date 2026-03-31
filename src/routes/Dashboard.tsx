@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { explorerService } from '../lib/explorerService';
 import { WORKSPACE_TEMPLATES } from '../lib/workspaceTemplates';
 import { Sidebar } from '../components/layout/Sidebar';
@@ -21,15 +20,17 @@ import { readStorageValue, writeStorageValue } from '../platform/storage/browser
 import { buildFaviconUrl, openExternalUrl } from '../platform/security/url';
 import { getErrorMessage } from '../lib/errorMessage';
 import { logger } from '../platform/observability/logger';
+import { useAuth } from '../hooks/useAuth';
+import { getUserFirstName } from '../lib/authProfile';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats] = useState({ folders: 0, apps: 0 });
   const [recentApps, setRecentApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState('');
   const [greeting, setGreeting] = useState({ text: 'Welcome back', icon: Sun });
   const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
 
@@ -52,11 +53,6 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserName(user.email?.split('@')[0] || 'Explorer');
-      }
-
       const [folders, allApps] = await Promise.all([
         explorerService.getFolders(),
         explorerService.getAllApps(),
@@ -147,6 +143,7 @@ export default function Dashboard() {
   };
 
   const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ?? WORKSPACE_TEMPLATES[0];
+  const userName = getUserFirstName(user);
 
   return (
     <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
