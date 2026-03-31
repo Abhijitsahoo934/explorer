@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
 
@@ -24,6 +24,29 @@ const RouteLoader = () => (
     </p>
   </div>
 );
+
+const RecoveryHashRedirect = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
+    if (!hash) return;
+
+    const hashParams = new URLSearchParams(hash);
+    const hasRecoveryToken =
+      Boolean(hashParams.get('access_token')) &&
+      (hashParams.get('type') === 'recovery' || location.pathname === '/');
+
+    if (!hasRecoveryToken || location.pathname === '/update-password' || location.pathname === '/auth/callback') {
+      return;
+    }
+
+    navigate(`/update-password${window.location.hash}`, { replace: true });
+  }, [location.pathname, navigate]);
+
+  return null;
+};
 
 /**
  * Protected Route Wrapper
@@ -78,6 +101,7 @@ function App() {
   return (
     <Router>
       <CommandPaletteProvider>
+      <RecoveryHashRedirect />
       <Suspense fallback={<RouteLoader />}>
         <Routes>
           {/* Public Routes */}

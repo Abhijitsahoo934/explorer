@@ -18,6 +18,10 @@ export default function AuthCallback() {
       try {
         const url = new URL(window.location.href);
         const authCode = url.searchParams.get('code');
+        const nextRoute = url.searchParams.get('next');
+        const flow = url.searchParams.get('flow');
+        const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+        const hashType = hashParams.get('type');
         const authError =
           url.searchParams.get('error_description') ??
           url.searchParams.get('error');
@@ -43,11 +47,14 @@ export default function AuthCallback() {
         }
 
         if (data.session) {
-          trackFunnelEvent('oauth_login');
+          const isRecoveryFlow = flow === 'recovery' || hashType === 'recovery';
+          if (!isRecoveryFlow) {
+            trackFunnelEvent('oauth_login');
+          }
           prefetchAuthenticatedRoutes();
           const storedReturnTo = readStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo);
           removeStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo);
-          navigate(storedReturnTo || '/dashboard', { replace: true });
+          navigate(isRecoveryFlow ? nextRoute || '/update-password' : storedReturnTo || '/dashboard', { replace: true });
         } else {
           throw new Error('Google sign-in did not create a session.');
         }
