@@ -14,7 +14,22 @@ import {
   getStoredWorkspaceTemplates,
   saveWorkspaceTemplateDefinition,
 } from '../lib/workspaceTemplates';
-import { Briefcase, CheckCircle2, Code2, Filter, Rocket, Sparkles, BookmarkPlus, Trash2, Share2, Copy, X } from 'lucide-react';
+import {
+  Briefcase,
+  CheckCircle2,
+  Code2,
+  Filter,
+  Rocket,
+  Sparkles,
+  BookmarkPlus,
+  Trash2,
+  Share2,
+  Copy,
+  X,
+  Palette,
+  GraduationCap,
+  Search,
+} from 'lucide-react';
 import { trackFunnelEvent } from '../lib/analyticsService';
 import { getErrorMessage } from '../lib/errorMessage';
 import { logger } from '../platform/observability/logger';
@@ -22,9 +37,11 @@ import { Seo } from '../components/system/Seo';
 
 const FILTERS = [
   { id: 'all', label: 'All Templates', icon: Sparkles },
-  { id: 'founders', label: 'Founders', icon: Rocket },
-  { id: 'builders', label: 'Builders', icon: Code2 },
-  { id: 'operators', label: 'Operators', icon: Briefcase },
+  { id: 'business', label: 'Business', icon: Rocket },
+  { id: 'technical', label: 'Technical', icon: Code2 },
+  { id: 'creative', label: 'Creative', icon: Palette },
+  { id: 'creators', label: 'Creators', icon: Briefcase },
+  { id: 'specialized', label: 'Specialized', icon: GraduationCap },
   { id: 'custom', label: 'My Templates', icon: BookmarkPlus },
 ] as const;
 
@@ -32,6 +49,7 @@ export default function TemplateMarketplace() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]['id']>('all');
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<'success' | 'warning'>('success');
   const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
@@ -52,9 +70,27 @@ export default function TemplateMarketplace() {
   );
 
   const filteredTemplates = useMemo(() => {
-    if (activeFilter === 'all') return templates;
-    return templates.filter((template) => template.category === activeFilter);
-  }, [activeFilter, templates]);
+    const byCategory =
+      activeFilter === 'all' ? templates : templates.filter((template) => template.category === activeFilter);
+
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return byCategory;
+
+    return byCategory.filter((template) => {
+      const haystack = [
+        template.title,
+        template.subtitle,
+        template.audience,
+        ...(template.tags ?? []),
+        ...template.template.folders.map((folder) => folder.name),
+        ...template.template.folders.flatMap((folder) => folder.apps.map((app) => app.name)),
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(q);
+    });
+  }, [activeFilter, searchQuery, templates]);
 
   const handleFolderSelect = (folderId: string | null) => {
     if (folderId) {
@@ -212,11 +248,11 @@ export default function TemplateMarketplace() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
                   <Sparkles size={12} />
-                  Template Marketplace
+                  Professional Ecosystems
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">Install or create a category-defining workspace</h1>
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">Install a real operating system for your profession</h1>
                 <p className="text-sm md:text-base text-muted mt-3 max-w-3xl leading-relaxed">
-                  Curated operating systems for founders, builders, and operators, plus reusable templates saved from your own live workspace.
+                  Curated workspace systems for builders, creators, operators, and specialists, plus reusable templates saved from your own live setup.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -243,6 +279,15 @@ export default function TemplateMarketplace() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              <div className="relative min-w-[280px] flex-1 max-w-xl">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                <input
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search by profession, tool, or workflow..."
+                  className="h-11 w-full rounded-2xl border border-border bg-card/70 pl-11 pr-4 text-sm text-foreground outline-none transition-all placeholder:text-muted focus:border-accent/30 focus:ring-4 focus:ring-accent/10"
+                />
+              </div>
               <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-card/70 text-[10px] uppercase tracking-widest font-black text-muted">
                 <Filter size={12} />
                 Filter
@@ -261,6 +306,21 @@ export default function TemplateMarketplace() {
                   {filter.label}
                 </button>
               ))}
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-border bg-card/60 p-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Curated systems</p>
+                <p className="mt-2 text-2xl font-black text-foreground">{CURATED_WORKSPACE_TEMPLATES.length}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-card/60 p-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Visible results</p>
+                <p className="mt-2 text-2xl font-black text-foreground">{filteredTemplates.length}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-card/60 p-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Use case</p>
+                <p className="mt-2 text-sm font-bold text-foreground">From startup teams to creators and specialists</p>
+              </div>
             </div>
 
             {feedback && (
@@ -342,6 +402,13 @@ export default function TemplateMarketplace() {
                 </SpotlightCard>
               ))}
             </div>
+
+            {filteredTemplates.length === 0 && (
+              <div className="rounded-[2rem] border border-dashed border-border bg-card/40 p-10 text-center">
+                <p className="text-lg font-black text-foreground">No ecosystem matched that search.</p>
+                <p className="mt-2 text-sm text-muted">Try a profession like “developer”, “teacher”, “founder”, or a tool like “Figma” or “Supabase”.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>
