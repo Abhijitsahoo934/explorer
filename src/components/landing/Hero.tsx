@@ -85,8 +85,8 @@ export default function Hero() {
         </h1>
 
         <p className="hero-subtitle text-lg md:text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
-          Explorer transforms chaotic tabs, forgotten bookmarks, and scattered tools into a structured workspace
-          that stays organized across browsers, machines, and sessions.
+          Explorer gives your browser a clean operating surface for work. Organize apps into folders, launch faster,
+          and keep the same setup across browsers, machines, and sessions.
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-4 mb-8 z-30">
@@ -111,13 +111,13 @@ export default function Hero() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-4xl mb-16">
           <div className="hero-proof rounded-2xl border border-border bg-card/60 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
-            Structured workspaces instead of bookmark clutter
+            Structured workspaces instead of scattered links
           </div>
           <div className="hero-proof rounded-2xl border border-border bg-card/60 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
-            Command palette for instant access
+            Fast launch and command palette access
           </div>
           <div className="hero-proof rounded-2xl border border-border bg-card/60 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
-            Same setup across browsers and devices
+            The same setup across browsers and devices
           </div>
         </div>
       </div>

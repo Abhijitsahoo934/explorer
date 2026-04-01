@@ -5,12 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import ProductPreview from '../components/landing/ProductPreview';
-import ProblemSection from '../components/landing/sections/ProblemSection';
-import SolutionReveal from '../components/landing/sections/SolutionReveal';
 import FeaturesGrid from '../components/landing/sections/FeaturesGrid';
 import UseCases from '../components/landing/sections/UseCases';
-import WorkflowSteps from '../components/landing/sections/WorkflowSteps';
-import BenefitsSection from '../components/landing/sections/BenefitsSection';
 import FinalCTA from '../components/landing/sections/FinalCTA';
 import Footer from '../components/landing/Footer';
 
@@ -70,16 +66,6 @@ export default function Landing() {
           <ProductPreview />
         </section>
 
-        {/* Problem Section */}
-        <section id="problem" className="relative">
-          <ProblemSection />
-        </section>
-
-        {/* Solution Reveal */}
-        <section id="solution" className="relative">
-          <SolutionReveal />
-        </section>
-
         {/* Features Grid */}
         <section id="features" className="relative">
           <FeaturesGrid />
@@ -88,16 +74,6 @@ export default function Landing() {
         {/* Use Cases */}
         <section id="use-cases" className="relative">
           <UseCases />
-        </section>
-
-        {/* Workflow Steps */}
-        <section id="workflow" className="relative">
-          <WorkflowSteps />
-        </section>
-
-        {/* Benefits */}
-        <section id="benefits" className="relative">
-          <BenefitsSection />
         </section>
 
         {/* Final CTA */}

@@ -79,12 +79,12 @@ export default function ProductPreview() {
             Product Surface
           </div>
           <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
-            Built to feel like
+            One place for the
             <br />
-            software, not a saved-links list.
+            tools you actually use.
           </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto mt-6 leading-relaxed">
-            Explorer combines structured folders, launch-ready apps, and keyboard-first control so your internet workflow feels intentional, portable, and fast.
+            Keep your work stack structured by purpose, not memory. Explorer helps you move from browser chaos to a setup that feels calm, clear, and repeatable.
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export default function ProductPreview() {
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-muted font-black">Explorer Workspace</p>
-                  <h3 className="text-lg font-black text-foreground">Startup Operating Surface</h3>
+                  <h3 className="text-lg font-black text-foreground">A workspace built around real flow</h3>
                 </div>
               </div>
               <div className="hidden md:flex items-center gap-2">
@@ -148,7 +148,7 @@ export default function ProductPreview() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">4 linked tools</p>
-                    <p className="text-sm text-muted mt-1">Organized by workflow, not by memory.</p>
+                    <p className="text-sm text-muted mt-1">Open what matters. Ignore the noise.</p>
                   </div>
                 </div>
 
@@ -171,7 +171,7 @@ export default function ProductPreview() {
                 <div className="mt-5 grid gap-4 md:grid-cols-3">
                   <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
-                    <p className="mt-3 text-sm font-bold text-foreground">Fewer tabs, faster start</p>
+                    <p className="mt-3 text-sm font-bold text-foreground">Fewer tabs. Faster start.</p>
                   </div>
                   <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Behavior</p>
@@ -179,7 +179,7 @@ export default function ProductPreview() {
                   </div>
                   <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Advantage</p>
-                    <p className="mt-3 text-sm font-bold text-foreground">Installable workflows</p>
+                    <p className="mt-3 text-sm font-bold text-foreground">Portable workflow setup</p>
                   </div>
                 </div>
               </div>

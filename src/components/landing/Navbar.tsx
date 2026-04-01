@@ -36,9 +36,6 @@ export default function Navbar() {
           <a href="#use-cases" className="hover:text-foreground transition-colors">
             Use Cases
           </a>
-          <a href="#workflow" className="hover:text-foreground transition-colors">
-            How It Works
-          </a>
         </div>
 
         {/* Auth Buttons */}
