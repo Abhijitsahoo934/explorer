@@ -112,8 +112,8 @@ export default function Landing() {
       {/* Background Elements - Fixed, non-interfering */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         {/* Gradient Orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-accent/20 to-purple-500/20 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-accent/20 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-0 left-1/4 w-[32rem] h-[32rem] bg-gradient-to-br from-accent/18 to-sky-400/12 rounded-full blur-3xl opacity-25" />
+        <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-gradient-to-br from-sky-400/14 to-accent/12 rounded-full blur-3xl opacity-20" />
         
         {/* Subtle Grid */}
         <div 

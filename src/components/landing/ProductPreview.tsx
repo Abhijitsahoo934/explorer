@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FolderTree, Globe, Github, Figma, MessageSquare, Sparkles } from 'lucide-react';
+import { FolderTree, Globe, Github, Figma, MessageSquare, Sparkles, ShieldCheck, Command } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,15 +76,15 @@ export default function ProductPreview() {
         <div className="preview-header text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.25em] font-black text-accent mb-6">
             <Sparkles size={12} />
-            Product Preview
+            Product Surface
           </div>
           <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
-            Your browser,
+            Built to feel like
             <br />
-            structured like an operating system.
+            software, not a saved-links list.
           </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto mt-6 leading-relaxed">
-            Keep folders, tools, and workflows in one elegant workspace so your team can move with clarity instead of tab chaos.
+            Explorer combines structured folders, launch-ready apps, and keyboard-first control so your internet workflow feels intentional, portable, and fast.
           </p>
         </div>
 
@@ -102,15 +102,20 @@ export default function ProductPreview() {
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-muted font-black">Explorer Workspace</p>
-                  <h3 className="text-lg font-black text-foreground">Startup Command Center</h3>
+                  <h3 className="text-lg font-black text-foreground">Startup Operating Surface</h3>
                 </div>
               </div>
               <div className="hidden md:flex items-center gap-2">
+                <div className="px-3 py-1 rounded-full bg-background/80 text-foreground text-[10px] uppercase tracking-widest font-black border border-border inline-flex items-center gap-1.5">
+                  <Command size={11} />
+                  Ctrl K
+                </div>
                 <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 text-[10px] uppercase tracking-widest font-black">
                   Live Sync
                 </div>
-                <div className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] uppercase tracking-widest font-black">
-                  Focus Mode
+                <div className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] uppercase tracking-widest font-black inline-flex items-center gap-1.5">
+                  <ShieldCheck size={11} />
+                  Secure
                 </div>
               </div>
             </div>
@@ -161,6 +166,21 @@ export default function ProductPreview() {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-3">
+                  <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
+                    <p className="mt-3 text-sm font-bold text-foreground">Fewer tabs, faster start</p>
+                  </div>
+                  <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Behavior</p>
+                    <p className="mt-3 text-sm font-bold text-foreground">Context stays organized</p>
+                  </div>
+                  <div className="preview-card rounded-[1.25rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Advantage</p>
+                    <p className="mt-3 text-sm font-bold text-foreground">Installable workflows</p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,261 +1,167 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Play, Sparkles, Github, Figma, MessageSquare } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Command, FolderTree, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-gsap.registerPlugin(ScrollTrigger);
+const TRUST_POINTS = [
+  'Structured workspaces instead of bookmark clutter',
+  'Command palette for instant access',
+  'Cross-browser sync with your account',
+] as const;
+
+const WORKSPACE_ROWS = [
+  { label: 'Founder OS', apps: 'Pitch Deck, Stripe, Analytics' },
+  { label: 'Developer OS', apps: 'GitHub, Docs, Vercel' },
+  { label: 'Student OS', apps: 'Research, Notes, Assignments' },
+] as const;
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mockupRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero text reveal animation
-      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      tl.fromTo(
-        '.hero-badge',
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, delay: 0.3 }
-      )
-        .fromTo(
-          '.hero-title-line',
-          { y: 100, opacity: 0, rotateX: -20 },
-          { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.15 },
-          '-=0.8'
-        )
-        .fromTo(
-          '.hero-subtitle',
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1 },
-          '-=0.8'
-        )
-        .fromTo(
-          '.hero-cta',
-          { y: 20, opacity: 0, scale: 0.95 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.1 },
-          '-=0.6'
-        );
-
-      // 3D mockup scroll animation
-      if (mockupRef.current) {
-        gsap.fromTo(
-          mockupRef.current,
-          {
-            rotateX: 45,
-            scale: 0.85,
-            y: 100,
-            opacity: 0,
-          },
-          {
-            rotateX: 0,
-            scale: 1,
-            y: -50,
-            opacity: 1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: 'top top',
-              end: '+=800',
-              scrub: 1,
-            },
-          }
-        );
-      }
-
-      // Folder cards animation
-      gsap.fromTo(
-        '.workspace-card',
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          delay: 1.5,
-          ease: 'power3.out',
-        }
-      );
+      tl.fromTo('.hero-eyebrow', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, delay: 0.15 })
+        .fromTo('.hero-headline', { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, '-=0.4')
+        .fromTo('.hero-copy', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75 }, '-=0.45')
+        .fromTo('.hero-cta', { y: 18, opacity: 0, scale: 0.98 }, { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.08 }, '-=0.45')
+        .fromTo('.hero-proof', { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, stagger: 0.07 }, '-=0.35')
+        .fromTo('.hero-surface', { y: 40, opacity: 0, scale: 0.98 }, { y: 0, opacity: 1, scale: 1, duration: 0.9 }, '-=0.5');
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 px-6"
-      style={{ perspective: '2000px' }}
-    >
-      {/* Hero Content */}
-      <div className="relative z-20 container mx-auto text-center flex flex-col items-center max-w-6xl">
-        {/* Badge */}
-        <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-glass border border-border text-xs font-bold text-muted mb-8 tracking-wider uppercase backdrop-blur-md">
-          <Sparkles size={14} className="text-accent" />
-          <span className="gradient-text">Browser Explorer v2.0</span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground mb-6 leading-[0.9] uppercase">
-          <div className="overflow-hidden pb-2">
-            <div className="hero-title-line">Browse Like</div>
-          </div>
-          <div className="overflow-hidden">
-            <div className="hero-title-line gradient-text">A File System.</div>
-          </div>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="hero-subtitle text-lg md:text-xl text-muted max-w-2xl mx-auto mb-12 leading-relaxed">
-          Explorer transforms your browser into a structured workspace where websites live inside folders instead of messy tabs.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-20 z-30">
-          <button
-            onClick={() => navigate('/auth')}
-            className="hero-cta group h-14 px-8 text-sm font-bold tracking-wide bg-accent text-white hover:bg-accent-hover rounded-xl shadow-glow hover:shadow-glow-lg transition-all duration-300 flex items-center gap-2"
-          >
-            Launch Workspace
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-
-          <button className="hero-cta flex items-center gap-3 text-muted hover:text-foreground transition-colors text-sm font-semibold group">
-            <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-glass group-hover:bg-card-hover transition-colors backdrop-blur-md">
-              <Play size={16} className="ml-0.5 fill-current" />
-            </div>
-            Watch Demo
-          </button>
-        </div>
-      </div>
-
-      {/* 3D Mockup with Realistic Content */}
-      <div
-        className="relative z-10 w-full max-w-6xl"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        <div
-          ref={mockupRef}
-          className="w-full aspect-[16/10] rounded-3xl border border-border bg-card/50 backdrop-blur-xl overflow-hidden shadow-premium"
-        >
-          {/* Window Header */}
-          <div className="h-12 border-b border-border bg-sidebar/50 flex items-center px-6 gap-2 backdrop-blur-md">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+    <section ref={containerRef} className="relative px-6 pt-32 pb-20 md:pt-36 md:pb-28">
+      <div className="container mx-auto max-w-7xl">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="max-w-3xl">
+            <div className="hero-eyebrow inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-accent shadow-sm backdrop-blur-xl">
+              <Sparkles size={12} />
+              Workspace OS For The Modern Web
             </div>
 
-            <div className="mx-auto flex items-center gap-2 px-4 py-1.5 rounded-lg bg-background/50 border border-border text-xs text-muted font-mono">
-              explorer://workspace/coding
+            <h1 className="hero-headline mt-7 text-5xl font-black tracking-[-0.06em] text-foreground md:text-7xl lg:text-[5.4rem] leading-[0.92]">
+              Stop saving links.
+              <span className="block text-muted">Start installing</span>
+              <span className="block">workspaces.</span>
+            </h1>
+
+            <p className="hero-copy mt-7 max-w-2xl text-lg leading-8 text-muted md:text-xl">
+              Explorer turns scattered tabs, forgotten bookmarks, and disconnected tools into a structured workspace
+              you can open from any browser, on any machine, with the same organized flow.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => navigate('/auth')}
+                className="hero-cta inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-foreground px-7 text-[11px] font-black uppercase tracking-[0.16em] text-background shadow-sm transition-all hover:-translate-y-0.5 hover:opacity-90"
+              >
+                Start Your Workspace
+                <ArrowRight size={16} />
+              </button>
+
+              <a
+                href="#product-preview"
+                className="hero-cta inline-flex h-14 items-center justify-center gap-2 rounded-2xl border border-border bg-card/70 px-7 text-[11px] font-black uppercase tracking-[0.16em] text-foreground shadow-sm backdrop-blur-xl transition-all hover:border-accent/30 hover:bg-card-hover"
+              >
+                See Product Walkthrough
+              </a>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {TRUST_POINTS.map((point) => (
+                <div key={point} className="hero-proof flex items-start gap-3 rounded-2xl border border-border bg-card/55 px-4 py-4 backdrop-blur-xl">
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-accent" />
+                  <p className="text-sm font-medium leading-6 text-foreground">{point}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Workspace Content */}
-          <div className="p-6 h-[calc(100%-3rem)] flex gap-6">
-            {/* Sidebar with Folders */}
-            <div className="hidden md:flex w-56 h-full rounded-xl border border-border bg-sidebar/50 flex-col gap-2 p-4 backdrop-blur-sm">
-              <div className="text-xs font-semibold text-muted mb-2 px-2">Folders</div>
-              
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 border border-accent/20 text-sm font-medium text-foreground">
-                <div className="w-4 h-4 rounded bg-accent/20" />
-                Coding
-              </div>
-              
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-card-hover text-sm text-muted">
-                <div className="w-4 h-4 rounded bg-muted/20" />
-                Design
-              </div>
-              
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-card-hover text-sm text-muted">
-                <div className="w-4 h-4 rounded bg-muted/20" />
-                AI Tools
-              </div>
-              
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-card-hover text-sm text-muted">
-                <div className="w-4 h-4 rounded bg-muted/20" />
-                Learning
-              </div>
-            </div>
+          <div className="hero-surface relative">
+            <div className="absolute -top-10 right-10 h-40 w-40 rounded-full bg-accent/10 blur-[110px]" />
+            <div className="absolute -bottom-8 left-8 h-40 w-40 rounded-full bg-sky-400/10 blur-[110px]" />
 
-            {/* Main Workspace Grid */}
-            <div className="flex-1 h-full flex flex-col gap-4">
-              {/* Search Bar */}
-              <div className="w-full h-12 rounded-xl bg-background/50 border border-border flex items-center px-4">
-                <div className="w-1/3 h-4 rounded bg-muted/10" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/78 shadow-premium backdrop-blur-2xl">
+              <div className="border-b border-border px-5 py-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-[var(--surface-strong)]">
+                      <FolderTree size={18} className="text-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Explorer Workspace</p>
+                      <p className="mt-1 text-lg font-black tracking-tight text-foreground">Command center, not bookmark clutter</p>
+                    </div>
+                  </div>
+
+                  <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
+                    <ShieldCheck size={12} />
+                    Secure Sync
+                  </div>
+                </div>
               </div>
 
-              {/* Website Cards Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1">
-                {/* GitHub Card */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center mb-3">
-                    <Github size={20} className="text-accent" />
+              <div className="space-y-5 p-5">
+                <div className="rounded-[1.5rem] border border-border bg-background/80 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card/70 text-accent">
+                      <Command size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Command Palette</p>
+                      <p className="mt-1 truncate text-sm font-semibold text-foreground">Open Startup Workspace</p>
+                    </div>
+                    <kbd className="ml-auto rounded-lg border border-border bg-card px-2 py-1 text-[10px] font-black uppercase tracking-widest text-muted">
+                      Ctrl K
+                    </kbd>
                   </div>
-                  <div className="text-sm font-semibold text-foreground mb-1">GitHub</div>
-                  <div className="text-xs text-muted">Code hosting platform</div>
                 </div>
 
-                {/* Stack Overflow Card */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group">
-                  <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-3">
-                    <div className="w-5 h-5 rounded bg-orange-500/20" />
-                  </div>
-                  <div className="text-sm font-semibold text-foreground mb-1">StackOverflow</div>
-                  <div className="text-xs text-muted">Developer community</div>
+                <div className="space-y-3">
+                  {WORKSPACE_ROWS.map((row, index) => (
+                    <div
+                      key={row.label}
+                      className={`rounded-[1.5rem] border px-4 py-4 ${
+                        index === 0 ? 'border-accent/25 bg-accent/10' : 'border-border bg-background/70'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-black text-foreground">{row.label}</p>
+                          <p className="mt-1 text-sm text-muted">{row.apps}</p>
+                        </div>
+                        <div className="rounded-full border border-border bg-card px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                          Ready
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
-                {/* React Docs Card */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group">
-                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3">
-                    <div className="w-5 h-5 rounded bg-blue-500/20" />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-[1.4rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Use Case</p>
+                    <p className="mt-3 text-xl font-black text-foreground">Developers</p>
                   </div>
-                  <div className="text-sm font-semibold text-foreground mb-1">React Docs</div>
-                  <div className="text-xs text-muted">Official documentation</div>
-                </div>
-
-                {/* Figma Card */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group">
-                  <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3">
-                    <Figma size={20} className="text-purple-500" />
+                  <div className="rounded-[1.4rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Use Case</p>
+                    <p className="mt-3 text-xl font-black text-foreground">Founders</p>
                   </div>
-                  <div className="text-sm font-semibold text-foreground mb-1">Figma</div>
-                  <div className="text-xs text-muted">Design platform</div>
-                </div>
-
-                {/* ChatGPT Card */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group">
-                  <div className="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-3">
-                    <MessageSquare size={20} className="text-green-500" />
+                  <div className="rounded-[1.4rem] border border-border bg-background/70 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Use Case</p>
+                    <p className="mt-3 text-xl font-black text-foreground">Students</p>
                   </div>
-                  <div className="text-sm font-semibold text-foreground mb-1">ChatGPT</div>
-                  <div className="text-xs text-muted">AI assistant</div>
-                </div>
-
-                {/* More Card (Placeholder) */}
-                <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/50 transition-all duration-300 cursor-pointer group opacity-50">
-                  <div className="w-10 h-10 rounded-lg bg-muted/10 border border-muted/20 flex items-center justify-center mb-3">
-                    <div className="text-2xl text-muted">+</div>
-                  </div>
-                  <div className="text-sm font-semibold text-muted mb-1">Add more</div>
-                  <div className="text-xs text-muted/50">Organize tools</div>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Glow Effects */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-purple-500/5 pointer-events-none" />
         </div>
       </div>
-
-      {/* Floating gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl opacity-20 animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '1s' }} />
     </section>
   );
 }
