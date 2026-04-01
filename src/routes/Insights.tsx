@@ -6,6 +6,7 @@ import { Grain } from '../components/ui/Grain';
 import { Button } from '../components/ui/Button';
 import { fetchMyProductEvents, type ProductEventRow } from '../lib/analyticsService';
 import { BarChart3, RefreshCw, TrendingUp, MousePointerClick, Activity } from 'lucide-react';
+import { Seo } from '../components/system/Seo';
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
@@ -90,6 +91,7 @@ export default function Insights() {
 
   return (
     <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
+      <Seo title="Insights | Explorer" robots="noindex,nofollow" canonicalPath="/insights" />
       <Grain />
       <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 

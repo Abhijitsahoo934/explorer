@@ -29,6 +29,7 @@ import { useAuth } from '../hooks/useAuth';
 import { recordFolderUsage } from '../lib/contextEngine';
 import { logger } from '../platform/observability/logger';
 import { getErrorMessage } from '../lib/errorMessage';
+import { Seo } from '../components/system/Seo';
 
 // --- MAIN WORKSPACE DROPPABLE FOLDER CARD ---
 const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () => void }) => {
@@ -250,6 +251,7 @@ const Explorer: React.FC = () => {
       onDragEnd={handleDragEnd}
     >
       <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/30 selection:text-white transition-colors duration-500 relative">
+        <Seo title="Explorer Workspace | Explorer" robots="noindex,nofollow" canonicalPath="/explorer" />
         <Grain opacity={0.3} />
         
         <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />

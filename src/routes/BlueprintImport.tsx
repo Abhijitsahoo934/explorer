@@ -8,6 +8,7 @@ import { Grain } from '../components/ui/Grain';
 import { motion } from 'framer-motion';
 import { FolderPlus, Link2, Sparkles, AlertCircle } from 'lucide-react';
 import { trackFunnelEvent } from '../lib/analyticsService';
+import { Seo } from '../components/system/Seo';
 
 type DecodedBlueprint = WorkspaceTemplate;
 
@@ -100,6 +101,7 @@ export default function BlueprintImport() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
+      <Seo title="Install Blueprint | Explorer" robots="noindex,nofollow" canonicalPath="/blueprint" />
       <Grain opacity={0.05} />
 
       <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-accent/10 rounded-full blur-[160px] pointer-events-none transition-colors duration-700" />

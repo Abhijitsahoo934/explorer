@@ -6,6 +6,7 @@ import { trackFunnelEvent } from '../lib/analyticsService';
 import { Grain } from '../components/ui/Grain';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { readStorageValue, removeStorageValue } from '../platform/storage/browserStorage';
+import { Seo } from '../components/system/Seo';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ export default function AuthCallback() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center relative overflow-hidden">
+      <Seo title="Authenticating | Explorer" robots="noindex,nofollow" canonicalPath="/auth/callback" />
       <Grain opacity={0.03} />
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full bg-accent/10 blur-[140px]" />

@@ -22,6 +22,7 @@ import { getErrorMessage } from '../lib/errorMessage';
 import { logger } from '../platform/observability/logger';
 import { useAuth } from '../hooks/useAuth';
 import { getUserFirstName } from '../lib/authProfile';
+import { Seo } from '../components/system/Seo';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
@@ -147,6 +148,7 @@ export default function Dashboard() {
 
   return (
     <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
+      <Seo title="Dashboard | Explorer" robots="noindex,nofollow" canonicalPath="/dashboard" />
       <Grain />
       
       {/* Subtle Background Glows */}

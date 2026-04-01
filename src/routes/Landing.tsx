@@ -9,6 +9,7 @@ import FeaturesGrid from '../components/landing/sections/FeaturesGrid';
 import UseCases from '../components/landing/sections/UseCases';
 import FinalCTA from '../components/landing/sections/FinalCTA';
 import Footer from '../components/landing/Footer';
+import { Seo } from '../components/system/Seo';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,6 +52,11 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Seo
+        title="Explorer | Workspace Operating System"
+        description="Organize apps, tools, and workflows into a structured workspace you can open from any browser."
+        canonicalPath="/"
+      />
       {/* Fixed Navbar */}
       <Navbar />
 

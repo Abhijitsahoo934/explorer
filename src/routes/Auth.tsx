@@ -12,6 +12,7 @@ import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { GoogleLogo } from '../components/ui/GoogleLogo';
 import { getErrorMessage } from '../lib/errorMessage';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { Seo } from '../components/system/Seo';
 
 const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -120,6 +121,7 @@ const Auth: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
+      <Seo title="Sign In | Explorer" robots="noindex,nofollow" canonicalPath="/auth" />
       <Grain />
       
       {/* Dynamic Background Glows */}

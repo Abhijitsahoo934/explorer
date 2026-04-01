@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Lock, ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Seo } from '../components/system/Seo';
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState('');
@@ -72,6 +73,7 @@ const UpdatePassword = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+      <Seo title="Reset Password | Explorer" robots="noindex,nofollow" canonicalPath="/update-password" />
       <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-accent/10 rounded-full blur-[150px] pointer-events-none" />
 
       <motion.div
