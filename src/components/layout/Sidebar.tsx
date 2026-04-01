@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutGrid, FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FolderTree } from '../explorer/FolderTree';
 import { SettingsModal } from './SettingsModal';
 import { cn } from '../../lib/utils'; // <--- YE IMPORT MISSING THA! FIX HO GAYA!
+import { BrandLogo } from '../ui/BrandLogo';
 
 interface SidebarProps {
   onAddFolder: () => void;
@@ -97,9 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center gap-3 cursor-pointer group flex-1 overflow-hidden"
               >
-                <div className="relative w-10 h-10 shrink-0 rounded-xl bg-[var(--surface-strong)] border border-border flex items-center justify-center text-foreground shadow-sm group-hover:scale-105 transition-transform duration-300">
-                  <LayoutGrid size={20} strokeWidth={2.5} />
-                </div>
+                <BrandLogo className="relative h-10 w-10 shrink-0 rounded-xl group-hover:scale-105 transition-transform duration-300" />
                 <div className="truncate pr-2">
                   <span className="font-black tracking-tighter text-lg text-foreground uppercase block leading-none truncate">Explorer</span>
                   <span className="text-[9px] uppercase tracking-[0.2em] text-accent font-bold truncate">Workspace OS</span>

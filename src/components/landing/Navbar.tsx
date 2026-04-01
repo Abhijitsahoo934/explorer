@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { BrandLogo } from '../ui/BrandLogo';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -12,9 +13,7 @@ export default function Navbar() {
           className="flex items-center gap-3 cursor-pointer group"
           onClick={() => navigate('/')}
         >
-          <div className="w-11 h-11 rounded-2xl bg-[var(--surface-strong)] border border-border flex items-center justify-center text-foreground shadow-sm group-hover:-translate-y-0.5 transition-all duration-300">
-            <LayoutGrid size={18} strokeWidth={2.5} />
-          </div>
+          <BrandLogo className="h-11 w-11 group-hover:-translate-y-0.5 transition-all duration-300" />
           <div>
             <span className="font-black tracking-tight text-base text-foreground uppercase block leading-none">
               Explorer

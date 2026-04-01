@@ -8,9 +8,10 @@ import { STORAGE_KEYS } from '../platform/storage/keys';
 import { removeStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { Button } from '../components/ui/Button';
 import { Grain } from '../components/ui/Grain';
-import { LayoutGrid, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { GoogleLogo } from '../components/ui/GoogleLogo';
 import { getErrorMessage } from '../lib/errorMessage';
+import { BrandLogo } from '../components/ui/BrandLogo';
 
 const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -138,10 +139,10 @@ const Auth: React.FC = () => {
             <motion.div 
               whileHover={{ rotate: 180, scale: 1.05 }}
               transition={{ duration: 0.6, ease: "anticipate" }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-[1.25rem] bg-foreground text-background mb-6 shadow-md border border-border/50 cursor-pointer"
+              className="inline-flex items-center justify-center mb-6 cursor-pointer"
               onClick={() => navigate('/')}
             >
-              <LayoutGrid size={28} strokeWidth={2.5} />
+              <BrandLogo className="h-16 w-16 rounded-[1.25rem] border-border/70 shadow-md" />
             </motion.div>
             <h1 className="text-3xl font-black tracking-tight mb-2 text-foreground">
               {isSignUp ? 'Create Workspace' : 'Welcome Back'}

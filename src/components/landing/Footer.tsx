@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { BrandLogo } from '../ui/BrandLogo';
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -10,48 +11,62 @@ export default function Footer() {
       <div className="container mx-auto px-6 py-14">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-2xl bg-[var(--surface-strong)] border border-border flex items-center justify-center text-foreground shadow-sm">
-                <LayoutGrid size={18} strokeWidth={2.5} />
-              </div>
+            <div className="mb-5 flex items-center gap-3">
+              <BrandLogo className="h-11 w-11" />
               <div>
-                <span className="font-black tracking-tight text-lg text-foreground uppercase block leading-none">Explorer</span>
-                <span className="text-[9px] uppercase tracking-[0.24em] text-muted font-black">Workspace OS</span>
+                <span className="block leading-none text-lg font-black uppercase tracking-tight text-foreground">
+                  Explorer
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-[0.24em] text-muted">
+                  Workspace OS
+                </span>
               </div>
             </div>
 
-            <p className="text-muted leading-7">
+            <p className="leading-7 text-muted">
               A calmer way to organize the apps, tools, and links you actually use on the web.
             </p>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-3">
             <div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.18em] text-foreground mb-4">Product</h3>
+              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Product</h3>
               <div className="space-y-3">
-                <a href="#product-preview" className="block text-sm text-muted hover:text-foreground transition-colors">Product</a>
-                <a href="#features" className="block text-sm text-muted hover:text-foreground transition-colors">Features</a>
-                <a href="#use-cases" className="block text-sm text-muted hover:text-foreground transition-colors">Use Cases</a>
+                <a href="#product-preview" className="block text-sm text-muted transition-colors hover:text-foreground">
+                  Product
+                </a>
+                <a href="#features" className="block text-sm text-muted transition-colors hover:text-foreground">
+                  Features
+                </a>
+                <a href="#use-cases" className="block text-sm text-muted transition-colors hover:text-foreground">
+                  Use Cases
+                </a>
               </div>
             </div>
 
             <div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.18em] text-foreground mb-4">Company</h3>
+              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Company</h3>
               <div className="space-y-3">
-                <button onClick={() => navigate('/auth')} className="block text-left text-sm text-muted hover:text-foreground transition-colors">
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                >
                   Sign In
                 </button>
-                <button onClick={() => navigate('/auth')} className="block text-left text-sm text-muted hover:text-foreground transition-colors">
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                >
                   Start Workspace
                 </button>
               </div>
             </div>
 
             <div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.18em] text-foreground mb-4">Contact</h3>
+              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Contact</h3>
               <a
                 href="mailto:hello@explorero.tech"
-                className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
               >
                 <Mail size={14} />
                 hello@explorero.tech
@@ -60,7 +75,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-sm text-muted">© {currentYear} Explorer. All rights reserved.</p>
           <p className="text-sm text-muted">Built for focused, organized work.</p>
         </div>
