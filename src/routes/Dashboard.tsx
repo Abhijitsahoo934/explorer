@@ -465,9 +465,9 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              <div className="relative z-10 max-h-[calc(100vh-12rem)] overflow-hidden p-6 md:p-8">
-                <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-                <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 custom-scrollbar lg:max-h-[calc(100vh-18rem)]">
+              <div className="relative z-10 max-h-[calc(100vh-8rem)] overflow-hidden p-4 sm:p-6 md:p-8">
+                <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="max-h-[28vh] space-y-3 overflow-y-auto pr-1 custom-scrollbar sm:max-h-[32vh] lg:max-h-[calc(100vh-18rem)]">
                   {WORKSPACE_TEMPLATES.map((template) => (
                     <button
                       key={template.id}
@@ -491,22 +491,22 @@ export default function Dashboard() {
                   ))}
                 </div>
 
-                <SpotlightCard className="max-h-[60vh] overflow-y-auto border-border bg-background/70 p-6 custom-scrollbar md:max-h-[calc(100vh-18rem)] md:p-7">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-5">
+                <SpotlightCard className="max-h-[calc(100vh-22rem)] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar sm:max-h-[calc(100vh-20rem)] md:p-7 lg:max-h-[calc(100vh-18rem)]">
+                  <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                     <div>
                       <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-5`}>
                         <selectedTemplate.icon size={22} className="text-accent" />
                       </div>
-                      <h3 className="text-2xl font-black text-foreground tracking-tight">{selectedTemplate.title}</h3>
+                      <h3 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
                       <p className="text-sm text-muted mt-3 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
                     </div>
-                    <div className="rounded-2xl border border-border bg-card/70 px-4 py-3 min-w-[150px]">
+                    <div className="rounded-2xl border border-border bg-card/70 px-4 py-3 md:min-w-[150px]">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
                       <p className="text-sm font-bold text-foreground mt-2">Structured from day one</p>
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 mt-8">
+                  <div className="mt-8 grid gap-4 md:grid-cols-2">
                     {selectedTemplate.template.folders.map((folder) => (
                       <div key={folder.name} className="rounded-[1.25rem] border border-border bg-card/70 p-4">
                         <div className="flex items-center justify-between gap-3">
@@ -525,7 +525,7 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                     <Button
                       className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
                       loading={activeTemplateId === selectedTemplate.id}

@@ -87,7 +87,7 @@ export const AddFolderModal: React.FC<AddFolderModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto p-3 pt-4 sm:p-6 sm:pt-8">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -104,7 +104,7 @@ export const AddFolderModal: React.FC<AddFolderModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
-            className="relative w-full max-w-sm bg-card/95 border border-border rounded-[2rem] p-7 shadow-premium backdrop-blur-2xl overflow-hidden"
+            className="relative my-auto w-full max-w-sm overflow-y-auto overflow-hidden rounded-[2rem] border border-border bg-card/95 p-5 shadow-premium backdrop-blur-2xl max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-4rem)] custom-scrollbar sm:p-7"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
@@ -113,13 +113,13 @@ export const AddFolderModal: React.FC<AddFolderModalProps> = ({
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50" />
             <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 bg-accent/20 rounded-full blur-[40px] pointer-events-none" />
 
-            <div className="flex justify-between items-start mb-6 relative z-10">
+            <div className="relative z-10 mb-5 flex items-start justify-between gap-4 sm:mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center shadow-sm">
                   <FolderPlus size={22} className="text-accent" />
                 </div>
                 <div>
-                  <h3 id="modal-title" className="font-black text-foreground tracking-tight text-xl">New Folder</h3>
+                  <h3 id="modal-title" className="font-black text-foreground tracking-tight text-lg sm:text-xl">New Folder</h3>
                   <p className="text-[11px] text-muted font-bold tracking-wide mt-0.5 uppercase">Organize workspace</p>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export const AddFolderModal: React.FC<AddFolderModalProps> = ({
                 </div>
               </div>
               
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <button
                   type="button"
                   onClick={onClose}

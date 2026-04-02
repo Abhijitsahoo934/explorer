@@ -128,7 +128,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto p-3 pt-4 sm:p-6 sm:pt-8">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -143,12 +143,12 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-            className="relative w-full max-w-[420px] bg-card/95 border border-white/10 rounded-[2.5rem] p-8 shadow-2xl backdrop-blur-3xl overflow-hidden"
+            className="relative my-auto w-full max-w-[420px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-card/95 p-5 shadow-2xl backdrop-blur-3xl sm:p-8 max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar"
           >
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-30" />
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-accent/20 rounded-full blur-[60px] pointer-events-none" />
 
-            <div className="flex justify-between items-start mb-8 relative z-10">
+            <div className="relative z-10 mb-6 flex items-start justify-between gap-4 sm:mb-8">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-[1.25rem] bg-black/50 border border-white/5 flex items-center justify-center shadow-lg relative overflow-hidden group">
                   <AnimatePresence mode="wait">
@@ -172,7 +172,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="font-black text-white tracking-tight text-2xl">Add app</h3>
+                  <h3 className="font-black text-white tracking-tight text-xl sm:text-2xl">Add app</h3>
                   <p className="text-[10px] text-zinc-500 font-bold tracking-[0.15em] mt-1 uppercase flex items-center gap-1.5">
                     Workspace OS <Sparkles size={12} className="text-accent" />
                   </p>
@@ -228,14 +228,14 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-1.5 opacity-60">
                   <CornerDownLeft size={12} className="text-zinc-500" />
                   <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Press Enter to save</span>
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-2">
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:gap-4">
                 <button
                   type="button"
                   onClick={onClose}

@@ -112,7 +112,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6">
+        <div className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto p-3 pt-4 sm:p-4 sm:pt-6 md:items-center md:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -125,42 +125,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-4xl bg-card border border-border rounded-[2rem] shadow-premium overflow-hidden flex flex-col md:flex-row min-h-[560px]"
+            className="relative my-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] border border-border bg-card shadow-premium max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] md:flex-row"
           >
-            <div className="w-full md:w-64 bg-sidebar border-r border-border p-6 flex flex-col gap-2 shrink-0">
+            <div className="w-full shrink-0 border-b border-border bg-sidebar p-4 sm:p-5 md:w-64 md:border-b-0 md:border-r md:p-6">
               <div className="mb-5">
                 <p className="text-[10px] uppercase tracking-widest text-muted font-black">Settings</p>
                 <h2 className="text-xl font-black text-foreground mt-2">Control Center</h2>
                 <p className="text-xs text-muted mt-2 leading-relaxed">Tune the product experience, recovery flows, and device-level behavior.</p>
               </div>
 
-              <button
-                onClick={() => setActiveTab('appearance')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === 'appearance'
-                    ? 'bg-accent/10 text-accent border border-accent/20'
-                    : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
-                }`}
-              >
-                <User size={16} /> Appearance
-              </button>
+              <div className="grid gap-2 md:flex md:flex-col">
+                <button
+                  onClick={() => setActiveTab('appearance')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                    activeTab === 'appearance'
+                      ? 'bg-accent/10 text-accent border border-accent/20'
+                      : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
+                  }`}
+                >
+                  <User size={16} /> Appearance
+                </button>
 
-              <button
-                onClick={() => setActiveTab('privacy')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === 'privacy'
-                    ? 'bg-accent/10 text-accent border border-accent/20'
-                    : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
-                }`}
-              >
-                <Shield size={16} /> Privacy & Security
-              </button>
+                <button
+                  onClick={() => setActiveTab('privacy')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                    activeTab === 'privacy'
+                      ? 'bg-accent/10 text-accent border border-accent/20'
+                      : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
+                  }`}
+                >
+                  <Shield size={16} /> Privacy & Security
+                </button>
+              </div>
             </div>
 
-            <div className="flex-1 p-8 md:p-10 overflow-y-auto custom-scrollbar relative">
+            <div className="relative flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 md:p-10">
               <button
                 onClick={onClose}
-                className="absolute top-8 right-8 p-2 text-muted hover:text-foreground hover:bg-card-hover rounded-xl transition-all"
+                className="absolute right-4 top-4 z-10 rounded-xl p-2 text-muted transition-all hover:bg-card-hover hover:text-foreground sm:right-5 sm:top-5 md:right-8 md:top-8"
               >
                 <X size={20} strokeWidth={2.5} />
               </button>

@@ -59,6 +59,7 @@ export default function TemplateMarketplace() {
   const [isCreatingShare, setIsCreatingShare] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     setCustomTemplates(getStoredWorkspaceTemplates());
@@ -93,6 +94,7 @@ export default function TemplateMarketplace() {
   }, [activeFilter, searchQuery, templates]);
 
   const handleFolderSelect = (folderId: string | null) => {
+    setMobileSidebarOpen(false);
     if (folderId) {
       navigate(`/explorer?folder=${encodeURIComponent(folderId)}`);
       return;
@@ -237,14 +239,16 @@ export default function TemplateMarketplace() {
         onAddFolder={() => navigate('/explorer')}
         onAddApp={() => navigate('/explorer')}
         folderTreeSyncKey={folderTreeSyncKey}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/40 border-l border-border backdrop-blur-3xl">
-        <Topbar />
+        <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
-        <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 lg:p-12">
           <div className="max-w-[1320px] mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
+            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
                   <Sparkles size={12} />
@@ -255,9 +259,9 @@ export default function TemplateMarketplace() {
                   Curated workspace systems for builders, creators, operators, and specialists, plus reusable templates saved from your own live setup.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Button
-                  className="h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                  className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6"
                   loading={isSavingCurrentWorkspace}
                   onClick={handleSaveCurrentWorkspace}
                 >
@@ -265,21 +269,21 @@ export default function TemplateMarketplace() {
                 </Button>
               <Button
                 variant="secondary"
-                className="h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6"
                 loading={isCreatingShare}
                 onClick={handleShareBlueprint}
               >
                 <Share2 size={16} className="mr-1" />
                 Share Blueprint
               </Button>
-                <Button variant="outline" className="h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black" onClick={() => navigate('/dashboard')}>
+                <Button variant="outline" className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6" onClick={() => navigate('/dashboard')}>
                   Back To Dashboard
                 </Button>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[280px] flex-1 max-w-xl">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="relative w-full sm:min-w-[280px] sm:max-w-xl sm:flex-1">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
                 <input
                   value={searchQuery}
@@ -288,24 +292,26 @@ export default function TemplateMarketplace() {
                   className="h-11 w-full rounded-2xl border border-border bg-card/70 pl-11 pr-4 text-sm text-foreground outline-none transition-all placeholder:text-muted focus:border-accent/30 focus:ring-4 focus:ring-accent/10"
                 />
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-card/70 text-[10px] uppercase tracking-widest font-black text-muted">
+              <div className="inline-flex items-center gap-2 self-start rounded-xl border border-border bg-card/70 px-3 py-2 text-[10px] uppercase tracking-widest font-black text-muted">
                 <Filter size={12} />
                 Filter
               </div>
-              {FILTERS.map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveFilter(filter.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-[11px] uppercase tracking-widest font-black transition-all ${
-                    activeFilter === filter.id
-                      ? 'border-accent/20 bg-accent/10 text-accent'
-                      : 'border-border bg-card/70 text-muted hover:text-foreground hover:bg-card-hover'
-                  }`}
-                >
-                  <filter.icon size={14} />
-                  {filter.label}
-                </button>
-              ))}
+              <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar sm:flex-wrap sm:overflow-visible sm:pb-0">
+                {FILTERS.map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActiveFilter(filter.id)}
+                    className={`inline-flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2.5 text-[11px] uppercase tracking-widest font-black transition-all ${
+                      activeFilter === filter.id
+                        ? 'border-accent/20 bg-accent/10 text-accent'
+                        : 'border-border bg-card/70 text-muted hover:text-foreground hover:bg-card-hover'
+                    }`}
+                  >
+                    <filter.icon size={14} />
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -338,8 +344,8 @@ export default function TemplateMarketplace() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {filteredTemplates.map((template) => (
-                <SpotlightCard key={template.id} className="p-7 bg-card border-border backdrop-blur-md hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-premium">
-                  <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+                <SpotlightCard key={template.id} className="border-border bg-card p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium sm:p-7">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${template.accent} border border-border flex items-center justify-center mb-5`}>
                         <template.icon size={22} className="text-accent" />
@@ -347,13 +353,13 @@ export default function TemplateMarketplace() {
                       <h2 className="text-2xl font-black text-foreground tracking-tight">{template.title}</h2>
                       <p className="text-sm text-muted mt-3 leading-relaxed max-w-xl">{template.subtitle}</p>
                     </div>
-                    <div className="rounded-2xl border border-border bg-background/60 px-4 py-3 min-w-[220px]">
+                    <div className="min-w-0 rounded-2xl border border-border bg-background/60 px-4 py-3 lg:min-w-[220px]">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Best For</p>
                       <p className="text-sm font-bold text-foreground mt-2">{template.audience}</p>
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4 mt-8">
+                  <div className="mt-8 grid gap-4 sm:grid-cols-2">
                     {template.template.folders.map((folder) => (
                       <div key={folder.name} className="rounded-[1.25rem] border border-border bg-background/60 p-4">
                         <div className="flex items-center justify-between gap-3">
@@ -372,9 +378,9 @@ export default function TemplateMarketplace() {
                     ))}
                   </div>
 
-                  <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                     <Button
-                      className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                      className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6"
                       loading={activeTemplateId === template.id}
                       onClick={() => handleInstall(template.id)}
                     >
@@ -383,7 +389,7 @@ export default function TemplateMarketplace() {
                     {template.source === 'custom' ? (
                       <Button
                         variant="ghost"
-                        className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                        className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6"
                         onClick={() => handleDeleteCustomTemplate(template.id)}
                       >
                         <Trash2 size={14} className="mr-2" />
@@ -392,7 +398,7 @@ export default function TemplateMarketplace() {
                     ) : (
                       <Button
                         variant="ghost"
-                        className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                        className="h-12 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto sm:px-6"
                         onClick={() => navigate('/explorer')}
                       >
                         Explore Manually
@@ -414,21 +420,21 @@ export default function TemplateMarketplace() {
       </main>
 
       {shareModalOpen && shareLink && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto p-3 pt-4 sm:p-6 sm:pt-8">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm"
             onClick={() => setShareModalOpen(false)}
           />
 
-          <div className="relative w-full max-w-lg bg-card/95 border border-border rounded-[2.5rem] p-7 shadow-premium backdrop-blur-2xl">
-            <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="relative my-auto w-full max-w-lg max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[2.5rem] border border-border bg-card/95 p-5 shadow-premium backdrop-blur-2xl custom-scrollbar sm:max-h-[calc(100vh-4rem)] sm:p-7">
+            <div className="mb-4 flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-border flex items-center justify-center">
                   <Share2 size={20} className="text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-black text-foreground tracking-tight text-xl">Share your blueprint</h3>
+                  <h3 className="font-black text-foreground tracking-tight text-lg sm:text-xl">Share your blueprint</h3>
                   <p className="text-sm text-muted mt-1">Anyone with this link can preview and install into their workspace.</p>
                 </div>
               </div>
@@ -449,9 +455,9 @@ export default function TemplateMarketplace() {
                 value={shareLink}
                 className="w-full min-h-[84px] resize-y bg-background border border-border rounded-2xl px-4 py-3 text-xs font-mono text-foreground focus:outline-none"
               />
-              <div className="flex gap-3 mt-3">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                 <Button
-                  className="h-10 px-5 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                  className="h-10 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto"
                   variant="outline"
                   onClick={handleCopyShareLink}
                   icon={Copy}
@@ -459,7 +465,7 @@ export default function TemplateMarketplace() {
                   Copy Link
                 </Button>
                 <Button
-                  className="h-10 px-5 rounded-2xl text-[11px] uppercase tracking-widest font-black flex-1"
+                  className="h-10 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:flex-1"
                   onClick={() => {
                     window.open(shareLink, '_blank', 'noopener,noreferrer');
                   }}
