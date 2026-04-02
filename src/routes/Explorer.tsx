@@ -293,7 +293,7 @@ const Explorer: React.FC = () => {
                   <div className="relative z-10 mb-8 flex flex-col justify-between gap-6 sm:mb-10 md:flex-row md:items-end lg:mb-12">
                     <div className="flex items-start gap-4 sm:items-center sm:gap-6">
                       <motion.div 
-                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-2xl backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-[2rem]"
+                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-[2rem]"
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {currentFolderId ? <FolderIcon size={32} className="text-accent relative z-10" /> : <LayoutGrid size={32} className="text-accent relative z-10" />}
