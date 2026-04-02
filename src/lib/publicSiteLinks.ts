@@ -15,3 +15,11 @@ export const PUBLIC_TEMPLATE_LINKS = [
     description: 'Manage clients, delivery, invoicing, and meetings from one workspace.',
   },
 ] as const;
+
+export const PUBLIC_ARTICLE_LINKS = [
+  {
+    title: 'Stop Using Bookmarks for Real Work',
+    path: '/blog/stop-using-bookmarks',
+    description: 'Why bookmarks break down for serious workflows and what to use instead.',
+  },
+] as const;

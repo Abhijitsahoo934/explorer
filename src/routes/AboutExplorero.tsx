@@ -5,6 +5,7 @@ import Footer from '../components/landing/Footer';
 import { Grain } from '../components/ui/Grain';
 import { Button } from '../components/ui/Button';
 import { Seo } from '../components/system/Seo';
+import { PUBLIC_ARTICLE_LINKS } from '../lib/publicSiteLinks';
 
 const principles = [
   'Bookmarks save links. Explorero saves complete working setups.',
@@ -159,6 +160,17 @@ export default function AboutExplorero() {
               >
                 Back to homepage
               </Button>
+            </div>
+
+            <div className="mt-8 rounded-[1.5rem] border border-border bg-background/70 p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Read next</p>
+              <button
+                onClick={() => navigate(PUBLIC_ARTICLE_LINKS[0].path)}
+                className="mt-3 text-left transition-colors hover:text-accent"
+              >
+                <h3 className="text-xl font-black tracking-tight text-foreground">{PUBLIC_ARTICLE_LINKS[0].title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">{PUBLIC_ARTICLE_LINKS[0].description}</p>
+              </button>
             </div>
           </div>
         </section>

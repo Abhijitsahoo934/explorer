@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import { BrandLogo } from '../ui/BrandLogo';
-import { PUBLIC_TEMPLATE_LINKS } from '../../lib/publicSiteLinks';
+import { PUBLIC_ARTICLE_LINKS, PUBLIC_TEMPLATE_LINKS } from '../../lib/publicSiteLinks';
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-3">
+          <div className="grid gap-10 sm:grid-cols-4">
             <div>
               <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Product</h3>
               <div className="space-y-3">
@@ -55,6 +55,21 @@ export default function Footer() {
               <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Templates</h3>
               <div className="space-y-3">
                 {PUBLIC_TEMPLATE_LINKS.map((link) => (
+                  <button
+                    key={link.path}
+                    onClick={() => navigate(link.path)}
+                    className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                  >
+                    {link.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Learn</h3>
+              <div className="space-y-3">
+                {PUBLIC_ARTICLE_LINKS.map((link) => (
                   <button
                     key={link.path}
                     onClick={() => navigate(link.path)}

@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
+import { GoogleAnalyticsTracker } from './components/system/GoogleAnalyticsTracker';
 
 const Landing = lazy(() => import('./routes/Landing'));
 const Auth = lazy(() => import('./routes/Auth'));
@@ -11,6 +12,7 @@ const Explorer = lazy(() => import('./routes/Explorer'));
 const TemplateMarketplace = lazy(() => import('./routes/TemplateMarketplace'));
 const TemplateSeoPage = lazy(() => import('./routes/TemplateSeoPage'));
 const AboutExplorero = lazy(() => import('./routes/AboutExplorero'));
+const BlogArticlePage = lazy(() => import('./routes/BlogArticlePage'));
 const UpdatePassword = lazy(() => import('./routes/UpdatePassword'));
 const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
 const Insights = lazy(() => import('./routes/Insights'));
@@ -103,6 +105,7 @@ function App() {
   return (
     <Router>
       <CommandPaletteProvider>
+      <GoogleAnalyticsTracker />
       <RecoveryHashRedirect />
       <Suspense fallback={<RouteLoader />}>
         <Routes>
@@ -120,6 +123,7 @@ function App() {
           />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/about-explorero" element={<AboutExplorero />} />
+          <Route path="/blog/:slug" element={<BlogArticlePage />} />
           
           {/* Protected Routes: Sirf Login ke baad dikhenge */}
           <Route 
