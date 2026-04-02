@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Search, Bell, User, Sun, Moon, LogOut, Settings, Command, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -26,14 +26,12 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  
-  // Profile & Settings States
   const [showProfile, setShowProfile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  
+
   const notifDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const { resolvedTheme, setTheme } = useTheme();
   const { user } = useAuth();
 
@@ -50,7 +48,6 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
         if (!isMounted) return;
         setNotifications(notifs as AppNotification[]);
 
-        // Keep bell dropdown in sync with live DB changes (user-scoped).
         const refetch = () => {
           void notificationService
             .getNotifications()
@@ -74,6 +71,20 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
       isMounted = false;
       subscription?.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node) && !(event.target as Element).closest('#bell-btn')) {
+        setShowNotifications(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node) && !(event.target as Element).closest('#profile-btn')) {
+        setShowProfile(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleMarkAllAsRead = async () => {
@@ -100,35 +111,19 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     }
   };
 
-  // Click Outside logic
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node) && !(event.target as Element).closest('#bell-btn')) {
-        setShowNotifications(false);
-      }
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node) && !(event.target as Element).closest('#profile-btn')) {
-        setShowProfile(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/auth', { replace: true });
   };
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications.filter((notification) => !notification.is_read).length;
   const userDisplayName = getUserDisplayName(user);
   const userInitials = getUserInitials(user);
 
   return (
     <>
-      <header className="sticky top-0 z-[100] flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-4 backdrop-blur-2xl transition-all duration-300 md:px-6 lg:px-8">
-        
-        {/* Opens global command palette (folders + apps) — ⌘/Ctrl K */}
-        <div className="flex min-w-0 flex-1 items-center gap-3 group">
+      <header className="sticky top-0 z-[100] flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-3 backdrop-blur-2xl transition-all duration-300 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onOpenSidebar}
@@ -138,38 +133,50 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             <Menu size={18} />
           </button>
 
-          <div className="relative w-full max-w-xl flex-1">
-          <button
-            type="button"
-            onClick={() => {
-              setShowNotifications(false);
-              setShowProfile(false);
-              openCommandPalette();
-            }}
-            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card/50 py-2.5 pl-11 pr-4 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/30 hover:bg-card-hover focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:pr-16"
-          >
-            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-muted transition-all duration-300 group-hover:text-accent">
-              <Search size={18} strokeWidth={2} />
-            </div>
-            <span className="truncate font-medium">Search folders & apps…</span>
-            <div className="pointer-events-none absolute inset-y-0 right-3 hidden items-center gap-2 sm:flex">
-              <kbd className="hidden sm:inline-flex items-center gap-1 rounded-lg border border-border bg-background/50 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-muted shadow-sm">
-                <Command size={10} /> K
-              </kbd>
-            </div>
-          </button>
-        </div>
+          <div className="relative min-w-0 flex-1 max-w-xl">
+            <button
+              type="button"
+              onClick={() => {
+                setShowNotifications(false);
+                setShowProfile(false);
+                openCommandPalette();
+              }}
+              className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card/50 py-2.5 pl-10 pr-3 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/30 hover:bg-card-hover focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:pl-11 sm:pr-16"
+            >
+              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted transition-all duration-300 group-hover:text-accent sm:left-4">
+                <Search size={18} strokeWidth={2} />
+              </div>
+              <span className="truncate font-medium sm:hidden">Search...</span>
+              <span className="hidden truncate font-medium sm:block">Search folders & apps...</span>
+              <div className="pointer-events-none absolute inset-y-0 right-3 hidden items-center gap-2 md:flex">
+                <kbd className="inline-flex items-center gap-1 rounded-lg border border-border bg-background/50 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-muted shadow-sm">
+                  <Command size={10} /> K
+                </kbd>
+              </div>
+            </button>
+          </div>
         </div>
 
-        {/* RIGHT SIDE ACTIONS */}
-        <div className="relative ml-3 flex items-center gap-1 border-l border-border/50 pl-3 sm:ml-4 sm:gap-2 sm:pl-4 lg:ml-6 lg:pl-6">
-          <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} className="p-2.5 text-muted hover:text-foreground hover:bg-card-hover rounded-xl transition-all border border-transparent hover:border-border">
+        <div className="relative ml-2 flex items-center gap-1 border-l border-border/50 pl-2 sm:ml-4 sm:gap-2 sm:pl-4 lg:ml-6 lg:pl-6">
+          <button
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground sm:p-2.5"
+            aria-label="Toggle theme"
+          >
             {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <button id="bell-btn" onClick={() => setShowNotifications(!showNotifications)} className={`relative p-2.5 rounded-xl transition-all ${showNotifications ? 'bg-accent/10 text-accent' : 'text-muted hover:text-foreground hover:bg-card-hover'}`}>
+          <button
+            id="bell-btn"
+            onClick={() => {
+              setShowProfile(false);
+              setShowNotifications((value) => !value);
+            }}
+            className={`relative rounded-xl p-2 transition-all sm:p-2.5 ${showNotifications ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-card-hover hover:text-foreground'}`}
+            aria-label="Notifications"
+          >
             <Bell size={18} />
-            {unreadCount > 0 && <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background animate-pulse" />}
+            {unreadCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-background bg-red-500 animate-pulse" />}
           </button>
 
           <AnimatePresence>
@@ -179,53 +186,51 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
-                className="absolute top-[calc(100%+16px)] right-20 w-[360px] max-w-[calc(100vw-48px)] bg-card border border-border rounded-2xl shadow-premium p-2 z-50 backdrop-blur-2xl"
+                className="fixed left-3 right-3 top-[4.5rem] z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-14 sm:top-[calc(100%+16px)] sm:w-[360px] sm:max-w-[calc(100vw-48px)]"
               >
-                <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex items-center justify-between gap-3 px-3 py-2">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest font-black text-muted">Notifications</p>
-                    <p className="text-xs text-foreground font-bold mt-1">{unreadCount} unread</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted">Notifications</p>
+                    <p className="mt-1 text-xs font-bold text-foreground">{unreadCount} unread</p>
                   </div>
                   <button
                     onClick={handleMarkAllAsRead}
                     disabled={unreadCount === 0}
-                    className="text-[10px] uppercase tracking-widest font-black text-accent disabled:text-muted/50 disabled:cursor-not-allowed"
+                    className="shrink-0 text-[10px] font-black uppercase tracking-widest text-accent disabled:cursor-not-allowed disabled:text-muted/50"
                   >
                     Mark all read
                   </button>
                 </div>
 
-                <div className="max-h-[360px] overflow-y-auto custom-scrollbar space-y-2 px-1 pb-1">
+                <div className="max-h-[min(60vh,360px)] space-y-2 overflow-y-auto px-1 pb-1 custom-scrollbar">
                   {notifications.length > 0 ? (
                     notifications.map((notification) => (
                       <button
                         key={notification.id}
                         onClick={() => handleMarkAsRead(notification.id)}
-                        className={`w-full text-left rounded-2xl border px-4 py-3 transition-all ${
+                        className={`w-full rounded-2xl border px-4 py-3 text-left transition-all ${
                           notification.is_read
                             ? 'border-border bg-background/50 text-muted'
                             : 'border-accent/20 bg-accent/5 text-foreground'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div>
+                          <div className="min-w-0">
                             <p className="text-sm font-bold">{notification.title}</p>
-                            <p className="text-xs mt-1 leading-relaxed">{notification.message}</p>
+                            <p className="mt-1 text-xs leading-relaxed">{notification.message}</p>
                           </div>
-                          {!notification.is_read && (
-                            <span className="mt-1 w-2.5 h-2.5 rounded-full bg-accent shrink-0" />
-                          )}
+                          {!notification.is_read && <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent" />}
                         </div>
-                        <div className="mt-3 text-[10px] uppercase tracking-[0.2em] font-black opacity-70">
+                        <div className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
                           {new Date(notification.created_at).toLocaleString()}
                         </div>
                       </button>
                     ))
                   ) : (
                     <div className="rounded-2xl border border-border bg-background/40 px-4 py-8 text-center">
-                      <Bell size={18} className="mx-auto text-muted mb-3" />
+                      <Bell size={18} className="mx-auto mb-3 text-muted" />
                       <p className="text-sm font-bold text-foreground">No notifications yet</p>
-                      <p className="text-xs text-muted mt-2">Activity updates from folders and apps will appear here.</p>
+                      <p className="mt-2 text-xs text-muted">Activity updates from folders and apps will appear here.</p>
                     </div>
                   )}
                 </div>
@@ -233,24 +238,47 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             )}
           </AnimatePresence>
 
-          <div id="profile-btn" onClick={() => setShowProfile(!showProfile)} className="ml-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2">
+          <button
+            id="profile-btn"
+            type="button"
+            onClick={() => {
+              setShowNotifications(false);
+              setShowProfile((value) => !value);
+            }}
+            className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2"
+            aria-label="Profile"
+          >
             {userInitials || <User size={16} strokeWidth={3} />}
-          </div>
+          </button>
 
-          {/* Profile Dropdown Placeholder (Re-use your existing profile logic here) */}
           <AnimatePresence>
             {showProfile && (
-              <motion.div ref={profileDropdownRef} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+16px)] right-0 w-64 bg-card border border-border rounded-2xl shadow-premium p-2 z-50 backdrop-blur-2xl">
-                <div className="p-3 bg-background/50 rounded-xl mb-2">
-                    <p className="text-[10px] uppercase font-black text-muted tracking-widest mb-1">User Instance</p>
-                    <p className="text-sm font-bold truncate text-foreground">{userDisplayName}</p>
-                    <p className="text-xs truncate text-muted mt-1">{user?.email}</p>
+              <motion.div
+                ref={profileDropdownRef}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="fixed left-3 right-3 top-[4.5rem] z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+16px)] sm:w-64"
+              >
+                <div className="mb-2 rounded-xl bg-background/50 p-3">
+                  <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-muted">User Instance</p>
+                  <p className="truncate text-sm font-bold text-foreground">{userDisplayName}</p>
+                  <p className="mt-1 truncate text-xs text-muted">{user?.email}</p>
                 </div>
-                <button onClick={() => { setIsSettingsOpen(true); setShowProfile(false); }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted hover:text-foreground hover:bg-card-hover transition-all">
+                <button
+                  onClick={() => {
+                    setIsSettingsOpen(true);
+                    setShowProfile(false);
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted transition-all hover:bg-card-hover hover:text-foreground"
+                >
                   <Settings size={14} /> Preferences
                 </button>
-                <div className="h-px bg-border/50 my-2" />
-                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-500/10 transition-all font-bold">
+                <div className="my-2 h-px bg-border/50" />
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-500/10"
+                >
                   <LogOut size={14} /> Terminate Session
                 </button>
               </motion.div>
