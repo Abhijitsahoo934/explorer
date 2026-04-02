@@ -48,7 +48,7 @@ const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () 
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={cn(
-        "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative overflow-hidden surface-panel",
+        "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel",
         isOver 
           ? "bg-accent border-accent shadow-[0_0_40px_rgba(var(--accent),0.4)] scale-[1.05] z-10" 
           : "hover:bg-card-hover hover:border-accent/30"
@@ -58,7 +58,7 @@ const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () 
         "transition-all duration-300 flex flex-col items-center gap-4",
         isOver ? "opacity-0 scale-50 absolute" : "opacity-100 scale-100"
       )}>
-        <div className="w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-[var(--surface-strong)] group-hover:bg-accent group-hover:shadow-[0_0_30px_rgba(var(--accent),0.4)] transition-all duration-500">
+        <div className="relative isolate w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-[var(--surface-strong)] group-hover:bg-accent group-hover:shadow-[0_26px_50px_-26px_rgba(79,70,229,0.5)] transition-all duration-500">
           <FolderIcon size={32} className="text-muted group-hover:text-white transition-colors" />
         </div>
         <span className="text-sm font-black tracking-wide text-muted group-hover:text-foreground transition-colors truncate w-full px-4 text-center">

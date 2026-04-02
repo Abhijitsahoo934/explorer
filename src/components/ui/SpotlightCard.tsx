@@ -11,7 +11,7 @@ interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SpotlightCard({ 
   children, 
   className, 
-  spotlightColor = "rgba(255, 255, 255, 0.04)",
+  spotlightColor = "rgba(99, 102, 241, 0.08)",
   ...props 
 }: SpotlightCardProps) {
   // useMotionValue ensures we don't trigger React re-renders on every pixel move
@@ -27,7 +27,7 @@ export function SpotlightCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-950/60 backdrop-blur-xl transition-all duration-500 hover:border-white/10 hover:shadow-[0_0_40px_rgba(255,255,255,0.02)]",
+        "group relative overflow-hidden rounded-3xl border border-border bg-card/75 backdrop-blur-xl transition-all duration-500 hover:border-accent/20 hover:shadow-[0_24px_60px_-32px_rgba(15,23,42,0.22)]",
         className
       )}
       onMouseMove={handleMouseMove}
@@ -54,7 +54,7 @@ export function SpotlightCard({
           background: useMotionTemplate`
             radial-gradient(
               150px circle at ${mouseX}px ${mouseY}px,
-              rgba(255, 255, 255, 0.06),
+              rgba(255, 255, 255, 0.08),
               transparent 80%
             )
           `,

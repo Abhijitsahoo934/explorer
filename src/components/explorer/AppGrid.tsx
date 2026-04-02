@@ -77,13 +77,13 @@ const DraggableAppCard = ({
       className="h-full cursor-grab active:cursor-grabbing group/drag"
     >
       <motion.div variants={itemVariants} layout={false} className="h-full pointer-events-none">
-        <SpotlightCard className="p-6 group border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-accent/40 hover:shadow-glow transition-all duration-300 h-full flex flex-col backdrop-blur-xl rounded-[2rem] pointer-events-auto relative select-none">
+        <SpotlightCard className="p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 hover:shadow-premium transition-all duration-300 h-full flex flex-col backdrop-blur-xl rounded-[2rem] pointer-events-auto relative select-none">
           <div className="absolute top-4 right-4 opacity-0 group-hover/drag:opacity-30 transition-opacity">
-            <GripVertical size={16} className="text-white" />
+            <GripVertical size={16} className="text-muted" />
           </div>
 
           <div className="flex justify-between items-start mb-8 relative z-10">
-            <div className="relative w-16 h-16 rounded-[1.25rem] bg-[#0a0a0a] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-accent/30 transition-all duration-300 group-hover:scale-105 shadow-sm">
+            <div className="relative w-16 h-16 rounded-[1.25rem] bg-[var(--surface-strong)] flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-300 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
               {favicon && !imgError ? (
                 <img
                   src={favicon}
@@ -93,11 +93,11 @@ const DraggableAppCard = ({
                   draggable={false}
                 />
               ) : (
-                <Globe size={28} className="text-zinc-600 group-hover:text-accent transition-colors" />
+                <Globe size={28} className="text-muted group-hover:text-accent transition-colors" />
               )}
             </div>
 
-            <div className="flex gap-1.5 opacity-0 -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 bg-black/80 p-1.5 rounded-xl border border-white/10 shadow-lg">
+            <div className="flex gap-1.5 opacity-0 -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 bg-background/95 p-1.5 rounded-xl border border-border shadow-[0_18px_40px_-26px_rgba(15,23,42,0.35)] backdrop-blur-xl">
               <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()}
@@ -133,10 +133,10 @@ const DraggableAppCard = ({
           </div>
 
           <div className="space-y-1.5 mb-6 flex-1">
-            <h3 className="text-base font-black text-white truncate group-hover:text-accent transition-colors tracking-tight">
+            <h3 className="text-base font-black text-foreground truncate group-hover:text-accent transition-colors tracking-tight">
               {app.name}
             </h3>
-            <p className="text-[11px] text-zinc-500 truncate font-medium group-hover:text-zinc-300 transition-colors">
+            <p className="text-[11px] text-muted truncate font-medium transition-colors">
               {app.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
             </p>
           </div>
@@ -152,14 +152,14 @@ const DraggableAppCard = ({
               recordAppUsage(app.id);
               void explorerService.recordAppOpened(app.id);
             }}
-            className="flex items-center justify-between pt-4 border-t border-white/5 no-underline group/link mt-auto relative z-20 hover:bg-white/5 px-2 -mx-2 rounded-xl transition-all"
+            className="flex items-center justify-between pt-4 border-t border-border no-underline group/link mt-auto relative z-20 hover:bg-card-hover px-2 -mx-2 rounded-xl transition-all"
           >
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-black group-hover/link:text-white transition-colors duration-300">
+            <span className="text-[10px] text-muted uppercase tracking-widest font-black group-hover/link:text-foreground transition-colors duration-300">
               Open app
             </span>
             <ExternalLink
               size={14}
-              className="text-zinc-600 group-hover/link:text-accent group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all duration-300"
+              className="text-muted group-hover/link:text-accent group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all duration-300"
             />
           </a>
         </SpotlightCard>

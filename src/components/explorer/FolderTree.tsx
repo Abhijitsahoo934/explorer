@@ -77,7 +77,7 @@ const FolderNode: React.FC<FolderNodeProps> = ({ folder, allFolders, level, acti
             ? "bg-accent/10 border-accent/20 text-accent shadow-sm" 
             : isOver 
               ? "bg-accent/20 border-accent scale-[1.02] z-10 ring-2 ring-accent/50" 
-              : "hover:bg-zinc-100 dark:hover:bg-white/5 border-transparent text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white",
+              : "border-transparent text-zinc-700 dark:text-zinc-400 hover:bg-card-hover hover:border-border hover:text-foreground",
           isDragging ? "opacity-30 border-dashed border-accent/50 pointer-events-none" : ""
         )}
         style={{ paddingLeft: `${level * 16 + 8}px`, touchAction: 'none', ...dndStyle }}
@@ -89,7 +89,7 @@ const FolderNode: React.FC<FolderNodeProps> = ({ folder, allFolders, level, acti
         {/* 1. SEPARATED TOGGLE CHEVRON */}
         <div 
           className={cn(
-            "flex items-center justify-center w-6 h-6 rounded hover:bg-zinc-200 dark:hover:bg-white/10 shrink-0 z-20 transition-colors", 
+            "flex items-center justify-center w-6 h-6 rounded-lg hover:bg-card shrink-0 z-20 transition-colors", 
             !hasSubFolders && "opacity-0 pointer-events-none"
           )}
           onClick={(e) => { e.stopPropagation(); setIsOpen(!isExpanded); }}
@@ -102,10 +102,10 @@ const FolderNode: React.FC<FolderNodeProps> = ({ folder, allFolders, level, acti
         {/* 2. SEPARATED DRAG HANDLE */}
         <div 
           {...attributes} {...listeners}
-          className="flex items-center justify-center w-5 h-6 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing hover:bg-zinc-200 dark:hover:bg-white/10 rounded transition-opacity shrink-0 z-20"
+          className="flex items-center justify-center w-5 h-6 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing hover:bg-card rounded-lg transition-opacity shrink-0 z-20"
           onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical size={14} className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white" />
+          <GripVertical size={14} className="text-zinc-400 hover:text-foreground" />
         </div>
         
         {/* 3. ICON & NAME */}
@@ -124,9 +124,9 @@ const FolderNode: React.FC<FolderNodeProps> = ({ folder, allFolders, level, acti
         </div>
 
         {/* 4. ACTIONS */}
-        <div className="absolute right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 bg-gradient-to-l from-white via-white to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a] pl-8 py-1 rounded-r-xl">
+        <div className="absolute right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 rounded-xl border border-border bg-background/95 p-1 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl">
           <button onClick={(e) => { e.stopPropagation(); setIsAddSubfolderOpen(true); }} className="p-1.5 text-zinc-500 hover:text-accent hover:bg-accent/10 rounded-md transition-colors"><Plus size={14} /></button>
-          <button onClick={(e) => { e.stopPropagation(); setIsRenaming(true); }} className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 rounded-md transition-colors"><Edit3 size={14} /></button>
+          <button onClick={(e) => { e.stopPropagation(); setIsRenaming(true); }} className="p-1.5 text-zinc-500 hover:text-foreground hover:bg-card rounded-md transition-colors"><Edit3 size={14} /></button>
           <button onClick={handleDelete} className="p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors"><Trash2 size={14} /></button>
         </div>
       </motion.div>
@@ -211,7 +211,7 @@ export const FolderTree: React.FC<{
         onClick={() => onFolderSelect(null)}
         className={cn(
           "flex items-center gap-3 px-4 py-3.5 min-h-[48px] rounded-xl cursor-pointer transition-all mb-4 border",
-          currentFolderId === null ? "bg-accent/10 border-accent/20 text-accent font-bold shadow-sm" : "border-transparent text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white",
+          currentFolderId === null ? "bg-accent/10 border-accent/20 text-accent font-bold shadow-sm" : "border-transparent text-zinc-600 hover:bg-card-hover hover:border-border dark:text-zinc-400 hover:text-foreground",
           isRootOver ? "bg-accent/20 border-accent scale-[1.02] ring-2 ring-accent/50 z-10" : ""
         )}
       >
