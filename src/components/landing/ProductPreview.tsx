@@ -71,31 +71,31 @@ export default function ProductPreview() {
   }, []);
 
   return (
-    <section ref={containerRef} className="relative py-28 px-6">
+    <section ref={containerRef} className="relative py-20 sm:py-28 px-4 sm:px-6">
       <div className="container mx-auto max-w-6xl">
-        <div className="preview-header text-center mb-16">
+        <div className="preview-header text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.25em] font-black text-accent mb-6">
             <Sparkles size={12} />
             Product Surface
           </div>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
             One place for the
             <br />
             tools you actually use.
           </h2>
-          <p className="text-lg text-muted max-w-2xl mx-auto mt-6 leading-relaxed">
+          <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto mt-6 leading-relaxed">
             Keep your work stack structured by purpose, not memory. Explorer helps you move from browser chaos to a setup that feels calm, clear, and repeatable.
           </p>
         </div>
 
-        <div className="preview-mockup relative rounded-[2rem] border border-border bg-card/60 backdrop-blur-2xl p-4 md:p-6 shadow-premium overflow-hidden">
+        <div className="preview-mockup relative rounded-[1.5rem] sm:rounded-[2rem] border border-border bg-card/60 backdrop-blur-2xl p-3 sm:p-4 md:p-6 shadow-premium overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-16 left-16 w-48 h-48 rounded-full bg-accent/10 blur-[100px]" />
             <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full bg-sky-400/10 blur-[120px]" />
           </div>
 
           <div className="relative z-10 rounded-[1.5rem] border border-border bg-background/80 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-4 sm:px-5 py-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center shadow-lg">
                   <FolderTree size={18} />
@@ -121,7 +121,7 @@ export default function ProductPreview() {
             </div>
 
             <div className="grid lg:grid-cols-[260px_1fr] min-h-[460px]">
-              <aside className="border-r border-border bg-sidebar/60 p-5">
+              <aside className="border-b lg:border-b-0 lg:border-r border-border bg-sidebar/60 p-5">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black mb-4">Workspace Folders</p>
                 <div className="space-y-2">
                   {['Product', 'Engineering', 'Growth', 'Operations'].map((folder, index) => (
@@ -141,7 +141,7 @@ export default function ProductPreview() {
               </aside>
 
               <div className="p-5 md:p-6">
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Inside Product</p>
                     <h4 className="text-2xl font-black text-foreground mt-2">Launch Stack</h4>

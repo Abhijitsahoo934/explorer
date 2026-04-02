@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [templateFeedbackTone, setTemplateFeedbackTone] = useState<'success' | 'warning'>('success');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0].id);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Determine time of day for personalized greeting
   useEffect(() => {
@@ -90,6 +91,7 @@ export default function Dashboard() {
   }, [loading, stats.folders, stats.apps]);
 
   const handleFolderSelect = (folderId: string | null) => {
+    setMobileSidebarOpen(false);
     if (folderId) {
       recordFolderUsage(folderId);
       navigate(`/explorer?folder=${encodeURIComponent(folderId)}`);
@@ -162,13 +164,15 @@ export default function Dashboard() {
         onAddFolder={() => setIsFolderModalOpen(true)} 
         onAddApp={() => setIsAppModalOpen(true)}
         folderTreeSyncKey={folderTreeSyncKey}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
       
       <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/40 border-l border-border backdrop-blur-3xl">
         {/* TOPBAR */}
-        <Topbar />
+        <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
-        <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar relative">
+        <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 lg:p-12">
           <div className="max-w-[1200px] mx-auto">
             
             <AnimatePresence mode="wait">
@@ -194,12 +198,12 @@ export default function Dashboard() {
                 >
                   
                   {/* GREETING SECTION */}
-                  <motion.div variants={itemVariants} className="mt-2 relative">
+                  <motion.div variants={itemVariants} className="relative mt-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest mb-4 border border-accent/20">
                       <greeting.icon size={12} strokeWidth={3} />
                       {greeting.text}
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3 text-foreground">
+                    <h1 className="mb-3 text-3xl font-black tracking-tight text-foreground sm:text-4xl md:text-5xl">
                       Hello, <span className="text-accent capitalize bg-clip-text text-transparent bg-gradient-to-r from-accent to-accent-hover">{userName}</span>
                     </h1>
                     <p className="text-muted text-sm md:text-base font-medium tracking-wide max-w-xl">
@@ -280,15 +284,15 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    <div className="flex flex-wrap justify-end gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
                       <Button
                         variant="ghost"
-                        className="h-10 px-4 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                        className="h-10 w-full rounded-2xl px-4 text-[11px] uppercase tracking-widest font-black sm:w-auto"
                         onClick={() => navigate('/insights')}
                       >
                         Product insights
                       </Button>
-                      <Button variant="ghost" className="h-10 px-4 rounded-2xl text-[11px] uppercase tracking-widest font-black" onClick={() => navigate('/templates')}>
+                      <Button variant="ghost" className="h-10 w-full rounded-2xl px-4 text-[11px] uppercase tracking-widest font-black sm:w-auto" onClick={() => navigate('/templates')}>
                         Browse Template Marketplace
                       </Button>
                     </div>

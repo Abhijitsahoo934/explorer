@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,8 @@ interface SidebarProps {
   onFolderSelect?: (id: string | null) => void;
   /** Bump when Explorer refreshes folder list so the tree stays in sync without a full page reload */
   folderTreeSyncKey?: number;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -23,6 +25,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentFolderId = null,
   onFolderSelect = () => {},
   folderTreeSyncKey = 0,
+  mobileOpen = false,
+  onMobileClose,
 }) => {
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -74,23 +78,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const actualWidth = isCollapsed ? 84 : sidebarWidth;
+  const desktopWidth = `${actualWidth}px`;
 
   return (
     <>
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onMobileClose}
+            className="fixed inset-0 z-30 bg-slate-950/45 backdrop-blur-sm lg:hidden"
+            aria-label="Close navigation"
+          />
+        )}
+      </AnimatePresence>
+
       <motion.aside
-        animate={{ width: actualWidth }}
+        animate={{ width: desktopWidth }}
         transition={{ duration: isResizing ? 0 : 0.3, ease: "easeInOut" }}
-        className="h-screen bg-sidebar/90 backdrop-blur-2xl border-r border-border flex flex-col relative z-20 shrink-0 select-none transition-colors shadow-[var(--panel-shadow)]"
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(88vw,320px)] max-w-[320px] shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-[var(--panel-shadow)] backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:!transform-none"
+        )}
       >
         {/* DRAG RESIZE HANDLE */}
         <div
           onMouseDown={startResizing}
-          className="absolute top-0 right-0 bottom-0 w-1.5 cursor-col-resize hover:bg-accent/40 active:bg-accent z-50 transition-colors opacity-0 hover:opacity-100"
+          className="absolute top-0 right-0 bottom-0 z-50 hidden w-1.5 cursor-col-resize opacity-0 transition-colors hover:bg-accent/40 hover:opacity-100 active:bg-accent lg:block"
           title="Drag to resize"
         />
 
         {/* HEADER */}
-        <div className="h-20 flex items-center justify-between px-5 border-b border-border shrink-0">
+        <div className="flex h-20 items-center justify-between border-b border-border px-4 shrink-0 lg:px-5">
           <AnimatePresence>
             {!isCollapsed && (
               <motion.div 
@@ -109,10 +132,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 text-muted hover:text-foreground hover:bg-card-hover rounded-xl transition-all focus:outline-none shrink-0 mx-auto border border-transparent hover:border-border"
+            className="mx-auto hidden shrink-0 rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground focus:outline-none lg:block"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? <PanelLeft size={20} className="text-accent" /> : <PanelLeftClose size={20} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onMobileClose}
+            className="rounded-xl border border-border p-2 text-muted transition-all hover:bg-card-hover hover:text-foreground lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
           </button>
         </div>
 

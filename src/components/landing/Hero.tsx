@@ -66,16 +66,16 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 px-6"
+      className="relative flex min-h-screen flex-col items-center justify-center px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32"
       style={{ perspective: '2000px' }}
     >
       <div className="relative z-20 container mx-auto text-center flex flex-col items-center max-w-6xl">
-        <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-glass border border-border text-xs font-bold text-muted mb-8 tracking-[0.18em] uppercase backdrop-blur-md shadow-sm">
+        <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full bg-glass border border-border px-4 py-2 text-[10px] font-bold text-muted uppercase tracking-[0.18em] backdrop-blur-md shadow-sm sm:mb-8 sm:text-xs">
           <Sparkles size={14} className="text-accent" />
           <span className="gradient-text">Workspace OS for your internet</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground mb-6 leading-[0.9]">
+        <h1 className="mb-6 text-4xl font-black leading-[0.92] tracking-tighter text-foreground sm:text-5xl md:text-7xl lg:text-8xl">
           <div className="overflow-hidden pb-2">
             <div className="hero-title-line">Browse Like</div>
           </div>
@@ -84,15 +84,15 @@ export default function Hero() {
           </div>
         </h1>
 
-        <p className="hero-subtitle text-lg md:text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
+        <p className="hero-subtitle mx-auto mb-8 max-w-3xl text-base text-muted leading-relaxed sm:mb-10 sm:text-lg md:text-xl">
           Explorer gives your browser a clean operating surface for work. Organize apps into folders, launch faster,
           and keep the same setup across browsers, machines, and sessions.
         </p>
 
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-8 z-30">
+        <div className="z-30 mb-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:items-center md:flex-row md:justify-center md:gap-4">
           <button
             onClick={() => navigate('/auth')}
-            className="hero-cta group h-14 px-8 text-sm font-bold tracking-[0.14em] uppercase bg-foreground text-background hover:opacity-90 rounded-2xl shadow-sm transition-all duration-300 flex items-center gap-2"
+            className="hero-cta group flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-8 text-sm font-bold tracking-[0.14em] uppercase text-background shadow-sm transition-all duration-300 hover:opacity-90 sm:w-auto"
           >
             Start Workspace
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -100,7 +100,7 @@ export default function Hero() {
 
           <a
             href="#product-preview"
-            className="hero-cta flex items-center gap-3 text-muted hover:text-foreground transition-colors text-sm font-semibold group"
+            className="hero-cta flex items-center justify-center gap-3 text-sm font-semibold text-muted transition-colors group hover:text-foreground"
           >
             <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-glass group-hover:bg-card-hover transition-colors backdrop-blur-md shadow-sm">
               <Play size={16} className="ml-0.5 fill-current" />
@@ -111,13 +111,13 @@ export default function Hero() {
 
         <button
           onClick={() => navigate('/blog/stop-using-bookmarks')}
-          className="hero-cta mb-10 inline-flex items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-foreground"
+          className="hero-cta mb-10 inline-flex items-center gap-2 text-center text-sm font-semibold text-muted transition-colors hover:text-foreground"
         >
           Read why bookmarks break for real workflows
           <ArrowRight className="h-4 w-4" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-4xl mb-16">
+        <div className="mb-14 grid w-full max-w-4xl grid-cols-1 gap-3 sm:mb-16 md:grid-cols-3">
           <div className="hero-proof rounded-2xl border border-border bg-card/60 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
             Structured workspaces instead of scattered links
           </div>
@@ -133,21 +133,21 @@ export default function Hero() {
       <div className="relative z-10 w-full max-w-6xl" style={{ transformStyle: 'preserve-3d' }}>
         <div
           ref={mockupRef}
-          className="w-full aspect-[16/10] rounded-3xl border border-border bg-card/55 backdrop-blur-xl overflow-hidden shadow-premium"
+          className="w-full overflow-hidden rounded-[1.75rem] border border-border bg-card/55 shadow-premium backdrop-blur-xl sm:rounded-3xl"
         >
-          <div className="h-12 border-b border-border bg-sidebar/55 flex items-center px-6 gap-2 backdrop-blur-md">
+          <div className="h-12 border-b border-border bg-sidebar/55 flex items-center px-4 sm:px-6 gap-2 backdrop-blur-md">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
 
-            <div className="mx-auto flex items-center gap-2 px-4 py-1.5 rounded-lg bg-background/50 border border-border text-xs text-muted font-mono">
+            <div className="mx-auto hidden md:flex items-center gap-2 px-4 py-1.5 rounded-lg bg-background/50 border border-border text-xs text-muted font-mono">
               explorer://workspace/founder-os
             </div>
           </div>
 
-          <div className="p-6 h-[calc(100%-3rem)] flex gap-6">
+          <div className="p-4 sm:p-6 h-[calc(100%-3rem)] flex flex-col lg:flex-row gap-4 lg:gap-6">
             <div className="hidden md:flex w-56 h-full rounded-xl border border-border bg-sidebar/55 flex-col gap-2 p-4 backdrop-blur-sm">
               <div className="text-xs font-semibold text-muted mb-2 px-2 uppercase tracking-[0.16em]">Workspaces</div>
 
@@ -177,7 +177,7 @@ export default function Hero() {
                 Search folders, apps, and actions...
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 flex-1">
                 <div className="workspace-card rounded-xl bg-card border border-border p-4 hover:border-accent/40 transition-all duration-300 cursor-pointer group">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center mb-3">
                     <Github size={20} className="text-accent" />

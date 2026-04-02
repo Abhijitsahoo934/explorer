@@ -87,6 +87,7 @@ const Explorer: React.FC = () => {
   const [contentLoading, setContentLoading] = useState(false);
   const [folderTreeSyncKey, setFolderTreeSyncKey] = useState(0);
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const folderIdRef = useRef<string | null>(currentFolderId);
   const loadGenerationRef = useRef(0);
@@ -101,6 +102,7 @@ const Explorer: React.FC = () => {
   const [activeType, setActiveType] = useState<'folder' | 'app' | null>(null);
 
   const handleFolderChange = useCallback((folderId: string | null) => {
+    setMobileSidebarOpen(false);
     if (folderId) {
       recordFolderUsage(folderId);
     }
@@ -264,12 +266,14 @@ const Explorer: React.FC = () => {
           onAddFolder={() => setIsFolderModalOpen(true)} 
           onAddApp={() => setIsAppModalOpen(true)}
           folderTreeSyncKey={folderTreeSyncKey}
+          mobileOpen={mobileSidebarOpen}
+          onMobileClose={() => setMobileSidebarOpen(false)}
         />
         
         <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/35 backdrop-blur-3xl border-l border-border">
-          <Topbar />
+          <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
-          <div className="flex-1 p-6 md:p-12 overflow-y-auto custom-scrollbar relative">
+          <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 lg:p-12">
             <AnimatePresence mode="wait">
               {loading && folders.length === 0 ? (
                 <motion.div 
@@ -286,16 +290,16 @@ const Explorer: React.FC = () => {
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   className="max-w-[1400px] mx-auto"
                 >
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 relative z-10">
-                    <div className="flex items-center gap-6">
+                  <div className="relative z-10 mb-8 flex flex-col justify-between gap-6 sm:mb-10 md:flex-row md:items-end lg:mb-12">
+                    <div className="flex items-start gap-4 sm:items-center sm:gap-6">
                       <motion.div 
-                        className="w-20 h-20 rounded-[2rem] bg-card border border-border flex items-center justify-center shadow-2xl relative overflow-hidden group backdrop-blur-2xl"
+                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-2xl backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-[2rem]"
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {currentFolderId ? <FolderIcon size={32} className="text-accent relative z-10" /> : <LayoutGrid size={32} className="text-accent relative z-10" />}
                       </motion.div>
                       
-                      <div>
+                        <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar py-1">
                           <button 
                             onClick={() => handleFolderChange(null)}
@@ -320,17 +324,17 @@ const Explorer: React.FC = () => {
                             </React.Fragment>
                           ))}
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-foreground bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground to-accent/60">
+                        <h1 className="bg-gradient-to-br from-foreground via-foreground to-accent/60 bg-clip-text text-3xl font-black tracking-tighter text-transparent sm:text-4xl md:text-5xl lg:text-6xl">
                           {currentFolderName}
                         </h1>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                       <Button size="sm" variant="outline" className="h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black" onClick={() => setIsFolderModalOpen(true)}>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                       <Button size="sm" variant="outline" className="h-11 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:h-12 sm:px-6" onClick={() => setIsFolderModalOpen(true)}>
                          <FolderIcon size={14} className="mr-2" /> New Folder
                        </Button>
-                       <Button size="sm" className="h-12 px-8 rounded-2xl text-[11px] uppercase tracking-widest font-black shadow-[0_0_20px_rgba(var(--accent),0.3)] hover:shadow-[0_0_30px_rgba(var(--accent),0.5)] transition-all" onClick={() => setIsAppModalOpen(true)}>
+                       <Button size="sm" className="h-11 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black shadow-[0_0_20px_rgba(var(--accent),0.3)] transition-all hover:shadow-[0_0_30px_rgba(var(--accent),0.5)] sm:h-12 sm:px-8" onClick={() => setIsAppModalOpen(true)}>
                          <Plus size={16} className="mr-2 stroke-[3.5px]" /> Add App
                        </Button>
                     </div>

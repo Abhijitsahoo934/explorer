@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, User, Sun, Moon, LogOut, Settings, Command } from 'lucide-react';
+import { Search, Bell, User, Sun, Moon, LogOut, Settings, Command, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { notificationService } from '../../lib/notificationService';
@@ -20,7 +20,7 @@ interface AppNotification {
   created_at: string;
 }
 
-export const Topbar: React.FC = () => {
+export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar }) => {
   const navigate = useNavigate();
   const { open: openCommandPalette } = useCommandPalette();
 
@@ -125,10 +125,20 @@ export const Topbar: React.FC = () => {
 
   return (
     <>
-      <header className="h-16 border-b border-border flex items-center justify-between px-6 md:px-8 bg-sidebar/80 backdrop-blur-2xl sticky top-0 z-[100] shrink-0 transition-all duration-300">
+      <header className="sticky top-0 z-[100] flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-4 backdrop-blur-2xl transition-all duration-300 md:px-6 lg:px-8">
         
         {/* Opens global command palette (folders + apps) — ⌘/Ctrl K */}
-        <div className="relative w-full max-w-xl flex-1 group">
+        <div className="flex min-w-0 flex-1 items-center gap-3 group">
+          <button
+            type="button"
+            onClick={onOpenSidebar}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card/50 text-muted transition-all hover:bg-card-hover hover:text-foreground lg:hidden"
+            aria-label="Open navigation"
+          >
+            <Menu size={18} />
+          </button>
+
+          <div className="relative w-full max-w-xl flex-1">
           <button
             type="button"
             onClick={() => {
@@ -136,22 +146,23 @@ export const Topbar: React.FC = () => {
               setShowProfile(false);
               openCommandPalette();
             }}
-            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card/50 py-2.5 pl-11 pr-16 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/30 hover:bg-card-hover focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10"
+            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card/50 py-2.5 pl-11 pr-4 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/30 hover:bg-card-hover focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:pr-16"
           >
             <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-muted transition-all duration-300 group-hover:text-accent">
               <Search size={18} strokeWidth={2} />
             </div>
             <span className="truncate font-medium">Search folders & apps…</span>
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-2">
+            <div className="pointer-events-none absolute inset-y-0 right-3 hidden items-center gap-2 sm:flex">
               <kbd className="hidden sm:inline-flex items-center gap-1 rounded-lg border border-border bg-background/50 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-muted shadow-sm">
                 <Command size={10} /> K
               </kbd>
             </div>
           </button>
         </div>
+        </div>
 
         {/* RIGHT SIDE ACTIONS */}
-        <div className="flex items-center gap-2 ml-6 pl-6 border-l border-border/50 relative">
+        <div className="relative ml-3 flex items-center gap-1 border-l border-border/50 pl-3 sm:ml-4 sm:gap-2 sm:pl-4 lg:ml-6 lg:pl-6">
           <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} className="p-2.5 text-muted hover:text-foreground hover:bg-card-hover rounded-xl transition-all border border-transparent hover:border-border">
             {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
@@ -222,7 +233,7 @@ export const Topbar: React.FC = () => {
             )}
           </AnimatePresence>
 
-          <div id="profile-btn" onClick={() => setShowProfile(!showProfile)} className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-105 transition-all ml-2 text-xs font-black tracking-wide uppercase">
+          <div id="profile-btn" onClick={() => setShowProfile(!showProfile)} className="ml-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2">
             {userInitials || <User size={16} strokeWidth={3} />}
           </div>
 
