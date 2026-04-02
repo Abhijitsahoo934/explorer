@@ -25,6 +25,37 @@ export default function TemplateSeoPage() {
     return <Navigate to="/" replace />;
   }
 
+  const faqStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `What is ${page.title}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${page.title} is a structured workspace template in Explorero that helps users organize the tools needed for that workflow.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Who should use ${page.title}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: page.audience,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Is ${page.title} better than bookmarks?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${page.title} is better for active work because it groups related tools into one repeatable workspace instead of saving isolated links.`,
+        },
+      },
+    ],
+  };
+
   const handleInstall = async () => {
     setFeedback(null);
 
@@ -51,6 +82,14 @@ export default function TemplateSeoPage() {
         title={page.seoTitle}
         description={page.description}
         canonicalPath={`/templates/${page.slug}`}
+        keywords={[
+          `${page.title.toLowerCase()} template`,
+          `${page.title.toLowerCase()} workspace`,
+          `${page.slug.replace(/-/g, ' ')}`,
+          'organize tools',
+          'workflow setup',
+        ]}
+        structuredData={faqStructuredData}
       />
       <Grain />
       <Navbar />
@@ -185,6 +224,33 @@ export default function TemplateSeoPage() {
                     <p className="mt-3 text-sm leading-6 text-muted">{item.description}</p>
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 pb-16 pt-0">
+          <div className="container mx-auto max-w-4xl rounded-[2rem] border border-border bg-card/70 p-8 shadow-premium backdrop-blur-xl">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted">FAQ</p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight">Questions people ask before installing</h2>
+            <div className="mt-8 space-y-5">
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">What is {page.title}?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">
+                  {page.title} is a professional workspace setup inside Explorero that groups the tools, apps, and
+                  resources commonly used together in that workflow.
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">Who is this template for?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">{page.audience}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">Why not just use bookmarks?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">
+                  Bookmarks save links, but this template preserves a real working environment. That makes it easier to
+                  start, focus, and repeat the same setup every day.
+                </p>
               </div>
             </div>
           </div>

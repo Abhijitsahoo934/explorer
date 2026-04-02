@@ -30,6 +30,36 @@ const audiences = [
 
 export default function AboutExplorero() {
   const navigate = useNavigate();
+  const faqStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Explorero?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Explorero is a workspace operating system for organizing apps, tools, and workflows into structured digital workspaces.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is Explorero a bookmark manager?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Explorero is designed to organize complete workflows and working environments, not just save individual links.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Who is Explorero for?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Explorero is built for developers, creators, freelancers, founders, and anyone who wants a calmer browser workflow.',
+        },
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -37,6 +67,14 @@ export default function AboutExplorero() {
         title="About Explorero | Workspace OS for the Internet"
         description="Learn what Explorero is, why it was built, who it helps, and how it turns bookmarks and browser chaos into structured workspaces."
         canonicalPath="/about-explorero"
+        keywords={[
+          'about explorero',
+          'workspace os',
+          'organize apps and workflows',
+          'bookmark alternative',
+          'browser workflow system',
+        ]}
+        structuredData={faqStructuredData}
       />
       <Grain />
       <Navbar />
@@ -171,6 +209,36 @@ export default function AboutExplorero() {
                 <h3 className="text-xl font-black tracking-tight text-foreground">{PUBLIC_ARTICLE_LINKS[0].title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">{PUBLIC_ARTICLE_LINKS[0].description}</p>
               </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 pb-16 pt-2">
+          <div className="container mx-auto max-w-4xl rounded-[2rem] border border-border bg-card/70 p-8 shadow-premium backdrop-blur-xl">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted">FAQ</p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight">Frequently asked questions</h2>
+            <div className="mt-8 space-y-5">
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">What is Explorero?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">
+                  Explorero is a workspace operating system that helps people organize apps, tools, and workflows into
+                  structured environments instead of scattered tabs and bookmark piles.
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">Is Explorero better than bookmarks?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">
+                  For real workflows, yes. Bookmarks save isolated links, while Explorero helps preserve how tools
+                  belong together in active work.
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <h3 className="text-lg font-black tracking-tight">Can I use Explorero on different browsers?</h3>
+                <p className="mt-3 text-sm leading-7 text-muted">
+                  Yes. The goal is to keep your workspace structure consistent across browsers, devices, and sessions so
+                  your setup stays portable.
+                </p>
+              </div>
             </div>
           </div>
         </section>

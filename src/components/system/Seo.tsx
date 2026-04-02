@@ -5,10 +5,12 @@ interface SeoProps {
   description?: string;
   robots?: string;
   canonicalPath?: string;
+  keywords?: string[];
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const DEFAULT_DESCRIPTION =
-  'Explorer is a workspace operating system for organizing apps, folders, command workflows, and internet context in one premium interface.';
+  'Explorero is a workspace operating system for organizing apps, folders, command workflows, and internet context in one premium interface.';
 
 const SITE_URL = 'https://explorero.tech';
 
@@ -17,6 +19,8 @@ export function Seo({
   description = DEFAULT_DESCRIPTION,
   robots = 'index,follow',
   canonicalPath,
+  keywords,
+  structuredData,
 }: SeoProps) {
   useEffect(() => {
     document.title = title;
@@ -40,8 +44,16 @@ export function Seo({
     upsertMeta('robots', robots);
     upsertMeta('og:title', title, true);
     upsertMeta('og:description', description, true);
+    upsertMeta('og:url', canonicalPath ? `${SITE_URL}${canonicalPath}` : SITE_URL, true);
+    upsertMeta('og:image', `${SITE_URL}/logo.jpg`, true);
     upsertMeta('twitter:title', title);
     upsertMeta('twitter:description', description);
+    upsertMeta('twitter:image', `${SITE_URL}/logo.jpg`);
+    upsertMeta('twitter:card', 'summary_large_image');
+
+    if (keywords?.length) {
+      upsertMeta('keywords', keywords.join(', '));
+    }
 
     let canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
@@ -51,7 +63,23 @@ export function Seo({
     }
 
     canonical.href = canonicalPath ? `${SITE_URL}${canonicalPath}` : SITE_URL;
-  }, [canonicalPath, description, robots, title]);
+
+    const existingScripts = Array.from(
+      document.head.querySelectorAll('script[data-seo-structured-data="true"]')
+    ) as HTMLScriptElement[];
+    existingScripts.forEach((script) => script.remove());
+
+    if (structuredData) {
+      const entries = Array.isArray(structuredData) ? structuredData : [structuredData];
+      entries.forEach((entry) => {
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.dataset.seoStructuredData = 'true';
+        script.text = JSON.stringify(entry);
+        document.head.appendChild(script);
+      });
+    }
+  }, [canonicalPath, description, keywords, robots, structuredData, title]);
 
   return null;
 }
