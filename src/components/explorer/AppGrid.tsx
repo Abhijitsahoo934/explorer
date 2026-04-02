@@ -9,7 +9,7 @@ import type { App } from '../../types/explorer';
 import { explorerService } from '../../lib/explorerService';
 import { RenameModal } from './RenameModal';
 import { recordAppUsage } from '../../lib/contextEngine';
-import { buildFaviconUrl, normalizeExternalUrl } from '../../platform/security/url';
+import { buildFaviconUrl, normalizeExternalUrl, openExternalUrl } from '../../platform/security/url';
 import { logger } from '../../platform/observability/logger';
 
 interface AppGridProps {
@@ -45,6 +45,7 @@ const DraggableAppCard = ({
 }) => {
   const [imgError, setImgError] = useState(false);
   const favicon = app.icon || getFavicon(app.url);
+  const resolvedUrl = normalizeExternalUrl(app.url);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: app.id,
@@ -68,6 +69,13 @@ const DraggableAppCard = ({
     );
   }
 
+  const handleOpenApp = () => {
+    if (!resolvedUrl) return;
+    recordAppUsage(app.id);
+    void explorerService.recordAppOpened(app.id);
+    openExternalUrl(resolvedUrl);
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -77,7 +85,10 @@ const DraggableAppCard = ({
       className="h-full cursor-grab active:cursor-grabbing group/drag"
     >
       <motion.div variants={itemVariants} layout={false} className="h-full pointer-events-none">
-        <SpotlightCard className="p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 hover:shadow-premium transition-all duration-300 h-full flex flex-col backdrop-blur-xl rounded-[2rem] pointer-events-auto relative select-none">
+        <SpotlightCard
+          className="p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 hover:shadow-premium transition-all duration-300 h-full flex flex-col backdrop-blur-xl rounded-[2rem] pointer-events-auto relative select-none cursor-pointer"
+          onClick={handleOpenApp}
+        >
           <div className="absolute top-4 right-4 opacity-0 group-hover/drag:opacity-30 transition-opacity">
             <GripVertical size={16} className="text-muted" />
           </div>
@@ -141,18 +152,14 @@ const DraggableAppCard = ({
             </p>
           </div>
 
-          <a
-            href={normalizeExternalUrl(app.url) ?? '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            draggable={false}
+          <button
+            type="button"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              recordAppUsage(app.id);
-              void explorerService.recordAppOpened(app.id);
+              handleOpenApp();
             }}
-            className="flex items-center justify-between pt-4 border-t border-border no-underline group/link mt-auto relative z-20 hover:bg-card-hover px-2 -mx-2 rounded-xl transition-all"
+            className="flex w-full items-center justify-between pt-4 border-t border-border no-underline group/link mt-auto relative z-20 hover:bg-card-hover px-2 -mx-2 rounded-xl transition-all text-left"
           >
             <span className="text-[10px] text-muted uppercase tracking-widest font-black group-hover/link:text-foreground transition-colors duration-300">
               Open app
@@ -161,7 +168,7 @@ const DraggableAppCard = ({
               size={14}
               className="text-muted group-hover/link:text-accent group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all duration-300"
             />
-          </a>
+          </button>
         </SpotlightCard>
       </motion.div>
     </div>
