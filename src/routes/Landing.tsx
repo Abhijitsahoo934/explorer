@@ -53,8 +53,8 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Seo
-        title="Explorer | Workspace Operating System"
-        description="Organize apps, tools, and workflows into a structured workspace you can open from any browser."
+        title="Explorero | Workspace Operating System for the Internet"
+        description="Explorero helps you organize apps, tools, and workflows into a structured workspace you can open from any browser."
         canonicalPath="/"
       />
       {/* Fixed Navbar */}

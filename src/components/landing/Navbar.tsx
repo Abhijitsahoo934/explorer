@@ -16,7 +16,7 @@ export default function Navbar() {
           <BrandLogo className="h-11 w-11 group-hover:-translate-y-0.5 transition-all duration-300" />
           <div>
             <span className="font-black tracking-tight text-base text-foreground uppercase block leading-none">
-              Explorer
+              Explorero
             </span>
             <span className="text-[9px] uppercase tracking-[0.24em] text-muted font-black">
               Workspace OS
@@ -35,6 +35,9 @@ export default function Navbar() {
           <a href="#use-cases" className="hover:text-foreground transition-colors">
             Use Cases
           </a>
+          <button onClick={() => navigate('/about-explorero')} className="hover:text-foreground transition-colors">
+            About
+          </button>
         </div>
 
         {/* Auth Buttons */}

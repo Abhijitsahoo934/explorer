@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import { BrandLogo } from '../ui/BrandLogo';
+import { PUBLIC_TEMPLATE_LINKS } from '../../lib/publicSiteLinks';
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function Footer() {
               <BrandLogo className="h-11 w-11" />
               <div>
                 <span className="block leading-none text-lg font-black uppercase tracking-tight text-foreground">
-                  Explorer
+                  Explorero
                 </span>
                 <span className="text-[9px] font-black uppercase tracking-[0.24em] text-muted">
                   Workspace OS
@@ -41,24 +42,27 @@ export default function Footer() {
                 <a href="#use-cases" className="block text-sm text-muted transition-colors hover:text-foreground">
                   Use Cases
                 </a>
+                <button
+                  onClick={() => navigate('/about-explorero')}
+                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  About Explorero
+                </button>
               </div>
             </div>
 
             <div>
-              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Company</h3>
+              <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Templates</h3>
               <div className="space-y-3">
-                <button
-                  onClick={() => navigate('/auth')}
-                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => navigate('/auth')}
-                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
-                >
-                  Start Workspace
-                </button>
+                {PUBLIC_TEMPLATE_LINKS.map((link) => (
+                  <button
+                    key={link.path}
+                    onClick={() => navigate(link.path)}
+                    className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                  >
+                    {link.title}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -76,7 +80,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-sm text-muted">© {currentYear} Explorer. All rights reserved.</p>
+          <p className="text-sm text-muted">&copy; {currentYear} Explorero. All rights reserved.</p>
           <p className="text-sm text-muted">Built for focused, organized work.</p>
         </div>
       </div>

@@ -9,6 +9,8 @@ const AuthCallback = lazy(() => import('./routes/AuthCallback'));
 const Dashboard = lazy(() => import('./routes/Dashboard'));
 const Explorer = lazy(() => import('./routes/Explorer'));
 const TemplateMarketplace = lazy(() => import('./routes/TemplateMarketplace'));
+const TemplateSeoPage = lazy(() => import('./routes/TemplateSeoPage'));
+const AboutExplorero = lazy(() => import('./routes/AboutExplorero'));
 const UpdatePassword = lazy(() => import('./routes/UpdatePassword'));
 const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
 const Insights = lazy(() => import('./routes/Insights'));
@@ -117,6 +119,7 @@ function App() {
             } 
           />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/about-explorero" element={<AboutExplorero />} />
           
           {/* Protected Routes: Sirf Login ke baad dikhenge */}
           <Route 
@@ -143,6 +146,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/templates/:slug" element={<TemplateSeoPage />} />
 
           <Route path="/blueprint" element={<BlueprintImport />} />
 
