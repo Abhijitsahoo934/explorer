@@ -419,7 +419,7 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {isOnboardingOpen && (
-          <div className="fixed inset-0 z-[170] flex items-center justify-center p-4 md:p-6">
+          <div className="fixed inset-0 z-[170] flex items-start justify-center overflow-y-auto p-4 pt-6 md:p-6 md:pt-10">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -433,7 +433,7 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-              className="relative w-full max-w-5xl rounded-[2rem] border border-border bg-card/95 backdrop-blur-3xl shadow-premium overflow-hidden"
+              className="relative my-auto w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border bg-card/95 shadow-premium backdrop-blur-3xl"
             >
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute -top-16 left-20 w-56 h-56 rounded-full bg-accent/15 blur-[120px]" />
@@ -461,8 +461,9 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              <div className="relative z-10 grid lg:grid-cols-[280px_1fr] gap-6 p-6 md:p-8">
-                <div className="space-y-3">
+              <div className="relative z-10 max-h-[calc(100vh-12rem)] overflow-hidden p-6 md:p-8">
+                <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+                <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 custom-scrollbar lg:max-h-[calc(100vh-18rem)]">
                   {WORKSPACE_TEMPLATES.map((template) => (
                     <button
                       key={template.id}
@@ -486,7 +487,7 @@ export default function Dashboard() {
                   ))}
                 </div>
 
-                <SpotlightCard className="p-6 md:p-7 bg-background/70 border-border min-h-[360px]">
+                <SpotlightCard className="max-h-[60vh] overflow-y-auto border-border bg-background/70 p-6 custom-scrollbar md:max-h-[calc(100vh-18rem)] md:p-7">
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-5">
                     <div>
                       <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-5`}>
@@ -541,6 +542,7 @@ export default function Dashboard() {
                     </Button>
                   </div>
                 </SpotlightCard>
+                </div>
               </div>
             </motion.div>
           </div>
