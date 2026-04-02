@@ -5,7 +5,7 @@ import { Topbar } from '../components/layout/Topbar';
 import { Grain } from '../components/ui/Grain';
 import { Button } from '../components/ui/Button';
 import { fetchMyProductEvents, type ProductEventRow } from '../lib/analyticsService';
-import { BarChart3, RefreshCw, TrendingUp, MousePointerClick, Activity } from 'lucide-react';
+import { BarChart3, RefreshCw, TrendingUp, MousePointerClick, Activity, DatabaseZap, Info } from 'lucide-react';
 import { Seo } from '../components/system/Seo';
 
 function percentile(sorted: number[], p: number): number {
@@ -26,11 +26,21 @@ const FUNNEL_LABELS: Record<string, string> = {
   funnel_app_added: 'App saved',
 };
 
+function isAnalyticsProvisioningError(errorMessage: string | null): boolean {
+  if (!errorMessage) return false;
+  const normalized = errorMessage.toLowerCase();
+  return normalized.includes('product_events')
+    || normalized.includes('relation')
+    || normalized.includes('schema cache')
+    || normalized.includes('could not find the table');
+}
+
 export default function Insights() {
   const navigate = useNavigate();
   const [events, setEvents] = useState<ProductEventRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -82,12 +92,15 @@ export default function Insights() {
   const recent = useMemo(() => events.slice(0, 40), [events]);
 
   const handleFolderSelect = (folderId: string | null) => {
+    setMobileSidebarOpen(false);
     if (folderId) {
       navigate(`/explorer?folder=${encodeURIComponent(folderId)}`);
       return;
     }
     navigate('/explorer');
   };
+
+  const needsAnalyticsSetup = isAnalyticsProvisioningError(error);
 
   return (
     <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
@@ -100,10 +113,12 @@ export default function Insights() {
         onFolderSelect={handleFolderSelect}
         onAddFolder={() => navigate('/explorer')}
         onAddApp={() => navigate('/explorer')}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
       />
 
       <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/40 border-l border-border backdrop-blur-3xl">
-        <Topbar />
+        <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
           <div className="max-w-5xl mx-auto space-y-8">
@@ -113,9 +128,9 @@ export default function Insights() {
                   <BarChart3 size={12} />
                   Product insights
                 </div>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Your workspace telemetry</h1>
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Understand how your workspace is being used</h1>
                 <p className="text-sm text-muted mt-2 max-w-2xl leading-relaxed">
-                  Funnel counts and Core Web Vitals from your sessions. Requires the <code className="text-xs bg-card px-1.5 py-0.5 rounded border border-border">product_events</code> table in Supabase.
+                  Track activation events, product engagement, and core performance signals. Once analytics data starts flowing, this page becomes your operator view for product health.
                 </p>
               </div>
               <div className="flex gap-2">
@@ -134,8 +149,24 @@ export default function Insights() {
             </div>
 
             {error && (
-              <div className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-amber-800 dark:text-amber-200">
-                {error}
+              <div className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 text-sm text-amber-800 dark:text-amber-200">
+                <div className="flex items-start gap-3">
+                  {needsAnalyticsSetup ? (
+                    <DatabaseZap size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
+                  ) : (
+                    <Info size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
+                  )}
+                  <div>
+                    <p className="font-bold text-amber-900 dark:text-amber-100">
+                      {needsAnalyticsSetup ? 'Insights is waiting for its analytics table.' : 'Insights could not be loaded right now.'}
+                    </p>
+                    <p className="mt-1 leading-relaxed">
+                      {needsAnalyticsSetup
+                        ? 'The product_events table is not available yet in Supabase, so this screen cannot show real telemetry. Once that table exists, login, template installs, app saves, and web vitals will start appearing here.'
+                        : error}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -60,6 +60,7 @@ export default function TemplateMarketplace() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const customTemplateCount = customTemplates.length;
 
   useEffect(() => {
     setCustomTemplates(getStoredWorkspaceTemplates());
@@ -308,7 +309,7 @@ export default function TemplateMarketplace() {
                     }`}
                   >
                     <filter.icon size={14} />
-                    {filter.label}
+                    {filter.id === 'custom' ? `${filter.label} (${customTemplateCount})` : filter.label}
                   </button>
                 ))}
               </div>
@@ -324,8 +325,12 @@ export default function TemplateMarketplace() {
                 <p className="mt-2 text-2xl font-black text-foreground">{filteredTemplates.length}</p>
               </div>
               <div className="rounded-[1.5rem] border border-border bg-card/60 p-4">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Use case</p>
-                <p className="mt-2 text-sm font-bold text-foreground">From startup teams to creators and specialists</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">My templates</p>
+                <p className="mt-2 text-sm font-bold text-foreground">
+                  {customTemplateCount > 0
+                    ? `${customTemplateCount} reusable workspace ${customTemplateCount === 1 ? 'snapshot' : 'snapshots'} saved locally`
+                    : 'Save your current workspace to create reusable personal templates'}
+                </p>
               </div>
             </div>
 
@@ -411,8 +416,25 @@ export default function TemplateMarketplace() {
 
             {filteredTemplates.length === 0 && (
               <div className="rounded-[2rem] border border-dashed border-border bg-card/40 p-10 text-center">
-                <p className="text-lg font-black text-foreground">No ecosystem matched that search.</p>
-                <p className="mt-2 text-sm text-muted">Try a profession like “developer”, “teacher”, “founder”, or a tool like “Figma” or “Supabase”.</p>
+                <p className="text-lg font-black text-foreground">
+                  {activeFilter === 'custom' ? 'No personal templates saved yet.' : 'No ecosystem matched that search.'}
+                </p>
+                <p className="mt-2 text-sm text-muted">
+                  {activeFilter === 'custom'
+                    ? 'My Templates stores workspace snapshots you save from your own live setup. Use "Save Current Workspace" to create reusable operating systems for yourself or your team.'
+                    : 'Try a profession like "developer", "teacher", "founder", or a tool like "Figma" or "Supabase".'}
+                </p>
+                {activeFilter === 'custom' && (
+                  <div className="mt-5 flex justify-center">
+                    <Button
+                      className="h-11 rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black"
+                      loading={isSavingCurrentWorkspace}
+                      onClick={handleSaveCurrentWorkspace}
+                    >
+                      Save Current Workspace
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>

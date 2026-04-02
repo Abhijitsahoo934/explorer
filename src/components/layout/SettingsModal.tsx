@@ -29,21 +29,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
     const removedLocal = clearStorageKeys(localStorage, APP_LOCAL_STORAGE_KEYS);
     const removedSession = clearStorageKeys(sessionStorage, APP_SESSION_STORAGE_KEYS);
+    const totalRemoved = removedLocal + removedSession;
     setTheme('system');
 
     setFeedback({
       type: 'success',
-      message: removedLocal + removedSession > 0
-        ? 'Local app preferences cleared. Refreshing the workspace now while preserving your signed-in session.'
-        : 'No app-scoped cache was found to clear.',
+      message: totalRemoved > 0
+        ? `Cleared ${totalRemoved} local preference ${totalRemoved === 1 ? 'entry' : 'entries'} and reset the app to system defaults. Refreshing now while preserving your signed-in session.`
+        : 'No app-scoped cache was found, but the app will still refresh so you can confirm the current local state.',
     });
     setLoadingAction(null);
 
-    if (removedLocal + removedSession > 0) {
-      window.setTimeout(() => {
-        window.location.reload();
-      }, 900);
-    }
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 900);
   };
 
   const handlePasswordReset = async () => {
@@ -287,7 +286,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           </div>
                           <div>
                             <p className="text-sm font-bold text-foreground">Clear Local Cache</p>
-                            <p className="text-xs text-muted font-medium mt-0.5">Resets local UI preferences without signing you out.</p>
+                            <p className="text-xs text-muted font-medium mt-0.5">Resets theme, recents, onboarding state, and saved local templates without signing you out.</p>
                           </div>
                         </div>
                         <Button

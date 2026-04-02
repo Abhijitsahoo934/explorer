@@ -30,14 +30,26 @@ const sessionId =
 let clsValue = 0;
 let telemetryInitialized = false;
 
+function isMissingProductEventsTable(message: string | undefined) {
+  const normalized = (message ?? '').toLowerCase();
+  return normalized.includes('product_events')
+    && (
+      normalized.includes('schema cache')
+      || normalized.includes('could not find the table')
+      || normalized.includes('does not exist')
+      || normalized.includes('relation')
+    );
+}
+
 async function insertProductEvent(payload: AnalyticsPayload) {
   if (analyticsWriteDisabled) return;
 
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
   const { error } = await supabase.from('product_events').insert([
     {
-      user_id: user?.id ?? null,
+      user_id: user.id,
       session_id: sessionId,
       event_name: payload.name,
       metric_value: payload.value,
@@ -48,8 +60,10 @@ async function insertProductEvent(payload: AnalyticsPayload) {
   ]);
 
   if (error) {
-    // If analytics table is not provisioned yet, disable further writes to avoid noise.
-    analyticsWriteDisabled = true;
+    // Only disable writes when the analytics table is genuinely missing.
+    if (isMissingProductEventsTable(error.message)) {
+      analyticsWriteDisabled = true;
+    }
     if (import.meta.env.DEV) {
       console.warn('Analytics write disabled:', error.message);
     }
@@ -86,7 +100,12 @@ export async function fetchMyProductEvents(limit = 800): Promise<ProductEventRow
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingProductEventsTable(error.message)) {
+      throw new Error('The product_events table is not set up in Supabase yet.');
+    }
+    throw error;
+  }
   return (data as ProductEventRow[]) ?? [];
 }
 
@@ -187,4 +206,3 @@ export function initPerformanceTelemetry() {
     if (document.visibilityState === 'hidden') finalizeVitals();
   });
 }
-
