@@ -6,7 +6,7 @@ import { Grain } from '../components/ui/Grain';
 import { Button } from '../components/ui/Button';
 import { Seo } from '../components/system/Seo';
 import { getBlogArticle } from '../lib/blogArticles';
-import { PUBLIC_TEMPLATE_LINKS } from '../lib/publicSiteLinks';
+import { PUBLIC_ARTICLE_LINKS, PUBLIC_TEMPLATE_LINKS } from '../lib/publicSiteLinks';
 
 export default function BlogArticlePage() {
   const { slug } = useParams();
@@ -102,6 +102,22 @@ export default function BlogArticlePage() {
                   <p className="mt-3 text-sm leading-6 text-muted">{link.description}</p>
                 </button>
               ))}
+            </div>
+
+            <div className="mt-8 rounded-[1.5rem] border border-border bg-card/50 p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Continue reading</p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {PUBLIC_ARTICLE_LINKS.filter((link) => link.path !== `/blog/${article.slug}`).map((link) => (
+                  <button
+                    key={link.path}
+                    onClick={() => navigate(link.path)}
+                    className="rounded-2xl border border-border bg-background/70 p-4 text-left transition-all hover:border-accent/30 hover:bg-card"
+                  >
+                    <h3 className="text-base font-black tracking-tight">{link.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted">{link.description}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>

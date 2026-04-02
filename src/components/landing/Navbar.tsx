@@ -35,6 +35,9 @@ export default function Navbar() {
           <a href="#use-cases" className="hover:text-foreground transition-colors">
             Use Cases
           </a>
+          <button onClick={() => navigate('/learn')} className="hover:text-foreground transition-colors">
+            Learn
+          </button>
           <button onClick={() => navigate('/about-explorero')} className="hover:text-foreground transition-colors">
             About
           </button>

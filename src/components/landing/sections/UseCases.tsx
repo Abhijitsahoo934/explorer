@@ -1,12 +1,15 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Code, Palette, GraduationCap, TrendingUp, Microscope } from 'lucide-react';
+import { Code, Palette, GraduationCap, TrendingUp, Microscope, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { PUBLIC_TEMPLATE_LINKS } from '../../../lib/publicSiteLinks';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function UseCases() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -205,6 +208,18 @@ export default function UseCases() {
           <p className="text-muted italic">
             "No matter your workflow, Explorer helps you stay organized."
           </p>
+          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            {PUBLIC_TEMPLATE_LINKS.map((link) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/60 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent/30 hover:bg-card"
+              >
+                {link.title}
+                <ArrowRight size={14} className="text-accent" />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>

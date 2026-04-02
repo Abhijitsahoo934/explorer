@@ -109,6 +109,14 @@ export default function Hero() {
           </a>
         </div>
 
+        <button
+          onClick={() => navigate('/blog/stop-using-bookmarks')}
+          className="hero-cta mb-10 inline-flex items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-foreground"
+        >
+          Read why bookmarks break for real workflows
+          <ArrowRight className="h-4 w-4" />
+        </button>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-4xl mb-16">
           <div className="hero-proof rounded-2xl border border-border bg-card/60 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
             Structured workspaces instead of scattered links

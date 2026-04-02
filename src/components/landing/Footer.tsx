@@ -78,6 +78,12 @@ export default function Footer() {
                     {link.title}
                   </button>
                 ))}
+                <button
+                  onClick={() => navigate('/learn')}
+                  className="block text-left text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  Learn Hub
+                </button>
               </div>
             </div>
 

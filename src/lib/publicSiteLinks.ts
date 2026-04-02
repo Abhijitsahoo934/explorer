@@ -22,4 +22,14 @@ export const PUBLIC_ARTICLE_LINKS = [
     path: '/blog/stop-using-bookmarks',
     description: 'Why bookmarks break down for serious workflows and what to use instead.',
   },
+  {
+    title: 'How to Organize Your Browser Workflow',
+    path: '/blog/organize-browser-workflow',
+    description: 'A practical system for grouping tools, links, and actions around real work.',
+  },
+  {
+    title: 'Best Tools for Developers in 2026',
+    path: '/blog/best-tools-for-developers-2026',
+    description: 'A modern stack for coding, shipping, debugging, documentation, and product velocity.',
+  },
 ] as const;
