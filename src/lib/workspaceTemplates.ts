@@ -30,6 +30,10 @@ export interface WorkspaceTemplateDefinition {
   source: 'curated' | 'custom';
 }
 
+type StoredWorkspaceTemplate = Partial<Omit<WorkspaceTemplateDefinition, 'icon'>> & {
+  icon?: unknown;
+};
+
 export const CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinition> = [
   {
     id: 'startup-founder-os',
@@ -367,8 +371,38 @@ export const getStoredWorkspaceTemplates = (): WorkspaceTemplateDefinition[] => 
   try {
     const rawValue = readStorageValue(localStorage, USER_TEMPLATE_STORAGE_KEY);
     if (!rawValue) return [];
-    const parsedValue = JSON.parse(rawValue) as WorkspaceTemplateDefinition[];
-    return Array.isArray(parsedValue) ? parsedValue : [];
+    const parsedValue = JSON.parse(rawValue) as StoredWorkspaceTemplate[];
+    if (!Array.isArray(parsedValue)) return [];
+
+    return parsedValue
+      .filter((template): template is StoredWorkspaceTemplate & { template: WorkspaceTemplate } => {
+        return Boolean(
+          template &&
+          typeof template === 'object' &&
+          template.template &&
+          Array.isArray(template.template.folders)
+        );
+      })
+      .map((template, index) => ({
+        id: typeof template.id === 'string' && template.id.length > 0 ? template.id : `custom-restored-${index}`,
+        title: typeof template.title === 'string' && template.title.length > 0 ? template.title : `My Workspace ${index + 1}`,
+        subtitle:
+          typeof template.subtitle === 'string' && template.subtitle.length > 0
+            ? template.subtitle
+            : 'Saved from your current live workspace setup.',
+        icon: Rocket,
+        accent: typeof template.accent === 'string' && template.accent.length > 0
+          ? template.accent
+          : 'from-fuchsia-500/20 to-rose-500/10',
+        category: 'custom',
+        audience:
+          typeof template.audience === 'string' && template.audience.length > 0
+            ? template.audience
+            : 'Saved from your live workspace',
+        tags: Array.isArray(template.tags) ? template.tags.filter((tag): tag is string => typeof tag === 'string') : ['custom', 'workspace', 'personal'],
+        template: template.template,
+        source: 'custom',
+      }));
   } catch {
     return [];
   }

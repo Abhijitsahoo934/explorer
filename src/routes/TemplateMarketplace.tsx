@@ -349,11 +349,14 @@ export default function TemplateMarketplace() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {filteredTemplates.map((template) => (
+                (() => {
+                  const TemplateIcon = template.icon ?? Rocket;
+                  return (
                 <SpotlightCard key={template.id} className="border-border bg-card p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium sm:p-7">
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${template.accent} border border-border flex items-center justify-center mb-5`}>
-                        <template.icon size={22} className="text-accent" />
+                        <TemplateIcon size={22} className="text-accent" />
                       </div>
                       <h2 className="text-2xl font-black text-foreground tracking-tight">{template.title}</h2>
                       <p className="text-sm text-muted mt-3 leading-relaxed max-w-xl">{template.subtitle}</p>
@@ -411,6 +414,8 @@ export default function TemplateMarketplace() {
                     )}
                   </div>
                 </SpotlightCard>
+                  );
+                })()
               ))}
             </div>
 
