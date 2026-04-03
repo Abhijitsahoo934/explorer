@@ -6,7 +6,7 @@ import { Grain } from '../components/ui/Grain';
 import { SpotlightCard } from '../components/ui/SpotlightCard';
 import { Button } from '../components/ui/Button';
 import { explorerService } from '../lib/explorerService';
-import { base64UrlEncode } from '../lib/base64Url';
+import { createSharedBlueprint } from '../lib/sharedBlueprints';
 import {
   CURATED_WORKSPACE_TEMPLATES,
   buildWorkspaceTemplateFromSnapshot,
@@ -65,8 +65,10 @@ export default function TemplateMarketplace() {
     if (!shareLink) return null;
     try {
       const parsed = new URL(shareLink);
-      const dataSize = parsed.searchParams.get('data')?.length ?? 0;
-      return `${parsed.origin}/blueprint?data=... (${Math.round(dataSize / 10) / 100}k chars)`;
+      const shareId = parsed.searchParams.get('share');
+      return shareId
+        ? `${parsed.origin}/blueprint?share=${shareId}`
+        : `${parsed.origin}${parsed.pathname}`;
     } catch {
       return shareLink;
     }
@@ -201,10 +203,8 @@ export default function TemplateMarketplace() {
         apps
       );
 
-      // Payload for installer is only the WorkspaceTemplate shape (no id/category metadata).
-      const payload = sharedTemplate.template;
-      const encoded = base64UrlEncode(JSON.stringify(payload));
-      const link = `${window.location.origin}/blueprint?data=${encodeURIComponent(encoded)}`;
+      const publicId = await createSharedBlueprint(sharedTemplate.template);
+      const link = `${window.location.origin}/blueprint?share=${encodeURIComponent(publicId)}`;
 
       setShareLink(link);
       setShareModalOpen(true);
@@ -490,7 +490,7 @@ export default function TemplateMarketplace() {
               <div className="rounded-2xl border border-border bg-background px-4 py-3">
                 <p className="break-all text-xs font-mono text-foreground">{sharePreview}</p>
                 <p className="mt-2 text-[11px] leading-relaxed text-muted">
-                  The full secure import link is longer because it carries the workspace blueprint data inside the URL. Use Copy Link to share it cleanly.
+                  This link uses a short secure share ID, so it is cleaner to copy and easier to share with your team.
                 </p>
               </div>
               <div className="mt-3 flex flex-col gap-3 sm:flex-row">
@@ -515,7 +515,7 @@ export default function TemplateMarketplace() {
 
             <div className="flex items-center gap-2 text-xs text-muted">
               <CheckCircle2 size={14} className="text-accent" />
-              Tip: Share this with founders/operators—this is your “one-click setup win”.
+              Tip: Share this with founders or operators as a one-click setup win.
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { explorerService, type WorkspaceTemplate } from '../lib/explorerService';
 import { useAuth } from '../hooks/useAuth';
 import { base64UrlDecode } from '../lib/base64Url';
+import { fetchSharedBlueprint } from '../lib/sharedBlueprints';
 import { Button } from '../components/ui/Button';
 import { Grain } from '../components/ui/Grain';
 import { motion } from 'framer-motion';
@@ -45,8 +46,11 @@ export default function BlueprintImport() {
 
   const [isInstalling, setIsInstalling] = useState(false);
   const [installError, setInstallError] = useState<string | null>(null);
+  const [resolvedSharedBlueprint, setResolvedSharedBlueprint] = useState<DecodedBlueprint | null>(null);
+  const [resolvingShare, setResolvingShare] = useState(false);
 
   const dataParam = searchParams.get('data');
+  const shareParam = searchParams.get('share');
 
   const decoded = useMemo<DecodedBlueprint | null>(() => {
     if (!dataParam) return null;
@@ -59,25 +63,70 @@ export default function BlueprintImport() {
     }
   }, [dataParam]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!shareParam) {
+      setResolvedSharedBlueprint(null);
+      setResolvingShare(false);
+      return;
+    }
+
+    setResolvingShare(true);
+    setInstallError(null);
+
+    fetchSharedBlueprint(shareParam)
+      .then((blueprint) => {
+        if (cancelled) return;
+        setResolvedSharedBlueprint(blueprint);
+        if (!blueprint) {
+          setInstallError('This shared blueprint no longer exists or is unavailable.');
+        }
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        const message =
+          error instanceof Error ? error.message : 'Failed to load the shared blueprint.';
+        setInstallError(message);
+        setResolvedSharedBlueprint(null);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setResolvingShare(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shareParam]);
+
+  const activeBlueprint = shareParam ? resolvedSharedBlueprint : decoded;
+
   const derivedStats = useMemo(() => {
-    if (!decoded) return null;
-    const folderCount = decoded.folders.length;
-    const appCount = decoded.folders.reduce((acc, f) => {
+    if (!activeBlueprint) return null;
+    const folderCount = activeBlueprint.folders.length;
+    const appCount = activeBlueprint.folders.reduce((acc, f) => {
       const frec = f as unknown as Record<string, unknown>;
       return acc + blueprintFolderEntries(frec).length;
     }, 0);
     return { folderCount, appCount };
-  }, [decoded]);
+  }, [activeBlueprint]);
 
   const shareReturnTo = useMemo(() => {
     // Used when we have to redirect user to login.
-    if (!dataParam) return '/dashboard';
-    return `/blueprint?data=${encodeURIComponent(dataParam)}`;
-  }, [dataParam]);
+    if (shareParam) {
+      return `/blueprint?share=${encodeURIComponent(shareParam)}`;
+    }
+    if (dataParam) {
+      return `/blueprint?data=${encodeURIComponent(dataParam)}`;
+    }
+    return '/dashboard';
+  }, [dataParam, shareParam]);
 
   const handleInstall = async () => {
     setInstallError(null);
-    if (!decoded) return;
+    if (!activeBlueprint) return;
 
     if (!isAuthenticated) {
       navigate(`/auth?returnTo=${encodeURIComponent(shareReturnTo)}`);
@@ -86,8 +135,8 @@ export default function BlueprintImport() {
 
     setIsInstalling(true);
     try {
-      await explorerService.seedWorkspaceTemplate(decoded);
-      trackFunnelEvent('blueprint_installed', { name: decoded.name });
+      await explorerService.seedWorkspaceTemplate(activeBlueprint);
+      trackFunnelEvent('blueprint_installed', { name: activeBlueprint.name });
       navigate('/explorer', { replace: true });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to install blueprint.';
@@ -97,7 +146,9 @@ export default function BlueprintImport() {
     }
   };
 
-  const missingOrInvalid = !dataParam || !decoded;
+  const missingOrInvalid =
+    (!shareParam && !dataParam) ||
+    (!resolvingShare && !activeBlueprint);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
@@ -123,13 +174,17 @@ export default function BlueprintImport() {
                 <p className="text-[10px] uppercase tracking-[0.25em] text-muted font-black">Blueprint Install</p>
                 <h1 className="text-3xl font-black tracking-tight mt-1">Install a shared workspace setup</h1>
                 <p className="text-sm text-muted mt-2">
-                  {missingOrInvalid ? 'This link is missing or invalid.' : 'Preview what will be added to your vault.'}
+                  {resolvingShare
+                    ? 'Loading shared blueprint preview...'
+                    : missingOrInvalid
+                      ? 'This link is missing or invalid.'
+                      : 'Preview what will be added to your vault.'}
                 </p>
               </div>
             </div>
           </div>
 
-          {decoded && derivedStats && (
+          {activeBlueprint && derivedStats && (
             <div className="rounded-[1.75rem] border border-border bg-background/50 p-5 mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
@@ -137,7 +192,7 @@ export default function BlueprintImport() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs uppercase tracking-widest font-black text-muted">Blueprint Name</p>
-                  <p className="text-xl font-black truncate">{decoded.name}</p>
+                  <p className="text-xl font-black truncate">{activeBlueprint.name}</p>
                 </div>
               </div>
 
@@ -153,7 +208,7 @@ export default function BlueprintImport() {
               </div>
 
               <div className="mt-5 space-y-2">
-                {decoded.folders.map((f) => {
+                {activeBlueprint.folders.map((f) => {
                   const frec = f as unknown as Record<string, unknown>;
                   const entries = blueprintFolderEntries(frec) as Array<{ name: string; url: string }>;
                   return (
