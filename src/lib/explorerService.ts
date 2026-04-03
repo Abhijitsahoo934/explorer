@@ -19,6 +19,13 @@ export interface WorkspaceTemplate {
   folders: ReadonlyArray<WorkspaceTemplateFolder>;
 }
 
+const WORKSPACE_CHANGE_EVENT = 'explorer:workspace-changed';
+
+function notifyWorkspaceChanged() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(WORKSPACE_CHANGE_EVENT));
+}
+
 function templateApps(folder: WorkspaceTemplateFolder): ReadonlyArray<{ name: string; url: string }> {
   const legacy = folder as unknown as { websites?: typeof folder.apps };
   return folder.apps?.length ? folder.apps : legacy.websites ?? [];
@@ -128,6 +135,7 @@ export const explorerService = {
       .select()
       .single();
     if (error) throw error;
+    notifyWorkspaceChanged();
     return data;
   },
 
@@ -161,6 +169,7 @@ export const explorerService = {
 
       const { data, error } = await supabase.from(table).insert([payload]).select().single();
       if (error) throw error;
+      notifyWorkspaceChanged();
       return normalizeAppRecord((data || {}) as Record<string, unknown>);
     });
   },
@@ -247,6 +256,7 @@ export const explorerService = {
 
       if (appsError) throw appsError;
     }
+    notifyWorkspaceChanged();
   },
 
   async updateFolder(id: string, name: string): Promise<Folder> {
@@ -257,6 +267,7 @@ export const explorerService = {
       .select()
       .single();
     if (error) throw error;
+    notifyWorkspaceChanged();
     return data;
   },
 
@@ -278,6 +289,7 @@ export const explorerService = {
         .select()
         .single();
       if (error) throw error;
+      notifyWorkspaceChanged();
       return normalizeAppRecord((data || {}) as Record<string, unknown>);
     });
   },
@@ -287,6 +299,7 @@ export const explorerService = {
       if (table === 'websites') return;
       const { error } = await supabase.from(table).update({ is_pinned: isPinned }).eq('id', id);
       if (error) throw error;
+      notifyWorkspaceChanged();
     });
   },
 
@@ -308,6 +321,7 @@ export const explorerService = {
         .update({ folder_id: newFolderId })
         .eq('id', id);
       if (error) throw error;
+      notifyWorkspaceChanged();
     });
   },
 
@@ -318,6 +332,7 @@ export const explorerService = {
       .update({ parent_id: newParentId })
       .eq('id', id);
     if (error) throw error;
+    notifyWorkspaceChanged();
   },
 
   async deleteFolder(id: string): Promise<void> {
@@ -326,6 +341,7 @@ export const explorerService = {
       .delete()
       .eq('id', id);
     if (error) throw error;
+    notifyWorkspaceChanged();
   },
 
   async deleteApp(id: string): Promise<void> {
@@ -335,6 +351,7 @@ export const explorerService = {
         .delete()
         .eq('id', id);
       if (error) throw error;
+      notifyWorkspaceChanged();
     });
   },
 
@@ -375,5 +392,15 @@ export const explorerService = {
         () => callback()
       )
       .subscribe();
+  },
+
+  onWorkspaceChange(callback: () => void) {
+    if (typeof window === 'undefined') {
+      return () => {};
+    }
+
+    const handler = () => callback();
+    window.addEventListener(WORKSPACE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(WORKSPACE_CHANGE_EVENT, handler);
   },
 };

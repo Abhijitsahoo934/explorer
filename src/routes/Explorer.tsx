@@ -167,11 +167,15 @@ const Explorer: React.FC = () => {
         }
       })();
     });
+    const unsubscribeLocal = explorerService.onWorkspaceChange(() => {
+      void loadData();
+    });
 
     return () => {
       void subscription.unsubscribe();
+      unsubscribeLocal();
     };
-  }, [user?.id]);
+  }, [loadData, user?.id]);
 
   useEffect(() => {
     if (!user?.id) return;

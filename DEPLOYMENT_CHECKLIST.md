@@ -11,6 +11,7 @@
 ## Supabase
 
 - Enable Google provider
+- Run all SQL files in `supabase/migrations` in order before testing the hosted app
 - Verify RLS on `folders`, `apps`, `notifications`, `product_events`
 - Verify Realtime enabled for `folders`, `apps`, `notifications`
 - Create `product_events` table used by Insights

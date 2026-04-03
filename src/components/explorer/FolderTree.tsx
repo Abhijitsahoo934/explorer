@@ -15,7 +15,7 @@ interface FolderNodeProps {
   allFolders: FolderType[];
   level: number;
   activeFolderId: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
   onTreeRefresh: () => void;
 }
 
@@ -52,7 +52,8 @@ const FolderNode: React.FC<FolderNodeProps> = ({ folder, allFolders, level, acti
     if (window.confirm(`⚠️ Delete "${folder.name}" and all its contents?`)) {
       try {
         await explorerService.deleteFolder(folder.id);
-        if (isActive) onSelect('');
+        onTreeRefresh();
+        if (isActive) onSelect(null);
       } catch (error) { console.error("Delete failed:", error); }
     }
   };
@@ -192,8 +193,12 @@ export const FolderTree: React.FC<{
     if (!user?.id) return;
     fetchFolders();
     const subscription = explorerService.subscribeToWorkspace(user.id, fetchFolders);
+    const unsubscribeLocal = explorerService.onWorkspaceChange(() => {
+      void fetchFolders();
+    });
     return () => {
       void subscription.unsubscribe();
+      unsubscribeLocal();
     };
   }, [user?.id]);
 

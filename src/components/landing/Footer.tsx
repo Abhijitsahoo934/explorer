@@ -90,11 +90,11 @@ export default function Footer() {
             <div>
               <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Contact</h3>
               <a
-                href="mailto:hello@explorero.tech"
+                href="mailto:sahooabhijit934@gmail.com"
                 className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
               >
                 <Mail size={14} />
-                hello@explorero.tech
+                sahooabhijit934@gmail.com
               </a>
             </div>
           </div>
