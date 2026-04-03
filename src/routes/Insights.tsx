@@ -126,11 +126,11 @@ export default function Insights() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-3">
                   <BarChart3 size={12} />
-                  Product insights
+                  Workspace activity
                 </div>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Understand how your workspace is being used</h1>
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">See what is working inside your workspace</h1>
                 <p className="text-sm text-muted mt-2 max-w-2xl leading-relaxed">
-                  Track activation events, product engagement, and core performance signals. Once analytics data starts flowing, this page becomes your operator view for product health.
+                  This is an optional operator view. It helps you understand logins, template installs, app usage, and performance signals so you can improve the product with real data.
                 </p>
               </div>
               <div className="flex gap-2">

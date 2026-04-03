@@ -61,6 +61,16 @@ export default function TemplateMarketplace() {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const customTemplateCount = customTemplates.length;
+  const sharePreview = useMemo(() => {
+    if (!shareLink) return null;
+    try {
+      const parsed = new URL(shareLink);
+      const dataSize = parsed.searchParams.get('data')?.length ?? 0;
+      return `${parsed.origin}/blueprint?data=... (${Math.round(dataSize / 10) / 100}k chars)`;
+    } catch {
+      return shareLink;
+    }
+  }, [shareLink]);
 
   useEffect(() => {
     setCustomTemplates(getStoredWorkspaceTemplates());
@@ -477,11 +487,12 @@ export default function TemplateMarketplace() {
 
             <div className="rounded-[1.75rem] border border-border bg-background/50 p-4 mb-4">
               <p className="text-[10px] uppercase tracking-widest font-black text-muted mb-2">Blueprint link</p>
-              <textarea
-                readOnly
-                value={shareLink}
-                className="w-full min-h-[84px] resize-y bg-background border border-border rounded-2xl px-4 py-3 text-xs font-mono text-foreground focus:outline-none"
-              />
+              <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                <p className="break-all text-xs font-mono text-foreground">{sharePreview}</p>
+                <p className="mt-2 text-[11px] leading-relaxed text-muted">
+                  The full secure import link is longer because it carries the workspace blueprint data inside the URL. Use Copy Link to share it cleanly.
+                </p>
+              </div>
               <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                 <Button
                   className="h-10 w-full rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black sm:w-auto"

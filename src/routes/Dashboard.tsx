@@ -203,8 +203,8 @@ export default function Dashboard() {
                       <greeting.icon size={12} strokeWidth={3} />
                       {greeting.text}
                     </div>
-                    <h1 className="mb-3 max-w-full text-3xl font-black leading-[0.95] tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                      Hello, <span className="break-words text-accent capitalize bg-clip-text text-transparent bg-gradient-to-r from-accent to-accent-hover">{userName}</span>
+                    <h1 className="mb-3 max-w-full pb-1 text-3xl font-black leading-[1.02] tracking-tight text-foreground sm:text-4xl md:text-5xl">
+                      Hello, <span className="inline-block break-words capitalize text-accent">{userName}</span>
                     </h1>
                     <p className="text-muted text-sm md:text-base font-medium tracking-wide max-w-xl">
                       Your digital vault is ready. Here's a quick overview of your workspace today.

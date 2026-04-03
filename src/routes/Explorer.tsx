@@ -324,7 +324,7 @@ const Explorer: React.FC = () => {
                             </React.Fragment>
                           ))}
                         </div>
-                        <h1 className="bg-gradient-to-br from-foreground via-foreground to-accent/60 bg-clip-text text-3xl font-black tracking-tighter text-transparent sm:text-4xl md:text-5xl lg:text-6xl">
+                        <h1 className="pb-2 text-3xl font-black leading-[1.02] tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
                           {currentFolderName}
                         </h1>
                       </div>
