@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { fetchMyProductEvents, type ProductEventRow } from '../lib/analyticsService';
 import { BarChart3, RefreshCw, TrendingUp, MousePointerClick, Activity, DatabaseZap, Info } from 'lucide-react';
 import { Seo } from '../components/system/Seo';
+import { evaluateSLOGuardrails, summarizeReleaseReadiness } from '../lib/sloGuardrails';
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
@@ -91,6 +92,32 @@ export default function Insights() {
 
   const recent = useMemo(() => events.slice(0, 40), [events]);
 
+  const sloItems = useMemo(
+    () => evaluateSLOGuardrails(events, {
+      lcp: vitalStats.lcp,
+      fcp: vitalStats.fcp,
+      ttfb: vitalStats.ttfb,
+      cls: vitalStats.cls,
+    }),
+    [events, vitalStats]
+  );
+
+  const releaseReadiness = useMemo(() => summarizeReleaseReadiness(sloItems), [sloItems]);
+
+  const readinessTone =
+    releaseReadiness.status === 'go'
+      ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
+      : releaseReadiness.status === 'warn'
+        ? 'border-amber-500/25 bg-amber-500/10 text-amber-300'
+        : 'border-rose-500/25 bg-rose-500/10 text-rose-300';
+
+  const statusClass = (status: 'good' | 'warn' | 'fail') =>
+    status === 'good'
+      ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
+      : status === 'warn'
+        ? 'border-amber-500/25 bg-amber-500/10 text-amber-300'
+        : 'border-rose-500/25 bg-rose-500/10 text-rose-300';
+
   const handleFolderSelect = (folderId: string | null) => {
     setMobileSidebarOpen(false);
     if (folderId) {
@@ -171,6 +198,37 @@ export default function Insights() {
             )}
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="rounded-3xl border border-border bg-card/70 p-6 backdrop-blur-md md:col-span-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest font-black text-muted">Release guardrails</p>
+                    <h2 className="mt-1 text-lg font-black text-foreground">Mobile and reliability SLO status</h2>
+                  </div>
+                  <span className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-widest font-black ${readinessTone}`}>
+                    {releaseReadiness.status.toUpperCase()}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {sloItems.map((item) => (
+                    <div key={item.key} className="rounded-2xl border border-border bg-background/50 px-4 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-bold text-foreground">{item.label}</p>
+                        <span className={`rounded-md border px-1.5 py-0.5 text-[9px] uppercase tracking-widest font-black ${statusClass(item.status)}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm font-black text-foreground tabular-nums">{item.value}</p>
+                      <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">Target {item.target}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-4 text-xs text-muted">
+                  Decision rule: any FAIL = no-go, more than one WARN = caution, else go.
+                </p>
+              </div>
+
               <div className="rounded-3xl border border-border bg-card/70 p-6 backdrop-blur-md">
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-muted mb-4">
                   <MousePointerClick size={14} className="text-accent" />
@@ -254,7 +312,7 @@ export default function Insights() {
                           <td className="py-2.5 pr-4 font-medium">{row.event_name}</td>
                           <td className="py-2.5 pr-4 text-xs text-muted">{row.metric_type}</td>
                           <td className="py-2.5 pr-4 font-mono text-xs tabular-nums">{row.metric_value}</td>
-                          <td className="py-2.5 text-xs text-muted truncate max-w-[180px]">{row.path}</td>
+                          <td className="py-2.5 text-xs text-muted truncate max-w-45">{row.path}</td>
                         </tr>
                       ))}
                     </tbody>

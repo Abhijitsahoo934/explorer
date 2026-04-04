@@ -25,6 +25,8 @@ import { normalizeQuickActions } from '../lib/workspaceQuickActions';
 import { generateAIActions } from '../lib/aiActionEngine';
 import { buildWorkflowMacros } from '../lib/workflowMacros';
 import { CommandPalette } from '../components/command/CommandPalette';
+import { logger } from '../platform/observability/logger';
+import { trackProductEvent } from '../lib/analyticsService';
 
 export interface CommandPaletteContextValue {
   open: () => void;
@@ -66,6 +68,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
   const open = useCallback(() => {
     if (!session) return;
+    trackProductEvent('command_palette_opened');
     setIsOpen(true);
   }, [session]);
 
@@ -90,6 +93,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
     if (!isOpen || !session) return;
 
     let cancelled = false;
+    const loadStart = performance.now();
     setLoading(true);
     void (async () => {
       try {
@@ -97,9 +101,17 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         if (!cancelled) {
           setFolders(f);
           setApps(a);
+          trackProductEvent('command_palette_loaded', {
+            folders: f.length,
+            apps: a.length,
+            load_ms: Math.round(performance.now() - loadStart),
+          });
         }
       } catch (e) {
-        console.error('Command palette load failed:', e);
+        logger.error('command_palette_load', e);
+        trackProductEvent('command_palette_load_failed', {
+          load_ms: Math.round(performance.now() - loadStart),
+        });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -219,6 +231,12 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
   const executeItem = useCallback(
     (item: CommandPaletteItem) => {
+      trackProductEvent('command_palette_execute', {
+        item_id: item.id,
+        item_type: item.type,
+        query_length: debouncedQuery.trim().length,
+      });
+
       if (item.type === 'action' && item.navigateTo) {
         navigate(item.navigateTo);
         close();
@@ -321,7 +339,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
       }
       close();
     },
-    [close, navigate, folders, apps, recentAppsResolved, trackAppUsage, trackFolderUsage]
+    [close, navigate, folders, apps, recentAppsResolved, trackAppUsage, trackFolderUsage, debouncedQuery]
   );
 
   useEffect(() => {

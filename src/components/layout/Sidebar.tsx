@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft, X } from 'lucide-react';
+import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft, X, LayoutDashboard } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,8 @@ interface SidebarProps {
   onFolderSelect?: (id: string | null) => void;
   /** Bump when Explorer refreshes folder list so the tree stays in sync without a full page reload */
   folderTreeSyncKey?: number;
+  activeDragId?: string | null;
+  activeDragType?: 'folder' | 'app' | null;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
 }
@@ -25,11 +27,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentFolderId = null,
   onFolderSelect = () => {},
   folderTreeSyncKey = 0,
+  activeDragId = null,
+  activeDragType = null,
   mobileOpen = false,
   onMobileClose,
 }) => {
   const navigate = useNavigate();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const goToDashboard = () => {
+    onMobileClose?.();
+    navigate('/dashboard');
+  };
   
   // --- RESIZE & COLLAPSE LOGIC ---
   const [sidebarWidth, setSidebarWidth] = useState(280);
@@ -100,9 +109,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         animate={{ width: desktopWidth }}
         transition={{ duration: isResizing ? 0 : 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(88vw,320px)] max-w-[320px] shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-[var(--panel-shadow)] backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(88vw,320px)] max-w-[320px] shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-(--panel-shadow) backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:!transform-none"
+          "lg:transform-none!"
         )}
       >
         {/* DRAG RESIZE HANDLE */}
@@ -151,6 +160,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* QUICK ACTIONS */}
         <div className="p-4 space-y-3 border-b border-border shrink-0">
           <button
+            onClick={goToDashboard}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden",
+              isCollapsed ? "px-0" : "px-4"
+            )}
+            title="Dashboard"
+          >
+            <LayoutDashboard size={16} className={cn("shrink-0", isCollapsed ? "text-foreground" : "text-muted")} />
+            {!isCollapsed && <span className="text-[11px] uppercase tracking-widest font-bold whitespace-nowrap">Dashboard</span>}
+          </button>
+
+          <button
             onClick={onAddApp}
             className={cn(
               "w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all focus:outline-none overflow-hidden shadow-lg",
@@ -182,8 +203,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-0.5 whitespace-nowrap">
                 <div className="mb-4 px-2 mt-2">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Your Vault</p>
+                  {activeDragType === 'folder' && (
+                    <p className="mt-2 rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-accent">
+                      Drop on folder to nest, Root to move out
+                    </p>
+                  )}
                 </div>
-                <FolderTree currentFolderId={currentFolderId} onFolderSelect={onFolderSelect} syncKey={folderTreeSyncKey} />
+                <FolderTree
+                  currentFolderId={currentFolderId}
+                  onFolderSelect={onFolderSelect}
+                  syncKey={folderTreeSyncKey}
+                  activeDragId={activeDragId}
+                  activeDragType={activeDragType}
+                />
               </motion.div>
             )}
           </AnimatePresence>

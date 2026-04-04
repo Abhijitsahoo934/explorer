@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if [ -z "$1" ]; then
+  echo "[commit-msg] Missing commit message file path."
+  exit 1
+fi
+
+node scripts/validate-commit-message.mjs "$1"

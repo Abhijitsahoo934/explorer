@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import type { CommandPaletteItem } from '../../lib/commandPaletteUtils';
 import { cn } from '../../lib/utils';
+
+const MAX_RENDERED_ITEMS_DEFAULT = 80;
+const MAX_RENDERED_ITEMS_ACTIVE_FILTER = 120;
 
 function HighlightMatch({ text, query }: { text: string; query: string }) {
   const q = query.trim();
@@ -83,6 +86,34 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const compactMedia = window.matchMedia('(max-width: 768px)');
+    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const apply = () => {
+      setIsCompactViewport(compactMedia.matches);
+      setPrefersReducedMotion(motionMedia.matches);
+    };
+
+    apply();
+
+    compactMedia.addEventListener('change', apply);
+    motionMedia.addEventListener('change', apply);
+
+    return () => {
+      compactMedia.removeEventListener('change', apply);
+      motionMedia.removeEventListener('change', apply);
+    };
+  }, []);
+
+  const maxRenderedItems = hasActiveFilter ? MAX_RENDERED_ITEMS_ACTIVE_FILTER : MAX_RENDERED_ITEMS_DEFAULT;
+  const visibleItems = useMemo(() => items.slice(0, maxRenderedItems), [items, maxRenderedItems]);
+  const truncatedCount = Math.max(0, items.length - visibleItems.length);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -92,9 +123,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    const el = listRef.current?.querySelector<HTMLElement>(`[data-cmd-index="${selectedIndex}"]`);
+    const clampedIndex = Math.min(selectedIndex, Math.max(0, visibleItems.length - 1));
+    if (clampedIndex !== selectedIndex) {
+      onSelectIndex(clampedIndex);
+      return;
+    }
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-cmd-index="${clampedIndex}"]`);
     el?.scrollIntoView({ block: 'nearest' });
-  }, [isOpen, selectedIndex, items]);
+  }, [isOpen, selectedIndex, visibleItems, onSelectIndex]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -108,7 +144,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        onSelectIndex(Math.min(selectedIndex + 1, Math.max(0, items.length - 1)));
+        onSelectIndex(Math.min(selectedIndex + 1, Math.max(0, visibleItems.length - 1)));
         return;
       }
 
@@ -118,15 +154,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         return;
       }
 
-      if (e.key === 'Enter' && items[selectedIndex]) {
+      if (e.key === 'Enter' && visibleItems[selectedIndex]) {
         e.preventDefault();
-        onExecute(items[selectedIndex]);
+        onExecute(visibleItems[selectedIndex]);
       }
     };
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, items, onClose, onExecute, onSelectIndex, selectedIndex]);
+  }, [isOpen, visibleItems, onClose, onExecute, onSelectIndex, selectedIndex]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -141,16 +177,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const contextStart = quickActionCount + macroCutoff;
   const recentStart = quickActionCount + macroCutoff + contextCutoff;
   const workspaceStart = quickActionCount + macroCutoff + contextCutoff + recentCutoff;
-  const showWorkspaceSection = !hasActiveFilter && items.length > workspaceStart;
+  const showWorkspaceSection = !hasActiveFilter && visibleItems.length > workspaceStart;
 
-  const rowKeys = useMemo(() => items.map((it) => `${it.type}:${it.id}`), [items]);
-  const firstAiIndex = useMemo(() => items.findIndex((it) => it.type === 'ai'), [items]);
+  const rowKeys = useMemo(() => visibleItems.map((it) => `${it.type}:${it.id}`), [visibleItems]);
+  const firstAiIndex = useMemo(() => visibleItems.findIndex((it) => it.type === 'ai'), [visibleItems]);
 
   const content = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[240] flex items-start justify-center p-4 pt-[min(12vh,120px)] sm:pt-[15vh]"
+          className="fixed inset-0 z-240 flex items-start justify-center p-4 pt-[min(12vh,120px)] sm:pt-[15vh]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -176,7 +212,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             transition={{ type: 'spring', damping: 28, stiffness: 380 }}
             className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/85 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent" />
 
             <div className="flex items-center gap-3 border-b border-white/5 px-4 py-3">
               <Search className="shrink-0 text-zinc-500" size={18} strokeWidth={2.5} />
@@ -196,12 +232,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             </div>
 
             <div ref={listRef} className="max-h-[min(60vh,520px)] overflow-y-auto custom-scrollbar px-2 py-2">
-              {loading && items.length === 0 ? (
+              {loading && visibleItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-16">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Indexing workspace…</p>
                 </div>
-              ) : !loading && items.length === 0 ? (
+              ) : !loading && visibleItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
                   <Sparkles className="text-zinc-600" size={28} />
                   <p className="text-sm font-bold text-zinc-400">No results found</p>
@@ -217,7 +253,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     </p>
                   )}
 
-                  {items.map((item, index) => {
+                  {visibleItems.map((item, index) => {
                     const isAi = item.type === 'ai';
 
                     return (
@@ -258,7 +294,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           onClick={() => onExecute(item)}
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.02, duration: 0.18 }}
+                          transition={
+                            isCompactViewport || prefersReducedMotion
+                              ? { duration: 0.08 }
+                              : { delay: Math.min(index * 0.012, 0.18), duration: 0.16 }
+                          }
                           className={cn(
                             'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all',
                             isAi &&
@@ -299,7 +339,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                               </span>
                               <span
                                 className={cn(
-                                  'max-w-[120px] shrink-0 truncate rounded-md border px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide',
+                                  'max-w-30 shrink-0 truncate rounded-md border px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide',
                                   item.type === 'ai'
                                     ? 'border-purple-400/35 bg-purple-500/20 text-purple-200'
                                     : item.type === 'action'
@@ -335,6 +375,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     );
                   })}
                 </div>
+              )}
+
+              {truncatedCount > 0 && (
+                <p className="px-3 pb-2 pt-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                  Showing top {visibleItems.length} results · refine search for {truncatedCount} more
+                </p>
               )}
             </div>
 

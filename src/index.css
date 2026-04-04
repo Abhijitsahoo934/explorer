@@ -32,6 +32,7 @@
   --glass: rgba(255, 255, 255, 0.7);
   --surface-strong: #ffffff;
   --surface-soft: rgba(255, 255, 255, 0.7);
+  --panel-blur: 18px;
   --panel-shadow: 0 24px 60px -28px rgba(15, 23, 42, 0.18);
   --hero-glow: rgba(79, 70, 229, 0.14);
   --hero-glow-secondary: rgba(14, 165, 233, 0.1);
@@ -55,6 +56,7 @@
   --glass: rgba(15, 23, 42, 0.5);
   --surface-strong: #0b1220;
   --surface-soft: rgba(15, 23, 42, 0.72);
+  --panel-blur: 18px;
   --panel-shadow: 0 30px 80px -38px rgba(2, 6, 23, 0.85);
   --hero-glow: rgba(99, 102, 241, 0.18);
   --hero-glow-secondary: rgba(56, 189, 248, 0.1);
@@ -70,6 +72,7 @@
 
   html {
     background: var(--background);
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -86,6 +89,12 @@
     overflow-x: hidden;
     /* Smooth theme transition */
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, background 0.4s ease;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #root {
+    min-height: 100dvh;
   }
 
   /* Smooth Scrolling for Lenis */
@@ -188,8 +197,8 @@
   background: var(--surface-soft);
   border: 1px solid var(--border);
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
 }
 
 /* Simple utility to hide scrollbar but allow scrolling */
@@ -199,4 +208,36 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Mobile-first hardening for performance and interaction smoothness */
+@media (max-width: 768px) {
+  :root {
+    --panel-blur: 8px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--hero-glow) 70%, transparent), transparent 34%),
+      linear-gradient(180deg, color-mix(in srgb, var(--background) 98%, white 2%), var(--background));
+  }
+
+  .surface-panel {
+    box-shadow: 0 12px 30px -24px rgba(15, 23, 42, 0.28);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

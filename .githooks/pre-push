@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+printf "\n[pre-push] Running startup quality gate...\n"
+node scripts/git-pre-push.mjs

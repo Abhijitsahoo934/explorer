@@ -1,4 +1,68 @@
-# React + TypeScript + Vite
+# Explorer Browser Workspace
+
+Production-ready React + TypeScript + Vite application for Explorer.
+
+## Local Startup (Recommended)
+
+```bash
+npm install
+npm run doctor:dev
+npm run dev
+```
+
+If port 5173 is busy:
+
+```bash
+npm run dev -- --port 5174
+```
+
+## Quality Gates
+
+```bash
+npm run ci:check
+npm run qa:mobile
+npm run preflight:prod
+npm run preflight:prod:strict
+```
+
+`preflight:prod` runs environment validation, `ci:check`, and mobile QA sign-off in one command.
+`preflight:prod:strict` additionally fails if `VITE_APP_ENV` is not set to `production` (recommended for CI/release branches).
+
+## Git Push Protection
+
+Enable pre-push checks once per clone:
+
+```bash
+npm run setup:hooks
+```
+
+This installs a `pre-push` hook that runs `npm run ci:check` and blocks broken pushes.
+
+It also validates commit messages via `commit-msg` hook using conventional format:
+
+- `feat(scope): short description`
+- `fix(scope): short description`
+- `chore(scope): short description`
+
+Example:
+
+```bash
+fix(auth): prevent false recovery redirect after oauth login
+```
+
+`qa:mobile` generates a release sign-off template in `reports/`.
+
+## Environment
+
+Create `.env` from `.env.example` and set real values for:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_APP_ENV=production`
+
+---
+
+## Template Notes
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

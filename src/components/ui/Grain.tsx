@@ -1,8 +1,11 @@
 interface GrainProps {
   opacity?: number;
+  disabled?: boolean;
 }
 
-export function Grain({ opacity = 0.04 }: GrainProps) {
+export function Grain({ opacity = 0.04, disabled = false }: GrainProps) {
+  if (disabled) return null;
+
   return (
     <div
       className="pointer-events-none fixed inset-0 z-50 h-full w-full mix-blend-overlay select-none overflow-hidden"

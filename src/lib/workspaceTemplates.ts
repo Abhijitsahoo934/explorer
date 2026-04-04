@@ -14,6 +14,7 @@ import type { Folder, App } from '../types/explorer';
 import type { WorkspaceTemplate } from './explorerService';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { COMMUNITY_TEMPLATE_LIBRARY } from './communityTemplateLibrary';
 
 export const USER_TEMPLATE_STORAGE_KEY = STORAGE_KEYS.userTemplates;
 
@@ -34,7 +35,7 @@ type StoredWorkspaceTemplate = Partial<Omit<WorkspaceTemplateDefinition, 'icon'>
   icon?: unknown;
 };
 
-export const CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinition> = [
+const BASE_CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinition> = [
   {
     id: 'startup-founder-os',
     title: 'Startup Founder OS',
@@ -364,6 +365,93 @@ export const CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinit
     },
   },
 ] as const;
+
+const slugifyTemplateName = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+
+const inferTemplateCategory = (name: string): WorkspaceTemplateDefinition['category'] => {
+  const value = name.toLowerCase();
+  if (value.includes('designer') || value.includes('video') || value.includes('creator') || value.includes('blogger')) {
+    return 'creative';
+  }
+  if (value.includes('developer') || value.includes('engineer') || value.includes('devops') || value.includes('cybersecurity')) {
+    return 'technical';
+  }
+  if (value.includes('founder') || value.includes('manager') || value.includes('investor') || value.includes('marketer')) {
+    return 'business';
+  }
+  if (value.includes('student') || value.includes('teacher')) {
+    return 'specialized';
+  }
+  return 'specialized';
+};
+
+const inferTemplateIcon = (name: string): LucideIcon => {
+  const value = name.toLowerCase();
+  if (value.includes('founder') || value.includes('investor')) return Rocket;
+  if (value.includes('designer')) return Figma;
+  if (value.includes('video') || value.includes('creator')) return Clapperboard;
+  if (value.includes('blogger')) return PenSquare;
+  if (value.includes('developer') || value.includes('devops') || value.includes('automation')) return Code2;
+  if (value.includes('teacher') || value.includes('student')) return GraduationCap;
+  if (value.includes('product') || value.includes('analyst')) return BookOpen;
+  if (value.includes('ai') || value.includes('ml') || value.includes('cybersecurity')) return BrainCircuit;
+  return Rocket;
+};
+
+const inferTemplateAccent = (category: WorkspaceTemplateDefinition['category']) => {
+  if (category === 'creative') return 'from-pink-500/20 to-rose-500/10';
+  if (category === 'technical') return 'from-sky-500/20 to-indigo-500/10';
+  if (category === 'business') return 'from-amber-500/20 to-orange-500/10';
+  if (category === 'specialized') return 'from-emerald-500/20 to-teal-500/10';
+  return 'from-fuchsia-500/20 to-violet-500/10';
+};
+
+const toCommunityTemplateDefinition = (template: WorkspaceTemplate): WorkspaceTemplateDefinition => {
+  const category = inferTemplateCategory(template.name);
+  const folderCount = template.folders.length;
+
+  return {
+    id: slugifyTemplateName(template.name),
+    title: template.name,
+    subtitle: `${folderCount} folders preloaded for a production-ready workflow.`,
+    icon: inferTemplateIcon(template.name),
+    accent: inferTemplateAccent(category),
+    category,
+    audience: `Best for ${template.name.replace(/\s+OS$/i, '').toLowerCase()} workflows`,
+    tags: [
+      ...new Set(
+        template.name
+          .toLowerCase()
+          .replace(/\(.*?\)/g, '')
+          .split(/\s+/)
+          .filter((word) => word && word !== 'os')
+      ),
+    ].slice(0, 6),
+    template,
+    source: 'curated',
+  };
+};
+
+const mergeTemplateDefinitions = (
+  items: ReadonlyArray<WorkspaceTemplateDefinition>
+): ReadonlyArray<WorkspaceTemplateDefinition> => {
+  const map = new Map<string, WorkspaceTemplateDefinition>();
+  for (const item of items) {
+    map.set(item.id, item);
+  }
+  return Array.from(map.values());
+};
+
+const COMMUNITY_WORKSPACE_TEMPLATES = COMMUNITY_TEMPLATE_LIBRARY.map(toCommunityTemplateDefinition);
+
+export const CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinition> =
+  mergeTemplateDefinitions([...BASE_CURATED_WORKSPACE_TEMPLATES, ...COMMUNITY_WORKSPACE_TEMPLATES]);
 
 export const WORKSPACE_TEMPLATES = CURATED_WORKSPACE_TEMPLATES;
 

@@ -5,9 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "doctor:dev": "node scripts/dev-doctor.mjs",
+    "setup:hooks": "node scripts/setup-git-hooks.mjs",
+    "prepush:check": "node scripts/git-pre-push.mjs",
+    "commitmsg:check": "node scripts/validate-commit-message.mjs",
     "build": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "qa:mobile": "npm run build && node scripts/mobile-qa-signoff.mjs",
+    "ci:check": "npm run lint && npm run build",
+    "preflight:prod": "node scripts/prod-preflight.mjs",
+    "preflight:prod:strict": "node scripts/prod-preflight.mjs --strict"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

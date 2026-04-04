@@ -74,19 +74,34 @@ function trackMetric(payload: AnalyticsPayload) {
   void insertProductEvent(payload);
 }
 
+export function trackProductEvent(
+  eventName: string,
+  metadata?: Record<string, unknown>,
+  options?: {
+    metricValue?: number;
+    metricType?: AnalyticsMetricType;
+    path?: string;
+  }
+) {
+  const normalizedName = eventName.trim();
+  if (!normalizedName) return;
+
+  void insertProductEvent({
+    name: normalizedName,
+    value: options?.metricValue ?? 1,
+    type: options?.metricType ?? 'performance',
+    path: options?.path ?? (typeof window !== 'undefined' ? window.location.pathname : '/'),
+    metadata,
+  });
+}
+
 /**
  * Activation / funnel events. Stored as metric_type `performance` with value `1`
  * so existing DB CHECK constraints stay valid without migrations.
  */
 export function trackFunnelEvent(eventName: string, metadata?: Record<string, unknown>) {
   const name = eventName.startsWith('funnel_') ? eventName : `funnel_${eventName}`;
-  void insertProductEvent({
-    name,
-    value: 1,
-    type: 'performance',
-    path: typeof window !== 'undefined' ? window.location.pathname : '/',
-    metadata,
-  });
+  trackProductEvent(name, metadata, { metricValue: 1, metricType: 'performance' });
 }
 
 export async function fetchMyProductEvents(limit = 800): Promise<ProductEventRow[]> {

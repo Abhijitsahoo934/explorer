@@ -4,6 +4,7 @@ import {
   DndContext, 
   DragOverlay, 
   pointerWithin, 
+  rectIntersection,
   KeyboardSensor, 
   MouseSensor, 
   TouchSensor, 
@@ -11,7 +12,7 @@ import {
   useSensors, 
   useDroppable 
 } from '@dnd-kit/core';
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent, DragOverEvent, CollisionDetection } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useSearchParams } from 'react-router-dom';
 import { Sidebar } from '../components/layout/Sidebar';
@@ -30,9 +31,18 @@ import { recordFolderUsage } from '../lib/contextEngine';
 import { logger } from '../platform/observability/logger';
 import { getErrorMessage } from '../lib/errorMessage';
 import { Seo } from '../components/system/Seo';
+import { trackProductEvent } from '../lib/analyticsService';
 
 // --- MAIN WORKSPACE DROPPABLE FOLDER CARD ---
-const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () => void }) => {
+const WorkspaceFolderCard = ({
+  folder,
+  onClick,
+  reducedMotion,
+}: {
+  folder: Folder;
+  onClick: () => void;
+  reducedMotion: boolean;
+}) => {
   const { isOver, setNodeRef } = useDroppable({
     // FIX: Unique ID for workspace folders to prevent conflict with Sidebar folders!
     id: `workspace-folder-${folder.id}`, 
@@ -44,13 +54,13 @@ const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () 
       ref={setNodeRef}
       layout={false}
       variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-      whileHover={{ y: -5, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={reducedMotion ? undefined : { y: -5, scale: 1.02 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
       onClick={onClick}
       className={cn(
-        "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel",
+        "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel will-change-transform",
         isOver 
-          ? "bg-accent border-accent shadow-[0_0_40px_rgba(var(--accent),0.4)] scale-[1.05] z-10" 
+          ? "bg-accent/14 border-accent/45 shadow-[0_0_40px_rgba(var(--accent),0.32)] scale-[1.04] z-10" 
           : "hover:bg-card-hover hover:border-accent/30"
       )}
     >
@@ -58,8 +68,8 @@ const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () 
         "transition-all duration-300 flex flex-col items-center gap-4",
         isOver ? "opacity-0 scale-50 absolute" : "opacity-100 scale-100"
       )}>
-        <div className="relative isolate w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-[var(--surface-strong)] group-hover:bg-accent group-hover:shadow-[0_26px_50px_-26px_rgba(79,70,229,0.5)] transition-all duration-500">
-          <FolderIcon size={32} className="text-muted group-hover:text-white transition-colors" />
+        <div className="relative isolate w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-(--surface-strong) group-hover:bg-accent/20 group-hover:shadow-[0_26px_50px_-26px_rgba(79,70,229,0.5)] transition-all duration-500">
+          <FolderIcon size={32} className="text-muted group-hover:text-accent transition-colors" />
         </div>
         <span className="text-sm font-black tracking-wide text-muted group-hover:text-foreground transition-colors truncate w-full px-4 text-center">
           {folder.name}
@@ -67,10 +77,10 @@ const WorkspaceFolderCard = ({ folder, onClick }: { folder: Folder, onClick: () 
       </div>
 
       <div className={cn(
-        "absolute inset-0 flex flex-col items-center justify-center bg-accent text-white transition-all duration-300 pointer-events-none",
+        "absolute inset-0 flex flex-col items-center justify-center bg-accent/10 text-foreground transition-all duration-300 pointer-events-none",
         isOver ? "opacity-100 scale-100" : "opacity-0 scale-110"
       )}>
-        <ArrowDownToLine size={40} className="mb-2 animate-bounce" />
+        <ArrowDownToLine size={40} className="mb-2 animate-bounce text-accent" />
         <span className="text-lg font-black uppercase tracking-widest">Drop Here</span>
       </div>
     </motion.div>
@@ -100,6 +110,30 @@ const Explorer: React.FC = () => {
   
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<'folder' | 'app' | null>(null);
+  const [activeLabel, setActiveLabel] = useState<string>('');
+  const [dragHint, setDragHint] = useState<string | null>(null);
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
+
+  const resolveDropTargetFolderId = useCallback((overId: string): string | null => {
+    if (overId === 'root') return null;
+    if (overId.startsWith('workspace-folder-')) return overId.replace('workspace-folder-', '');
+    return overId;
+  }, []);
+
+  const wouldCreateFolderCycle = useCallback((movingFolderId: string, targetParentId: string | null): boolean => {
+    if (targetParentId === null) return false;
+    if (movingFolderId === targetParentId) return true;
+
+    const parentById = new Map(folders.map((folder) => [folder.id, folder.parent_id]));
+    let cursor: string | null = targetParentId;
+
+    while (cursor) {
+      if (cursor === movingFolderId) return true;
+      cursor = parentById.get(cursor) ?? null;
+    }
+
+    return false;
+  }, [folders]);
 
   const handleFolderChange = useCallback((folderId: string | null) => {
     setMobileSidebarOpen(false);
@@ -184,6 +218,17 @@ const Explorer: React.FC = () => {
     void loadData();
   }, [currentFolderId, user?.id, loadData]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 768px)');
+    const apply = () => setIsCompactViewport(media.matches);
+    apply();
+
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  }, []);
+
   const breadcrumbs = useMemo(() => {
     const path: Folder[] = [];
     let tempId = currentFolderId;
@@ -199,48 +244,109 @@ const Explorer: React.FC = () => {
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 140, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  const collisionDetection = useCallback<CollisionDetection>((args) => {
+    const pointerHits = pointerWithin(args);
+    if (pointerHits.length > 0) return pointerHits;
+    return rectIntersection(args);
+  }, []);
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     setActiveId(active.id as string);
     setActiveType(active.data.current?.type || null);
+    setActiveLabel(active.data.current?.folder?.name || active.data.current?.app?.name || 'Item');
+    setDragHint(active.data.current?.type === 'folder' ? 'Drop on any folder to nest, or Vault Root to move out.' : null);
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
+    setActiveType(null);
+    setActiveLabel('');
+    setDragHint(null);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+
+    if (active.data.current?.type !== 'folder') {
+      setDragHint(null);
+      return;
+    }
+
+    if (!over) {
+      setDragHint('Drop on any folder to nest, or Vault Root to move out.');
+      return;
+    }
+
+    const targetFolderId = resolveDropTargetFolderId(String(over.id));
+    const movingFolderId = String(active.id);
+
+    if (wouldCreateFolderCycle(movingFolderId, targetFolderId)) {
+      setDragHint('Invalid move: a folder cannot be dropped inside itself or its children.');
+      return;
+    }
+
+    if (targetFolderId === null) {
+      setDragHint('Release to move this folder to Vault Root.');
+      return;
+    }
+
+    const targetFolder = folders.find((folder) => folder.id === targetFolderId);
+    setDragHint(targetFolder ? `Release to place inside "${targetFolder.name}".` : 'Release to move folder.');
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
     setActiveType(null);
+    setActiveLabel('');
+    setDragHint(null);
 
     if (!over) return;
 
-    // INTELLIGENT ID PARSING: Resolve where the drop actually happened
-    let targetFolderId: string | null = null;
-    const overId = String(over.id);
-
-    if (overId === 'root') {
-      targetFolderId = null; // Dropped on Vault Root in Sidebar
-    } else if (overId.startsWith('workspace-folder-')) {
-      targetFolderId = overId.replace('workspace-folder-', ''); // Dropped on Jumbo Folder in Main Workspace
-    } else {
-      targetFolderId = overId; // Dropped directly on a Folder in the Sidebar!
-    }
+    const targetFolderId = resolveDropTargetFolderId(String(over.id));
 
     // Prevent dropping on itself or dropping a folder into itself
     if (active.id === targetFolderId || active.id === over.id) return;
 
     try {
       if (active.data.current?.type === 'app') {
+        if (active.data.current?.app?.folder_id === targetFolderId) return;
         setApps((prev) => prev.filter((a) => a.id !== active.id)); // Optimistic UI
         await explorerService.moveApp(active.id as string, targetFolderId);
+        trackProductEvent('workspace_app_moved', {
+          app_id: String(active.id),
+          target_folder_id: targetFolderId,
+          source_folder_id: active.data.current?.app?.folder_id ?? null,
+        });
       } else if (active.data.current?.type === 'folder') {
+        if (wouldCreateFolderCycle(String(active.id), targetFolderId)) return;
+        if (active.data.current?.folder?.parent_id === targetFolderId) return;
+
+        setFolders((prev) =>
+          prev.map((folder) =>
+            folder.id === active.id ? { ...folder, parent_id: targetFolderId } : folder
+          )
+        );
         await explorerService.moveFolder(active.id as string, targetFolderId);
+        trackProductEvent('workspace_folder_moved', {
+          folder_id: String(active.id),
+          target_parent_id: targetFolderId,
+          source_parent_id: active.data.current?.folder?.parent_id ?? null,
+        });
       }
       setTimeout(loadData, 50); 
     } catch (error) {
       logger.error('explorer_drag_drop', error, { activeId: active.id, overId: over.id });
+      trackProductEvent('workspace_drag_drop_failed', {
+        item_id: String(active.id),
+        item_type: active.data.current?.type ?? null,
+        over_id: String(over.id),
+      });
       loadData();
     }
   };
@@ -252,16 +358,18 @@ const Explorer: React.FC = () => {
   return (
     <DndContext 
       sensors={sensors} 
-      collisionDetection={pointerWithin} 
+      collisionDetection={collisionDetection} 
       onDragStart={handleDragStart} 
+      onDragOver={handleDragOver}
+      onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}
     >
       <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/30 selection:text-white transition-colors duration-500 relative">
         <Seo title="Explorer Workspace | Explorer" robots="noindex,nofollow" canonicalPath="/explorer" />
-        <Grain opacity={0.3} />
+        <Grain opacity={isCompactViewport ? 0.08 : 0.3} disabled={isCompactViewport} />
         
-        <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[10%] w-[500px] h-[500px] bg-sky-400/10 dark:bg-sky-400/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
+        <div className="hidden md:block absolute top-[10%] right-[-10%] w-150 h-150 bg-accent/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
+        <div className="hidden md:block absolute bottom-[-10%] left-[10%] w-125 h-125 bg-sky-400/10 dark:bg-sky-400/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
         
         {/* SIDEBAR NOW FULLY RECEIVES DROPS */}
         <Sidebar 
@@ -270,14 +378,19 @@ const Explorer: React.FC = () => {
           onAddFolder={() => setIsFolderModalOpen(true)} 
           onAddApp={() => setIsAppModalOpen(true)}
           folderTreeSyncKey={folderTreeSyncKey}
+          activeDragId={activeType === 'folder' ? activeId : null}
+          activeDragType={activeType}
           mobileOpen={mobileSidebarOpen}
           onMobileClose={() => setMobileSidebarOpen(false)}
         />
         
-        <main className="flex-1 flex flex-col relative z-10 overflow-hidden bg-background/35 backdrop-blur-3xl border-l border-border">
+        <main className={cn(
+          'flex-1 flex flex-col relative z-10 overflow-hidden border-l border-border',
+          isCompactViewport ? 'bg-background/80 backdrop-blur-md' : 'bg-background/35 backdrop-blur-3xl'
+        )}>
           <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
-          <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 lg:p-12">
+          <div className="relative flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 md:p-8 lg:p-12">
             <AnimatePresence mode="wait">
               {loading && folders.length === 0 ? (
                 <motion.div 
@@ -292,14 +405,14 @@ const Explorer: React.FC = () => {
                   key={currentFolderId ?? 'vault-root'}
                   initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="max-w-[1400px] mx-auto"
+                  className="max-w-350 mx-auto"
                 >
                   <div className="relative z-10 mb-8 flex flex-col justify-between gap-6 sm:mb-10 md:flex-row md:items-end lg:mb-12">
                     <div className="flex items-start gap-4 sm:items-center sm:gap-6">
                       <motion.div 
-                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-[2rem]"
+                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-border bg-card shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-4xl"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute inset-0 bg-linear-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {currentFolderId ? <FolderIcon size={32} className="text-accent relative z-10" /> : <LayoutGrid size={32} className="text-accent relative z-10" />}
                       </motion.div>
                       
@@ -358,14 +471,15 @@ const Explorer: React.FC = () => {
                           <WorkspaceFolderCard 
                             key={folder.id} 
                             folder={folder} 
-                            onClick={() => handleFolderChange(folder.id)} 
+                            onClick={() => handleFolderChange(folder.id)}
+                            reducedMotion={isCompactViewport}
                           />
                         ))}
                       </motion.div>
                     </section>
                   )}
 
-                  <section className={cn("relative", contentLoading && "min-h-[200px]")}>
+                  <section className={cn("relative", contentLoading && "min-h-50")}>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black mb-6 flex items-center gap-3">
                       Resources <span className="h-px flex-1 bg-border" />
                     </p>
@@ -386,6 +500,7 @@ const Explorer: React.FC = () => {
                         key={currentFolderId ?? 'root'}
                         apps={apps}
                         scopeKey={currentFolderId ?? 'root'}
+                        reducedMotion={isCompactViewport}
                         onWorkspaceChange={loadData}
                       />
                     ) : !contentLoading ? (
@@ -394,7 +509,7 @@ const Explorer: React.FC = () => {
                         className="surface-panel h-80 w-full rounded-[3rem] border-2 border-dashed border-border flex flex-col items-center justify-center text-center p-10 hover:bg-card-hover transition-all duration-500 cursor-pointer group"
                         onClick={() => setIsAppModalOpen(true)}
                       >
-                        <div className="w-20 h-20 rounded-3xl bg-[var(--surface-strong)] border border-border flex items-center justify-center text-muted mb-6 group-hover:text-accent transition-all shadow-xl">
+                        <div className="w-20 h-20 rounded-3xl bg-(--surface-strong) border border-border flex items-center justify-center text-muted mb-6 group-hover:text-accent transition-all shadow-xl">
                            <Plus size={36} className="stroke-[2.5px]" />
                         </div>
                         <h3 className="text-xl font-black text-foreground mb-3">Vault is empty</h3>
@@ -410,15 +525,19 @@ const Explorer: React.FC = () => {
           </div>
         </main>
 
-        <DragOverlay dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+        <DragOverlay dropAnimation={isCompactViewport ? { duration: 150, easing: 'ease-out' } : { duration: 210, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}>
           {activeId ? (
-            <div className="p-4 rounded-3xl bg-card border border-accent shadow-[0_0_50px_rgba(var(--accent),0.4)] opacity-95 scale-105 rotate-3 flex items-center gap-4 backdrop-blur-xl">
-              <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center">
+            <div className={cn(
+              'p-4 rounded-3xl bg-card/95 border border-accent/45 shadow-[0_0_50px_rgba(var(--accent),0.28)] opacity-95 scale-105 rotate-2 flex items-center gap-4',
+              isCompactViewport ? 'backdrop-blur-sm' : 'backdrop-blur-xl'
+            )}>
+              <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center">
                 {activeType === 'folder' ? <FolderIcon size={20} className="text-accent" /> : <Globe size={20} className="text-accent" />}
               </div>
               <div className="pr-4">
                 <p className="text-[10px] uppercase tracking-widest text-muted font-bold mb-0.5">Moving Item</p>
-                <p className="text-base font-black text-foreground capitalize">{activeType}</p>
+                <p className="text-base font-black text-foreground capitalize">{activeType}: {activeLabel}</p>
+                {dragHint && <p className="mt-1 text-[11px] font-semibold text-muted max-w-65">{dragHint}</p>}
               </div>
             </div>
           ) : null}

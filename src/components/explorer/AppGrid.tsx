@@ -15,6 +15,7 @@ import { logger } from '../../platform/observability/logger';
 interface AppGridProps {
   apps: App[];
   scopeKey?: string;
+  reducedMotion?: boolean;
   onWorkspaceChange?: () => void;
 }
 
@@ -37,11 +38,13 @@ const DraggableAppCard = ({
   onEdit,
   onDelete,
   onTogglePin,
+  reducedMotion,
 }: {
   app: App;
   onEdit: (app: App) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
   onTogglePin: (e: React.MouseEvent, app: App) => void;
+  reducedMotion: boolean;
 }) => {
   const [imgError, setImgError] = useState(false);
   const favicon = app.icon || getFavicon(app.url);
@@ -64,7 +67,7 @@ const DraggableAppCard = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="h-full w-full rounded-[2rem] border-2 border-dashed border-accent/50 bg-accent/5 opacity-40 min-h-[220px]"
+        className="h-full w-full rounded-4xl border-2 border-dashed border-accent/50 bg-accent/5 opacity-40 min-h-55"
       />
     );
   }
@@ -79,14 +82,21 @@ const DraggableAppCard = ({
   return (
     <div
       ref={setNodeRef}
-      style={{ ...style, touchAction: 'none' }}
+      style={{ ...style, touchAction: reducedMotion ? 'manipulation' : 'none' }}
       {...attributes}
       {...listeners}
       className="h-full cursor-grab active:cursor-grabbing group/drag"
     >
-      <motion.div variants={itemVariants} layout={false} className="h-full pointer-events-none">
+      <motion.div
+        variants={reducedMotion ? undefined : itemVariants}
+        initial={reducedMotion ? false : undefined}
+        layout={false}
+        className="h-full pointer-events-none"
+      >
         <SpotlightCard
-          className="p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 hover:shadow-premium transition-all duration-300 h-full flex flex-col backdrop-blur-xl rounded-[2rem] pointer-events-auto relative select-none cursor-pointer"
+          className={`p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 transition-all duration-300 h-full flex flex-col rounded-4xl pointer-events-auto relative select-none cursor-pointer ${
+            reducedMotion ? 'backdrop-blur-sm shadow-sm' : 'backdrop-blur-xl hover:shadow-premium'
+          }`}
           onClick={handleOpenApp}
         >
           <div className="absolute top-4 right-4 opacity-0 group-hover/drag:opacity-30 transition-opacity">
@@ -94,7 +104,7 @@ const DraggableAppCard = ({
           </div>
 
           <div className="flex justify-between items-start mb-8 relative z-10">
-            <div className="relative w-16 h-16 rounded-[1.25rem] bg-[var(--surface-strong)] flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-300 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
+            <div className="relative w-16 h-16 rounded-[1.25rem] bg-(--surface-strong) flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-300 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
               {favicon && !imgError ? (
                 <img
                   src={favicon}
@@ -175,7 +185,7 @@ const DraggableAppCard = ({
   );
 };
 
-export const AppGrid: React.FC<AppGridProps> = ({ apps, scopeKey = 'default', onWorkspaceChange }) => {
+export const AppGrid: React.FC<AppGridProps> = ({ apps, scopeKey = 'default', reducedMotion = false, onWorkspaceChange }) => {
   const [editTarget, setEditTarget] = useState<App | null>(null);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
@@ -206,15 +216,16 @@ export const AppGrid: React.FC<AppGridProps> = ({ apps, scopeKey = 'default', on
     <>
       <motion.div
         key={scopeKey}
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
+        variants={reducedMotion ? undefined : containerVariants}
+        initial={reducedMotion ? false : 'hidden'}
+        animate={reducedMotion ? undefined : 'show'}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
       >
         {apps.map((app) => (
           <DraggableAppCard
             key={app.id}
             app={app}
+            reducedMotion={reducedMotion}
             onEdit={(full) => setEditTarget(full)}
             onDelete={handleDelete}
             onTogglePin={handleTogglePin}

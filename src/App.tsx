@@ -41,7 +41,7 @@ const RecoveryHashRedirect = () => {
     const hashParams = new URLSearchParams(hash);
     const hasRecoveryToken =
       Boolean(hashParams.get('access_token')) &&
-      (hashParams.get('type') === 'recovery' || location.pathname === '/');
+      hashParams.get('type') === 'recovery';
 
     if (!hasRecoveryToken || location.pathname === '/update-password' || location.pathname === '/auth/callback') {
       return;

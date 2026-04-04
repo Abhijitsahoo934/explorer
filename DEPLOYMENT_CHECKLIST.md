@@ -32,6 +32,8 @@
 
 ## Performance
 
+- Run `npm run preflight:prod`
+- Run `npm run preflight:prod:strict` before final release cut
 - Run `npm run lint`
 - Run `npx tsc --noEmit -p tsconfig.app.json`
 - Run `npx tsc --noEmit -p tsconfig.node.json`
