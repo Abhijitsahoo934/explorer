@@ -27,6 +27,7 @@ import { buildWorkflowMacros } from '../lib/workflowMacros';
 import { CommandPalette } from '../components/command/CommandPalette';
 import { logger } from '../platform/observability/logger';
 import { trackProductEvent } from '../lib/analyticsService';
+import { isFounderUser } from '../lib/accessControl';
 
 export interface CommandPaletteContextValue {
   open: () => void;
@@ -54,7 +55,7 @@ const DEBOUNCE_MS = 150;
 const MAX_DISPLAY_ROWS = 500;
 
 export function CommandPaletteProvider({ children }: { children: React.ReactNode }) {
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   const navigate = useNavigate();
   const { trackAppUsage, trackFolderUsage, readTopContext } = useContextMemory();
 
@@ -122,7 +123,10 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
     };
   }, [isOpen, session]);
 
-  const quickActions = useMemo(() => normalizeQuickActions(), []);
+  const quickActions = useMemo(
+    () => normalizeQuickActions({ includeInsights: isFounderUser(user) }),
+    [user]
+  );
 
   const workspaceItems = useMemo(() => normalizeCommandItems(folders, apps), [folders, apps]);
 

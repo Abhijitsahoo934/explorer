@@ -32,8 +32,13 @@ export const WORKSPACE_QUICK_ACTIONS = [
   },
 ] as const;
 
-export function normalizeQuickActions(): CommandPaletteItem[] {
-  return WORKSPACE_QUICK_ACTIONS.map((a) => ({
+export function normalizeQuickActions(options?: { includeInsights?: boolean }): CommandPaletteItem[] {
+  const includeInsights = options?.includeInsights ?? true;
+  const source = includeInsights
+    ? WORKSPACE_QUICK_ACTIONS
+    : WORKSPACE_QUICK_ACTIONS.filter((action) => action.id !== 'action-insights');
+
+  return source.map((a) => ({
     id: a.id,
     type: 'action' as const,
     name: a.name,

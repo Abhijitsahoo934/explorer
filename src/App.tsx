@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { useAuth } from './hooks/useAuth';
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
 import { GoogleAnalyticsTracker } from './components/system/GoogleAnalyticsTracker';
+import { isFounderUser } from './lib/accessControl';
 
 const Landing = lazy(() => import('./routes/Landing'));
 const Auth = lazy(() => import('./routes/Auth'));
@@ -102,6 +103,24 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const FounderRoute = ({ children }: { children: React.ReactNode }) => {
+  const { session, user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen bg-background transition-colors duration-300" />;
+  }
+
+  if (!session) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!isFounderUser(user)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <Router>
@@ -159,9 +178,9 @@ function App() {
           <Route
             path="/insights"
             element={
-              <ProtectedRoute>
+              <FounderRoute>
                 <Insights />
-              </ProtectedRoute>
+              </FounderRoute>
             }
           />
 

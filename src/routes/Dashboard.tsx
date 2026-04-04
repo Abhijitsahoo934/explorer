@@ -23,12 +23,14 @@ import { logger } from '../platform/observability/logger';
 import { useAuth } from '../hooks/useAuth';
 import { getUserFirstName } from '../lib/authProfile';
 import { Seo } from '../components/system/Seo';
+import { isFounderUser } from '../lib/accessControl';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const canViewInsights = isFounderUser(user);
   const [stats, setStats] = useState({ folders: 0, apps: 0 });
   const [recentApps, setRecentApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
@@ -285,13 +287,15 @@ export default function Dashboard() {
                     )}
 
                     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-                      <Button
-                        variant="ghost"
-                        className="h-10 w-full rounded-2xl px-4 text-[11px] uppercase tracking-widest font-black sm:w-auto"
-                        onClick={() => navigate('/insights')}
-                      >
-                        Product insights
-                      </Button>
+                      {canViewInsights && (
+                        <Button
+                          variant="ghost"
+                          className="h-10 w-full rounded-2xl px-4 text-[11px] uppercase tracking-widest font-black sm:w-auto"
+                          onClick={() => navigate('/insights')}
+                        >
+                          Product insights
+                        </Button>
+                      )}
                       <Button variant="ghost" className="h-10 w-full rounded-2xl px-4 text-[11px] uppercase tracking-widest font-black sm:w-auto" onClick={() => navigate('/templates')}>
                         Browse Template Marketplace
                       </Button>
