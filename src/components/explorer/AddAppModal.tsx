@@ -420,6 +420,10 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     }
   };
 
+  const keyboardHintLabel = hasRecommendations
+    ? 'Press Enter to apply suggestion'
+    : 'Press Enter to save';
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -638,7 +642,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                           key={suggestion}
                           type="button"
                           onClick={() => handleApplyDomainSuggestion(suggestion)}
-                          className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-[10px] font-bold text-foreground transition-all hover:border-accent/40 hover:bg-accent/10"
+                          className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-[10px] font-black text-foreground transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:bg-accent/10"
                         >
                           {suggestion.replace(/^https?:\/\//, '')}
                         </button>
@@ -648,12 +652,15 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                 )}
 
                 {hasRecommendations && (
-                  <div className="mt-3 rounded-2xl border border-border bg-card/70 p-2.5 sm:p-3">
+                  <div className="mt-3 rounded-2xl border border-border bg-card/70 p-2.5 shadow-inner sm:p-3">
                     <div className="mb-2 flex items-center justify-between gap-2 px-1">
                       <div className="flex items-center gap-1.5">
                         <Sparkles size={12} className="text-accent" />
                         <p className="text-[10px] uppercase tracking-[0.15em] text-muted font-black">{recommendationHeader}</p>
                       </div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted">
+                        ↑↓ Navigate | Enter Select
+                      </p>
                     </div>
                     <div
                       className="space-y-1.5 max-h-56 overflow-y-auto pr-1 custom-scrollbar overscroll-contain"
@@ -675,14 +682,29 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                           aria-selected={index === activeRecommendationIndex}
                           className={`w-full rounded-xl border px-3 py-2.5 text-left transition-all ${
                             index === activeRecommendationIndex
-                              ? 'border-accent/30 bg-accent/[0.12]'
+                              ? 'border-accent/30 bg-accent/[0.12] shadow-[0_0_0_1px_rgba(var(--accent),0.18)]'
                               : 'border-transparent bg-background/60 hover:border-accent/30 hover:bg-accent/[0.08]'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-bold text-foreground">{recommendation.name}</span>
+                            <div className="flex min-w-0 items-center gap-2.5">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-card">
+                                <img
+                                  src={buildFaviconUrl(recommendation.url, 64) ?? ''}
+                                  alt=""
+                                  className="h-4 w-4 object-contain"
+                                  loading="lazy"
+                                />
+                              </span>
+                              <span className="truncate text-sm font-black text-foreground">{recommendation.name}</span>
+                            </div>
+                            {index === 0 && (
+                              <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.08em] text-accent">
+                                Best match
+                              </span>
+                            )}
                           </div>
-                          <p className="mt-1 text-xs text-muted truncate">{recommendation.url}</p>
+                          <p className="mt-1 truncate text-xs text-muted">{recommendation.url}</p>
                         </button>
                       ))}
                     </div>
@@ -713,22 +735,23 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
               <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-1.5 opacity-60">
                   <CornerDownLeft size={12} className="text-muted" />
-                  <span className="text-[10px] font-black text-muted uppercase tracking-widest">Press Enter to save</span>
+                  <span className="text-[10px] font-black text-muted uppercase tracking-widest">{keyboardHintLabel}</span>
                 </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted/80">Esc to close</span>
               </div>
 
-              <div className="sticky bottom-0 -mx-1 mt-1 border-t border-border bg-background/85 px-1 pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-md">
+              <div className="sticky bottom-0 -mx-1 mt-1 border-t border-border bg-gradient-to-t from-background via-background/90 to-transparent px-1 pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-md">
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-4 py-4 rounded-2xl border border-border bg-card/70 text-foreground text-xs uppercase tracking-widest font-black hover:bg-card-hover hover:border-[var(--border-hover)] transition-all"
+                  className="flex-1 rounded-2xl border border-border bg-card/70 px-4 py-4 text-xs font-black uppercase tracking-widest text-foreground transition-all hover:border-[var(--border-hover)] hover:bg-card-hover"
                 >
                   Cancel
                 </button>
                 <Button
                   type="submit"
-                  className="flex-1 py-4 rounded-2xl text-xs uppercase tracking-widest font-black shadow-[0_0_20px_rgba(var(--accent),0.2)] hover:shadow-[0_0_30px_rgba(var(--accent),0.4)] transition-all"
+                  className="flex-1 rounded-2xl py-4 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(var(--accent),0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(var(--accent),0.4)]"
                   disabled={!name.trim() || !url.trim() || loading}
                 >
                   {loading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Save app'}
