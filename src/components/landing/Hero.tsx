@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Play, Sparkles, Github, Figma, MessageSquare } from 'lucide-react';
+import { ArrowRight, Play, Github, Figma, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -71,8 +71,8 @@ export default function Hero() {
     >
       <div className="relative z-20 container mx-auto text-center flex flex-col items-center max-w-6xl">
         <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full bg-glass border border-border px-4 py-2 text-[10px] font-bold text-muted uppercase tracking-[0.18em] backdrop-blur-md shadow-sm sm:mb-8 sm:text-xs">
-          <Sparkles size={14} className="text-accent" />
-          <span className="gradient-text">Workspace OS for your internet</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <span className="text-foreground">Built for focused web work</span>
         </div>
 
         <h1 className="mb-6 text-4xl font-black leading-[0.92] tracking-tighter text-foreground sm:text-5xl md:text-7xl lg:text-8xl">
@@ -85,8 +85,8 @@ export default function Hero() {
         </h1>
 
         <p className="hero-subtitle mx-auto mb-8 max-w-3xl text-base text-muted leading-relaxed sm:mb-10 sm:text-lg md:text-xl">
-          Explorer gives your browser a clean operating surface for work. Organize apps into folders, launch faster,
-          and keep the same setup across browsers, machines, and sessions.
+          Explorer turns scattered tabs into a clear workspace. Group tools into folders, launch in seconds,
+          and carry the same structure across every browser and device.
         </p>
 
         <div className="z-30 mb-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:items-center md:flex-row md:justify-center md:gap-4">
@@ -113,7 +113,7 @@ export default function Hero() {
           onClick={() => navigate('/blog/stop-using-bookmarks')}
           className="hero-cta mb-10 inline-flex items-center gap-2 text-center text-sm font-semibold text-muted transition-colors hover:text-foreground"
         >
-          Read why bookmarks break for real workflows
+          See why modern teams outgrow bookmarks
           <ArrowRight className="h-4 w-4" />
         </button>
 

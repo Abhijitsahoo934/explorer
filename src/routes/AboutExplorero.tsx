@@ -64,12 +64,12 @@ export default function AboutExplorero() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <Seo
-        title="About Explorero | Workspace OS for the Internet"
+        title="About Explorero | Browser Workspace for Focused Work"
         description="Learn what Explorero is, why it was built, who it helps, and how it turns bookmarks and browser chaos into structured workspaces."
         canonicalPath="/about-explorero"
         keywords={[
           'about explorero',
-          'workspace os',
+          'browser workspace',
           'organize apps and workflows',
           'bookmark alternative',
           'browser workflow system',
@@ -122,9 +122,9 @@ export default function AboutExplorero() {
                 </div>
               </div>
 
-              <div className="rounded-[2rem] border border-border bg-card/75 p-6 shadow-premium backdrop-blur-2xl">
+              <div className="rounded-4xl border border-border bg-card/75 p-6 shadow-premium backdrop-blur-2xl">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                  <div className="rounded-3xl border border-border bg-background/70 p-5">
                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-accent/10">
                       <FolderTree size={20} className="text-accent" />
                     </div>
@@ -134,7 +134,7 @@ export default function AboutExplorero() {
                     </p>
                   </div>
 
-                  <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                  <div className="rounded-3xl border border-border bg-background/70 p-5">
                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-sky-500/10">
                       <Compass size={20} className="text-sky-500" />
                     </div>
@@ -145,7 +145,7 @@ export default function AboutExplorero() {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-[1.5rem] border border-border bg-background/60 p-5">
+                <div className="mt-6 rounded-3xl border border-border bg-background/60 p-5">
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Why it matters</p>
                   <div className="mt-4 space-y-3">
                     {principles.map((principle) => (
@@ -163,9 +163,9 @@ export default function AboutExplorero() {
 
         <section className="px-6 py-6">
           <div className="container mx-auto max-w-6xl">
-            <div className="grid gap-6 rounded-[2rem] border border-border bg-card/65 p-6 shadow-premium backdrop-blur-xl lg:grid-cols-3">
+            <div className="grid gap-6 rounded-4xl border border-border bg-card/65 p-6 shadow-premium backdrop-blur-xl lg:grid-cols-3">
               {audiences.map((audience) => (
-                <div key={audience.title} className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+                <div key={audience.title} className="rounded-3xl border border-border bg-background/70 p-5">
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Built for</p>
                   <h2 className="mt-3 text-2xl font-black tracking-tight">{audience.title}</h2>
                   <p className="mt-3 text-sm leading-6 text-muted">{audience.text}</p>
@@ -176,7 +176,7 @@ export default function AboutExplorero() {
         </section>
 
         <section className="px-6 pb-16 pt-6">
-          <div className="container mx-auto max-w-4xl rounded-[2rem] border border-border bg-sidebar/35 p-8 shadow-premium backdrop-blur-xl">
+          <div className="container mx-auto max-w-4xl rounded-4xl border border-border bg-sidebar/35 p-8 shadow-premium backdrop-blur-xl">
             <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted">Founder note</p>
             <h2 className="mt-4 text-3xl font-black tracking-tight md:text-4xl">Why we built Explorero</h2>
             <p className="mt-5 text-base leading-8 text-muted">
@@ -200,7 +200,7 @@ export default function AboutExplorero() {
               </Button>
             </div>
 
-            <div className="mt-8 rounded-[1.5rem] border border-border bg-background/70 p-5">
+            <div className="mt-8 rounded-3xl border border-border bg-background/70 p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">Read next</p>
               <button
                 onClick={() => navigate(PUBLIC_ARTICLE_LINKS[0].path)}
@@ -214,25 +214,25 @@ export default function AboutExplorero() {
         </section>
 
         <section className="px-6 pb-16 pt-2">
-          <div className="container mx-auto max-w-4xl rounded-[2rem] border border-border bg-card/70 p-8 shadow-premium backdrop-blur-xl">
+          <div className="container mx-auto max-w-4xl rounded-4xl border border-border bg-card/70 p-8 shadow-premium backdrop-blur-xl">
             <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted">FAQ</p>
             <h2 className="mt-4 text-3xl font-black tracking-tight">Frequently asked questions</h2>
             <div className="mt-8 space-y-5">
-              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+              <div className="rounded-3xl border border-border bg-background/70 p-5">
                 <h3 className="text-lg font-black tracking-tight">What is Explorero?</h3>
                 <p className="mt-3 text-sm leading-7 text-muted">
                   Explorero is a workspace operating system that helps people organize apps, tools, and workflows into
                   structured environments instead of scattered tabs and bookmark piles.
                 </p>
               </div>
-              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+              <div className="rounded-3xl border border-border bg-background/70 p-5">
                 <h3 className="text-lg font-black tracking-tight">Is Explorero better than bookmarks?</h3>
                 <p className="mt-3 text-sm leading-7 text-muted">
                   For real workflows, yes. Bookmarks save isolated links, while Explorero helps preserve how tools
                   belong together in active work.
                 </p>
               </div>
-              <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
+              <div className="rounded-3xl border border-border bg-background/70 p-5">
                 <h3 className="text-lg font-black tracking-tight">Can I use Explorero on different browsers?</h3>
                 <p className="mt-3 text-sm leading-7 text-muted">
                   Yes. The goal is to keep your workspace structure consistent across browsers, devices, and sessions so

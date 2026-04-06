@@ -111,7 +111,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto p-3 pt-4 sm:p-4 sm:pt-6 md:items-center md:p-6">
+        <div className="fixed inset-0 z-150 flex items-start justify-center overflow-y-auto overscroll-contain p-3 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 sm:pt-6 md:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -124,7 +124,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative my-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] border border-border bg-card shadow-premium max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] md:flex-row"
+            className="relative my-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-premium max-h-[calc(100dvh-1rem)] sm:rounded-4xl sm:max-h-[calc(100vh-3rem)] md:flex-row"
           >
             <div className="w-full shrink-0 border-b border-border bg-sidebar p-4 sm:p-5 md:w-64 md:border-b-0 md:border-r md:p-6">
               <div className="mb-5">
@@ -136,7 +136,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <div className="grid gap-2 md:flex md:flex-col">
                 <button
                   onClick={() => setActiveTab('appearance')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 min-h-11 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                     activeTab === 'appearance'
                       ? 'bg-accent/10 text-accent border border-accent/20'
                       : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
@@ -147,7 +147,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
                 <button
                   onClick={() => setActiveTab('privacy')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 min-h-11 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                     activeTab === 'privacy'
                       ? 'bg-accent/10 text-accent border border-accent/20'
                       : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
@@ -158,10 +158,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
             </div>
 
-            <div className="relative flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 md:p-10">
+            <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-10">
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 z-10 rounded-xl p-2 text-muted transition-all hover:bg-card-hover hover:text-foreground sm:right-5 sm:top-5 md:right-8 md:top-8"
+                className="absolute right-4 top-4 z-10 rounded-xl p-2.5 text-muted transition-all hover:bg-card-hover hover:text-foreground sm:right-5 sm:top-5 md:right-8 md:top-8"
+                aria-label="Close settings"
               >
                 <X size={20} strokeWidth={2.5} />
               </button>
@@ -174,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="space-y-8"
+                    className="space-y-7 sm:space-y-8"
                   >
                     <div>
                       <h2 className="text-2xl font-black tracking-tight text-foreground">Appearance</h2>
@@ -185,7 +186,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       <div className={`flex items-start gap-3 rounded-2xl border p-4 ${
                         feedback.type === 'success'
                           ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-300'
-                          : 'border-red-500/20 bg-red-500/5 text-red-500'
+                          : 'border-red-500/20 bg-red-500/5 text-red-700 dark:text-red-300'
                       }`}>
                         {feedback.type === 'success' ? <CheckCircle2 size={18} className="mt-0.5 shrink-0" /> : <AlertTriangle size={18} className="mt-0.5 shrink-0" />}
                         <p className="text-sm font-medium leading-relaxed">{feedback.message}</p>
@@ -225,7 +226,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="space-y-8"
+                    className="space-y-7 sm:space-y-8"
                   >
                     <div>
                       <h2 className="text-2xl font-black tracking-tight text-foreground">Privacy & Security</h2>
@@ -246,7 +247,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       <div className={`flex items-start gap-3 rounded-2xl border p-4 ${
                         feedback.type === 'success'
                           ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-300'
-                          : 'border-red-500/20 bg-red-500/5 text-red-500'
+                          : 'border-red-500/20 bg-red-500/5 text-red-700 dark:text-red-300'
                       }`}>
                         {feedback.type === 'success' ? <CheckCircle2 size={18} className="mt-0.5 shrink-0" /> : <AlertTriangle size={18} className="mt-0.5 shrink-0" />}
                         <p className="text-sm font-medium leading-relaxed">{feedback.message}</p>
@@ -302,23 +303,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     </div>
 
                     <div className="space-y-4 pt-4 border-t border-border">
-                      <h3 className="text-[11px] uppercase tracking-widest text-red-500 font-bold flex items-center gap-2">
+                      <h3 className="text-[11px] uppercase tracking-widest text-red-600 dark:text-red-400 font-bold flex items-center gap-2">
                         <AlertTriangle size={14} /> Danger Zone
                       </h3>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-red-500/20 bg-red-500/5 gap-4">
                         <div>
-                          <p className="text-sm font-bold text-red-500">Delete Account</p>
-                          <p className="text-xs text-red-500/70 font-medium mt-0.5">Permanently remove your workspace and data.</p>
+                          <p className="text-sm font-bold text-red-700 dark:text-red-300">Delete Account</p>
+                          <p className="text-xs text-red-700/75 dark:text-red-300/80 font-medium mt-0.5">Permanently remove your workspace and data.</p>
                         </div>
-                        <button
+                        <Button
+                          type="button"
+                          variant="danger"
+                          size="sm"
                           onClick={handleDeleteAccount}
-                          disabled={loadingAction === 'delete'}
-                          className={`shrink-0 px-4 py-2 rounded-xl text-white text-xs font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-red-500/20 ${
-                            loadingAction === 'delete' ? 'bg-red-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
-                          }`}
+                          loading={loadingAction === 'delete'}
+                          className="shrink-0 text-xs font-bold"
                         >
-                          {loadingAction === 'delete' ? 'Deleting...' : 'Delete Account'}
-                        </button>
+                          Delete Account
+                        </Button>
                       </div>
                     </div>
                   </motion.div>

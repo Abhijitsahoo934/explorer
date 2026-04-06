@@ -72,21 +72,21 @@ const UpdatePassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 sm:p-6 relative overflow-hidden transition-colors duration-300">
       <Seo title="Reset Password | Explorer" robots="noindex,nofollow" canonicalPath="/update-password" />
       <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-accent/10 rounded-full blur-[150px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-card border border-border p-8 md:p-10 rounded-[2.5rem] shadow-premium text-center relative z-10"
+        className="w-full max-w-md bg-card border border-border p-6 sm:p-8 md:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-premium text-center relative z-10"
       >
         <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mx-auto mb-6">
           <ShieldCheck size={32} className="text-accent" />
         </div>
         <h2 className="text-2xl font-black mb-2 tracking-tight">Set New Password</h2>
         <p className="text-muted text-sm mb-8 font-medium">
-          {isRecoveryReady ? 'Enter a strong, secure password for your vault.' : 'Waiting for a valid recovery session from your reset email.'}
+          {isRecoveryReady ? 'Enter a strong password for your workspace account.' : 'Waiting for a valid recovery session from your reset email.'}
         </p>
 
         <form onSubmit={handleUpdate} className="space-y-4">
@@ -94,14 +94,14 @@ const UpdatePassword = () => {
             <label className="block text-[10px] uppercase tracking-widest text-muted font-bold ml-1 mb-2">
               New Password
             </label>
-            <Lock className="absolute left-4 top-[38px] text-muted group-focus-within:text-accent transition-colors" size={16} />
+            <Lock className="absolute left-4 top-9.5 text-muted group-focus-within:text-accent transition-colors" size={16} />
             <input
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
+              className="w-full min-h-12 bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
               placeholder="Enter new password"
               disabled={!isRecoveryReady}
             />
@@ -111,14 +111,14 @@ const UpdatePassword = () => {
             <label className="block text-[10px] uppercase tracking-widest text-muted font-bold ml-1 mb-2">
               Confirm Password
             </label>
-            <Lock className="absolute left-4 top-[38px] text-muted group-focus-within:text-accent transition-colors" size={16} />
+            <Lock className="absolute left-4 top-9.5 text-muted group-focus-within:text-accent transition-colors" size={16} />
             <input
               type="password"
               required
               minLength={6}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
+              className="w-full min-h-12 bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all shadow-sm"
               placeholder="Confirm new password"
               disabled={!isRecoveryReady}
             />
@@ -154,7 +154,7 @@ const UpdatePassword = () => {
             type="submit"
             loading={loading}
             disabled={!isRecoveryReady || !password || password !== confirmPassword}
-            className="w-full mt-4 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-md"
+            className="w-full mt-4 min-h-12 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-md"
           >
             Update Password
           </Button>

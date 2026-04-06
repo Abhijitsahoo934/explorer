@@ -56,45 +56,45 @@ export default function UseCases() {
     {
       icon: Code,
       title: 'Developers',
-      description: 'Keep coding tools organized in one workspace.',
+      description: 'Keep repos, docs, and release tools in a single workspace.',
       structure: [
-        { folder: 'Coding', items: ['GitHub', 'Stack Overflow', 'React Docs', 'API Docs'] },
+        { folder: 'Build', items: ['GitHub', 'API docs', 'Stack Overflow', 'Release notes'] },
       ],
       color: 'accent',
     },
     {
       icon: Palette,
       title: 'Designers',
-      description: 'Collect inspiration and design tools in one place.',
+      description: 'Group design files, inspiration, and handoff tools without tab sprawl.',
       structure: [
-        { folder: 'Design', items: ['Figma', 'Dribbble', 'Behance', 'Color Hunt'] },
+        { folder: 'Design', items: ['Figma', 'References', 'Tokens', 'Handoff'] },
       ],
       color: 'purple',
     },
     {
       icon: Microscope,
       title: 'Researchers',
-      description: 'Organize knowledge sources logically.',
+      description: 'Keep sources, notes, and reading lists easy to revisit.',
       structure: [
-        { folder: 'Research', items: ['Papers', 'Blogs', 'Documentation', 'AI Articles'] },
+        { folder: 'Research', items: ['Papers', 'Sources', 'Reading list', 'Notes'] },
       ],
       color: 'blue',
     },
     {
       icon: TrendingUp,
       title: 'Startup Founders',
-      description: 'Keep all tools and dashboards structured.',
+      description: 'Keep metrics, ops, and go-to-market tools structured around the company flow.',
       structure: [
-        { folder: 'Startup', items: ['Analytics', 'Product Tools', 'Notion', 'Investor Docs'] },
+        { folder: 'Company', items: ['Analytics', 'Product', 'Notion', 'Investor docs'] },
       ],
       color: 'green',
     },
     {
       icon: GraduationCap,
       title: 'Students',
-      description: 'Organize learning resources for faster studying.',
+      description: 'Organize learning resources so studying starts faster and feels lighter.',
       structure: [
-        { folder: 'Learning', items: ['YouTube', 'Courses', 'Study Notes', 'Documentation'] },
+        { folder: 'Study', items: ['YouTube', 'Courses', 'Notes', 'Docs'] },
       ],
       color: 'orange',
     },
@@ -134,23 +134,26 @@ export default function UseCases() {
   };
 
   return (
-    <section ref={containerRef} className="relative py-32 px-6">
+    <section ref={containerRef} className="relative py-24 px-4 sm:px-6 sm:py-32">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="usecases-header text-center mb-20">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-6 leading-tight">
-            Built For
+        <div className="usecases-header text-center mb-14 sm:mb-20">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md">
+            Use cases
+          </div>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-5 leading-tight">
+            Built for people
             <br />
-            <span className="gradient-text">Builders</span>
+            <span className="gradient-text">who work in the browser.</span>
           </h2>
 
-          <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-            Explorer adapts to how you work, letting you structure the web around your projects.
+          <p className="text-base md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
+            Explorer adapts to how you work, letting you shape the web around your projects instead of around browser habits.
           </p>
         </div>
 
         {/* Use Cases Grid */}
-        <div className="usecases-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="usecases-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {useCases.map((useCase, index) => {
             const Icon = useCase.icon;
             const colors = colorMap[useCase.color];
@@ -158,30 +161,31 @@ export default function UseCases() {
             return (
               <div
                 key={index}
-                className={`usecase-card glass-card rounded-2xl p-8 border ${colors.border} hover:border-accent/50 transition-all duration-300 group cursor-pointer ${colors.bg}`}
+                className={`usecase-card glass-card rounded-[1.6rem] p-7 border ${colors.border} hover:border-accent/50 transition-all duration-300 group cursor-pointer ${colors.bg} sm:p-8`}
               >
-                {/* Icon */}
-                <div
-                  className={`w-14 h-14 rounded-xl ${colors.iconBg} border ${colors.border} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
-                >
-                  <Icon size={28} className={colors.text} />
+                <div className="flex items-start justify-between gap-4 mb-6">
+                  <div
+                    className={`w-14 h-14 rounded-xl ${colors.iconBg} border ${colors.border} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                  >
+                    <Icon size={28} className={colors.text} />
+                  </div>
+                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                    Workflow
+                  </span>
                 </div>
 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-foreground mb-3">
+                <h3 className="text-xl font-black tracking-tight text-foreground mb-3">
                   {useCase.title}
                 </h3>
 
-                {/* Description */}
                 <p className="text-muted leading-relaxed mb-6">
                   {useCase.description}
                 </p>
 
-                {/* Folder Structure Example */}
-                <div className="space-y-3 pt-6 border-t border-border/50">
+                <div className="space-y-3 pt-5 border-t border-border/50">
                   {useCase.structure.map((folder, idx) => (
                     <div key={idx}>
-                      <div className="text-sm font-semibold text-foreground mb-2">
+                      <div className="text-sm font-bold text-foreground mb-2">
                         {folder.folder}
                       </div>
                       <div className="ml-4 space-y-1.5">
@@ -204,9 +208,9 @@ export default function UseCases() {
         </div>
 
         {/* Bottom Message */}
-        <div className="mt-16 text-center">
+        <div className="mt-14 sm:mt-16 text-center">
           <p className="text-muted italic">
-            "No matter your workflow, Explorer helps you stay organized."
+            "A workspace should feel like a system, not a pile of saved tabs."
           </p>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             {PUBLIC_TEMPLATE_LINKS.map((link) => (

@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         animate={{ width: desktopWidth }}
         transition={{ duration: isResizing ? 0 : 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(88vw,320px)] max-w-[320px] shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-(--panel-shadow) backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(92vw,340px)] max-w-85 shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-(--panel-shadow) backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:transform-none!"
         )}
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <BrandLogo className="relative h-10 w-10 shrink-0 rounded-xl group-hover:scale-105 transition-transform duration-300" />
                 <div className="truncate pr-2">
                   <span className="font-black tracking-tighter text-lg text-foreground uppercase block leading-none truncate">Explorer</span>
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-accent font-bold truncate">Workspace OS</span>
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-accent font-bold truncate">Workspace</span>
                 </div>
               </motion.div>
             )}
@@ -162,19 +162,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={goToDashboard}
             className={cn(
-              "w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden",
+              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden min-h-12",
               isCollapsed ? "px-0" : "px-4"
             )}
             title="Dashboard"
           >
             <LayoutDashboard size={16} className={cn("shrink-0", isCollapsed ? "text-foreground" : "text-muted")} />
-            {!isCollapsed && <span className="text-[11px] uppercase tracking-widest font-bold whitespace-nowrap">Dashboard</span>}
+            {!isCollapsed && <span className="text-[11px] uppercase tracking-widest font-bold whitespace-nowrap">Home</span>}
           </button>
 
           <button
             onClick={onAddApp}
             className={cn(
-              "w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all focus:outline-none overflow-hidden shadow-lg",
+              "w-full flex items-center justify-center gap-2 rounded-xl transition-all focus:outline-none overflow-hidden shadow-lg min-h-12",
               isCollapsed ? "px-0 bg-accent text-white" : "px-4 bg-accent text-white hover:bg-accent-hover hover:shadow-[0_0_24px_rgba(99,102,241,0.28)]"
             )}
             title="Add App"
@@ -186,7 +186,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onAddFolder}
             className={cn(
-              "w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden",
+              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden min-h-12",
               isCollapsed ? "px-0" : "px-4"
             )}
             title="New Folder"
@@ -202,10 +202,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-0.5 whitespace-nowrap">
                 <div className="mb-4 px-2 mt-2">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Your Vault</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Workspace</p>
                   {activeDragType === 'folder' && (
                     <p className="mt-2 rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-accent">
-                      Drop on folder to nest, Root to move out
+                      Drop on folder to nest. Drop on Root to move out.
                     </p>
                   )}
                 </div>
@@ -226,25 +226,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={() => setIsSettingsOpen(true)}
             className={cn(
-              "w-full flex items-center gap-3 py-3 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all group overflow-hidden",
+              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all group overflow-hidden min-h-11",
               isCollapsed ? "justify-center px-0" : "px-4"
             )}
             title="Settings"
           >
             <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500 shrink-0" />
-            {!isCollapsed && <span className="text-xs font-bold tracking-wide whitespace-nowrap">Preferences</span>}
+            {!isCollapsed && <span className="text-xs font-bold tracking-wide whitespace-nowrap">Settings</span>}
           </button>
           
           <button
             onClick={handleLogout}
             className={cn(
-              "w-full flex items-center gap-3 py-3 rounded-xl text-muted hover:text-red-500 hover:bg-red-500/10 transition-all group overflow-hidden",
+              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-red-500 hover:bg-red-500/10 transition-all group overflow-hidden min-h-11",
               isCollapsed ? "justify-center px-0" : "px-4"
             )}
             title="Logout"
           >
             <LogOut size={18} className="group-hover:-translate-x-1 transition-transform duration-300 shrink-0" />
-            {!isCollapsed && <span className="text-xs font-bold tracking-wide whitespace-nowrap">Terminate</span>}
+            {!isCollapsed && <span className="text-xs font-bold tracking-wide whitespace-nowrap">Sign out</span>}
           </button>
         </div>
       </motion.aside>

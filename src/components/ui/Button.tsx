@@ -2,6 +2,7 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 // Use 'import type' for TypeScript-only interfaces
 import type { HTMLMotionProps } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -14,6 +15,7 @@ export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, disabled, children, icon: Icon, ...props }, ref) => {
+    const prefersReducedMotion = useReducedMotion();
     
     // Premium Tailwind variants with focus rings and shadows
     const variants = {
@@ -35,9 +37,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <motion.button
         ref={ref}
-        whileHover={{ scale: disabled || loading ? 1 : 1.02 }}
-        whileTap={{ scale: disabled || loading ? 1 : 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        whileHover={prefersReducedMotion ? undefined : { scale: disabled || loading ? 1 : 1.02 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: disabled || loading ? 1 : 0.98 }}
+        transition={prefersReducedMotion ? { duration: 0.12, ease: 'easeOut' } : { type: 'spring', stiffness: 400, damping: 25 }}
         disabled={disabled || loading}
         className={cn(
           "relative inline-flex items-center justify-center rounded-xl font-bold transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden",

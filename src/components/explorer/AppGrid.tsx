@@ -9,6 +9,7 @@ import type { App } from '../../types/explorer';
 import { explorerService } from '../../lib/explorerService';
 import { RenameModal } from './RenameModal';
 import { recordAppUsage } from '../../lib/contextEngine';
+import { cn } from '../../lib/utils';
 import { buildFaviconUrl, normalizeExternalUrl, openExternalUrl } from '../../platform/security/url';
 import { logger } from '../../platform/observability/logger';
 
@@ -59,6 +60,7 @@ const DraggableAppCard = ({
     ? {
         transform: CSS.Translate.toString(transform),
         zIndex: isDragging ? 999 : 1,
+        transition: isDragging ? 'none' : 'transform 180ms cubic-bezier(0.22, 1, 0.36, 1)',
       }
     : undefined;
 
@@ -94,17 +96,20 @@ const DraggableAppCard = ({
         className="h-full pointer-events-none"
       >
         <SpotlightCard
-          className={`p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 transition-all duration-300 h-full flex flex-col rounded-4xl pointer-events-auto relative select-none cursor-pointer ${
+          className={`p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 transition-all duration-200 h-full flex flex-col rounded-4xl pointer-events-auto relative select-none cursor-pointer ${
             reducedMotion ? 'backdrop-blur-sm shadow-sm' : 'backdrop-blur-xl hover:shadow-premium'
           }`}
           onClick={handleOpenApp}
         >
-          <div className="absolute top-4 right-4 opacity-0 group-hover/drag:opacity-30 transition-opacity">
+          <div className={cn(
+            "absolute top-4 right-4 transition-opacity",
+            reducedMotion ? "opacity-35" : "opacity-0 group-hover/drag:opacity-30"
+          )}>
             <GripVertical size={16} className="text-muted" />
           </div>
 
           <div className="flex justify-between items-start mb-8 relative z-10">
-            <div className="relative w-16 h-16 rounded-[1.25rem] bg-(--surface-strong) flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-300 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
+            <div className="relative w-16 h-16 rounded-[1.25rem] bg-(--surface-strong) flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-200 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
               {favicon && !imgError ? (
                 <img
                   src={favicon}
@@ -118,7 +123,10 @@ const DraggableAppCard = ({
               )}
             </div>
 
-            <div className="flex gap-1.5 opacity-0 -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 bg-background/95 p-1.5 rounded-xl border border-border shadow-[0_18px_40px_-26px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+            <div className={cn(
+              "flex gap-1.5 transition-all duration-200 bg-background/95 p-1.5 rounded-xl border border-border shadow-[0_18px_40px_-26px_rgba(15,23,42,0.35)] backdrop-blur-xl",
+              reducedMotion ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100"
+            )}>
               <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()}
@@ -176,7 +184,7 @@ const DraggableAppCard = ({
             </span>
             <ExternalLink
               size={14}
-              className="text-muted group-hover/link:text-accent group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all duration-300"
+              className="text-muted group-hover/link:text-accent group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all duration-200"
             />
           </button>
         </SpotlightCard>

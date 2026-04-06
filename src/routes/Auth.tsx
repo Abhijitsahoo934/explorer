@@ -120,7 +120,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 sm:p-6 relative overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
       <Seo title="Sign In | Explorer" robots="noindex,nofollow" canonicalPath="/auth" />
       <Grain />
       
@@ -134,7 +134,7 @@ const Auth: React.FC = () => {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="bg-card/80 backdrop-blur-2xl border border-border p-8 md:p-10 rounded-[2.5rem] shadow-premium transition-colors duration-300">
+        <div className="bg-card/80 backdrop-blur-2xl border border-border p-6 sm:p-8 md:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-premium transition-colors duration-300">
           
           {/* Header */}
           <div className="text-center mb-10">
@@ -150,14 +150,14 @@ const Auth: React.FC = () => {
               {isSignUp ? 'Create Workspace' : 'Welcome Back'}
             </h1>
             <p className="text-muted text-sm font-medium">
-              {isSignUp ? 'Join the future of workspace organization.' : 'Securely access your digital vault.'}
+              {isSignUp ? 'Set up your browser workspace in minutes.' : 'Sign in to continue to your workspace.'}
             </p>
           </div>
 
           <div className="space-y-6">
             {/* Social Sign In */}
             <button 
-              className="w-full py-3.5 rounded-xl border border-border bg-background hover:bg-card-hover hover:border-accent/30 transition-all font-bold tracking-wide flex items-center justify-center gap-3 text-sm text-foreground shadow-sm focus:outline-none focus:ring-4 focus:ring-accent/10"
+              className="w-full min-h-12 py-3.5 rounded-xl border border-border bg-background hover:bg-card-hover hover:border-accent/30 transition-all font-bold tracking-wide flex items-center justify-center gap-3 text-sm text-foreground shadow-sm focus:outline-none focus:ring-4 focus:ring-accent/10"
               onClick={handleGoogleLogin}
             >
               <GoogleLogo />
@@ -183,7 +183,7 @@ const Auth: React.FC = () => {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
+                    className="w-full min-h-12 bg-background border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
                     placeholder="Abhijit Sahoo"
                   />
                 </div>
@@ -200,7 +200,7 @@ const Auth: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
+                    className="w-full min-h-12 bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
                     placeholder="name@company.com"
                   />
                 </div>
@@ -217,7 +217,7 @@ const Auth: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
+                    className="w-full min-h-12 bg-background border border-border rounded-xl px-4 py-3.5 pl-11 text-sm text-foreground focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-muted/50 shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
@@ -227,7 +227,7 @@ const Auth: React.FC = () => {
                       type="button"
                       onClick={handleForgotPassword}
                       disabled={loading}
-                      className="text-[10px] uppercase tracking-widest font-black text-accent hover:text-accent/80 transition-colors disabled:opacity-60"
+                      className="min-h-10 inline-flex items-center text-[10px] uppercase tracking-widest font-black text-accent hover:text-accent/80 transition-colors disabled:opacity-60"
                     >
                       Forgot password?
                     </button>
@@ -263,10 +263,10 @@ const Auth: React.FC = () => {
 
               <Button 
                 type="submit" 
-                className="w-full mt-2 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:shadow-glow group"
+                className="w-full mt-2 min-h-12 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:shadow-glow group"
                 loading={loading}
               >
-                {isSignUp ? 'Initialize' : 'Launch Explorer'}
+                {isSignUp ? 'Create account' : 'Open workspace'}
                 {!loading && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}
               </Button>
             </form>
@@ -280,7 +280,7 @@ const Auth: React.FC = () => {
                   setError(null);
                   setFeedback(null);
                 }}
-                className="group text-muted hover:text-foreground text-xs font-bold transition-colors focus:outline-none"
+                className="group text-muted hover:text-foreground text-xs font-bold transition-colors focus:outline-none min-h-10 inline-flex items-center"
               >
                 {isSignUp ? 'Already on the grid?' : "New to the system?"} 
                 <span className="ml-2 text-accent group-hover:text-accent/80 group-hover:underline underline-offset-4 transition-colors">

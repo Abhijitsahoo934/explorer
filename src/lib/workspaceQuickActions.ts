@@ -5,7 +5,7 @@ export const WORKSPACE_QUICK_ACTIONS = [
   {
     id: 'action-explorer',
     name: 'Open Explorer',
-    subtext: 'Browse folders and apps in your vault',
+    subtext: 'Browse folders and apps in your workspace',
     keywords: ['explorer', 'vault', 'workspace', 'browse', 'filesystem', 'os', 'navigate'],
     navigateTo: '/explorer',
   },
@@ -19,7 +19,7 @@ export const WORKSPACE_QUICK_ACTIONS = [
   {
     id: 'action-templates',
     name: 'Template marketplace',
-    subtext: 'Install full workspace systems in one click',
+    subtext: 'Install complete workspace templates in one click',
     keywords: ['templates', 'marketplace', 'install', 'systems', 'os', 'blueprint', 'curated'],
     navigateTo: '/templates',
   },

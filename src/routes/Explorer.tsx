@@ -22,6 +22,7 @@ import { AppGrid } from '../components/explorer/AppGrid';
 import { AddFolderModal } from '../components/explorer/AddFolderModal';
 import { AddAppModal } from '../components/explorer/AddAppModal';
 import { explorerService } from '../lib/explorerService';
+import { notificationService } from '../lib/notificationService';
 import type { Folder, App } from '../types/explorer';
 import { ChevronRight, Plus, Folder as FolderIcon, LayoutGrid, ArrowDownToLine, Globe } from 'lucide-react';
 import { Button } from '../components/ui/Button';
@@ -56,11 +57,13 @@ const WorkspaceFolderCard = ({
       variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
       whileHover={reducedMotion ? undefined : { y: -5, scale: 1.02 }}
       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+      animate={isOver && !reducedMotion ? { scale: 1.03 } : { scale: 1 }}
+      transition={{ duration: 0.16, ease: 'easeOut' }}
       onClick={onClick}
       className={cn(
         "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel will-change-transform",
         isOver 
-          ? "bg-accent/14 border-accent/45 shadow-[0_0_40px_rgba(var(--accent),0.32)] scale-[1.04] z-10" 
+          ? "bg-accent/14 border-accent/45 ring-2 ring-accent/35 shadow-[0_0_40px_rgba(var(--accent),0.32)] scale-[1.04] z-10" 
           : "hover:bg-card-hover hover:border-accent/30"
       )}
     >
@@ -80,9 +83,13 @@ const WorkspaceFolderCard = ({
         "absolute inset-0 flex flex-col items-center justify-center bg-accent/10 text-foreground transition-all duration-300 pointer-events-none",
         isOver ? "opacity-100 scale-100" : "opacity-0 scale-110"
       )}>
-        <ArrowDownToLine size={40} className="mb-2 animate-bounce text-accent" />
+        <ArrowDownToLine size={40} className={cn('mb-2 text-accent', reducedMotion ? '' : 'animate-bounce')} />
         <span className="text-lg font-black uppercase tracking-widest">Drop Here</span>
       </div>
+
+      {isOver && !reducedMotion && (
+        <div className="pointer-events-none absolute inset-0 rounded-[2.5rem] ring-2 ring-accent/30 animate-pulse" />
+      )}
     </motion.div>
   );
 };
@@ -113,6 +120,22 @@ const Explorer: React.FC = () => {
   const [activeLabel, setActiveLabel] = useState<string>('');
   const [dragHint, setDragHint] = useState<string | null>(null);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [moveFeedback, setMoveFeedback] = useState<{ id: number; tone: 'success' | 'warning'; message: string } | null>(null);
+  const moveFeedbackTimerRef = useRef<number | null>(null);
+
+  const showMoveFeedback = useCallback((message: string, tone: 'success' | 'warning' = 'success') => {
+    if (moveFeedbackTimerRef.current) {
+      window.clearTimeout(moveFeedbackTimerRef.current);
+      moveFeedbackTimerRef.current = null;
+    }
+
+    const id = Date.now();
+    setMoveFeedback({ id, tone, message });
+    moveFeedbackTimerRef.current = window.setTimeout(() => {
+      setMoveFeedback((prev) => (prev?.id === id ? null : prev));
+    }, 1600);
+  }, []);
 
   const resolveDropTargetFolderId = useCallback((overId: string): string | null => {
     if (overId === 'root') return null;
@@ -222,11 +245,28 @@ const Explorer: React.FC = () => {
     if (typeof window === 'undefined') return;
 
     const media = window.matchMedia('(max-width: 768px)');
+    const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
     const apply = () => setIsCompactViewport(media.matches);
+    const applyReducedMotion = () => setPrefersReducedMotion(reducedMotionMedia.matches);
     apply();
+    applyReducedMotion();
 
     media.addEventListener('change', apply);
-    return () => media.removeEventListener('change', apply);
+    reducedMotionMedia.addEventListener('change', applyReducedMotion);
+    return () => {
+      media.removeEventListener('change', apply);
+      reducedMotionMedia.removeEventListener('change', applyReducedMotion);
+    };
+  }, []);
+
+  const reducedMotionExperience = isCompactViewport || prefersReducedMotion;
+
+  useEffect(() => {
+    return () => {
+      if (moveFeedbackTimerRef.current) {
+        window.clearTimeout(moveFeedbackTimerRef.current);
+      }
+    };
   }, []);
 
   const breadcrumbs = useMemo(() => {
@@ -243,8 +283,8 @@ const Explorer: React.FC = () => {
   }, [currentFolderId, folders]);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 140, tolerance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 10 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -259,7 +299,7 @@ const Explorer: React.FC = () => {
     setActiveId(active.id as string);
     setActiveType(active.data.current?.type || null);
     setActiveLabel(active.data.current?.folder?.name || active.data.current?.app?.name || 'Item');
-    setDragHint(active.data.current?.type === 'folder' ? 'Drop on any folder to nest, or Vault Root to move out.' : null);
+    setDragHint(active.data.current?.type === 'folder' ? 'Drop on any folder to nest, or Workspace Root to move out.' : null);
   };
 
   const handleDragCancel = () => {
@@ -278,7 +318,7 @@ const Explorer: React.FC = () => {
     }
 
     if (!over) {
-      setDragHint('Drop on any folder to nest, or Vault Root to move out.');
+      setDragHint('Drop on any folder to nest, or Workspace Root to move out.');
       return;
     }
 
@@ -291,7 +331,7 @@ const Explorer: React.FC = () => {
     }
 
     if (targetFolderId === null) {
-      setDragHint('Release to move this folder to Vault Root.');
+      setDragHint('Release to move this folder to Workspace Root.');
       return;
     }
 
@@ -316,16 +356,29 @@ const Explorer: React.FC = () => {
     try {
       if (active.data.current?.type === 'app') {
         if (active.data.current?.app?.folder_id === targetFolderId) return;
+        const movedName = active.data.current?.app?.name ?? activeLabel;
         setApps((prev) => prev.filter((a) => a.id !== active.id)); // Optimistic UI
         await explorerService.moveApp(active.id as string, targetFolderId);
+        try {
+          await notificationService.createNotification('App moved', `"${activeLabel}" moved successfully.`, 'success');
+        } catch (notificationError) {
+          logger.warn('explorer_drag_notification', 'Could not create app move notification', { error: notificationError });
+        }
         trackProductEvent('workspace_app_moved', {
           app_id: String(active.id),
           target_folder_id: targetFolderId,
           source_folder_id: active.data.current?.app?.folder_id ?? null,
         });
+
+        const targetLabel = targetFolderId
+          ? folders.find((folder) => folder.id === targetFolderId)?.name ?? 'folder'
+          : 'workspace root';
+        showMoveFeedback(`Moved "${movedName}" to ${targetLabel}.`);
       } else if (active.data.current?.type === 'folder') {
         if (wouldCreateFolderCycle(String(active.id), targetFolderId)) return;
         if (active.data.current?.folder?.parent_id === targetFolderId) return;
+
+        const movedName = active.data.current?.folder?.name ?? activeLabel;
 
         setFolders((prev) =>
           prev.map((folder) =>
@@ -333,26 +386,42 @@ const Explorer: React.FC = () => {
           )
         );
         await explorerService.moveFolder(active.id as string, targetFolderId);
+        try {
+          await notificationService.createNotification('Folder moved', `"${activeLabel}" moved successfully.`, 'success');
+        } catch (notificationError) {
+          logger.warn('explorer_drag_notification', 'Could not create folder move notification', { error: notificationError });
+        }
         trackProductEvent('workspace_folder_moved', {
           folder_id: String(active.id),
           target_parent_id: targetFolderId,
           source_parent_id: active.data.current?.folder?.parent_id ?? null,
         });
+
+        const targetLabel = targetFolderId
+          ? folders.find((folder) => folder.id === targetFolderId)?.name ?? 'folder'
+          : 'workspace root';
+        showMoveFeedback(`Moved folder "${movedName}" to ${targetLabel}.`);
       }
-      setTimeout(loadData, 50); 
+      void loadData();
     } catch (error) {
       logger.error('explorer_drag_drop', error, { activeId: active.id, overId: over.id });
+      try {
+        await notificationService.createNotification('Move failed', 'Drag and drop failed. Please try again.', 'warning');
+      } catch (notificationError) {
+        logger.warn('explorer_drag_notification', 'Could not create move failed notification', { error: notificationError });
+      }
       trackProductEvent('workspace_drag_drop_failed', {
         item_id: String(active.id),
         item_type: active.data.current?.type ?? null,
         over_id: String(over.id),
       });
+      showMoveFeedback('Drag and drop failed. Please try again.', 'warning');
       loadData();
     }
   };
 
   const currentFolder = folders.find(f => f.id === currentFolderId);
-  const currentFolderName = currentFolder?.name || 'Vault';
+  const currentFolderName = currentFolder?.name || 'Workspace';
   const currentSubFolders = folders.filter(f => f.parent_id === currentFolderId);
 
   return (
@@ -390,6 +459,26 @@ const Explorer: React.FC = () => {
         )}>
           <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
+          <AnimatePresence>
+            {moveFeedback && (
+              <motion.div
+                key={moveFeedback.id}
+                initial={reducedMotionExperience ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 }}
+                animate={reducedMotionExperience ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                exit={reducedMotionExperience ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 }}
+                transition={{ duration: reducedMotionExperience ? 0.12 : 0.18, ease: 'easeOut' }}
+                className={cn(
+                  'pointer-events-none absolute right-3 top-18 z-30 rounded-2xl border px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.12em] shadow-premium backdrop-blur-xl sm:right-6 sm:top-20',
+                  moveFeedback.tone === 'success'
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                    : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                )}
+              >
+                {moveFeedback.message}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="relative flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 md:p-8 lg:p-12">
             <AnimatePresence mode="wait">
               {loading && folders.length === 0 ? (
@@ -420,7 +509,7 @@ const Explorer: React.FC = () => {
                         <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar py-1">
                           <button 
                             onClick={() => handleFolderChange(null)}
-                            className="text-muted hover:text-foreground text-[10px] uppercase tracking-widest font-black transition-colors flex items-center gap-1 shrink-0"
+                            className="text-muted hover:text-foreground text-[11px] uppercase tracking-widest font-black transition-colors flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg hover:bg-card/60"
                           >
                             <LayoutGrid size={12} /> Root
                           </button>
@@ -430,7 +519,7 @@ const Explorer: React.FC = () => {
                               <ChevronRight size={12} className="text-muted shrink-0" />
                               <button 
                                 onClick={() => handleFolderChange(crumb.id)}
-                                className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-md transition-all shrink-0 ${
+                                className={`text-[11px] uppercase tracking-widest font-black px-3 py-1.5 rounded-lg transition-all shrink-0 ${
                                   idx === breadcrumbs.length - 1 
                                     ? "bg-accent/10 text-accent border border-accent/20" 
                                     : "text-muted hover:text-foreground hover:bg-card-hover"
@@ -472,7 +561,7 @@ const Explorer: React.FC = () => {
                             key={folder.id} 
                             folder={folder} 
                             onClick={() => handleFolderChange(folder.id)}
-                            reducedMotion={isCompactViewport}
+                            reducedMotion={reducedMotionExperience}
                           />
                         ))}
                       </motion.div>
@@ -500,7 +589,7 @@ const Explorer: React.FC = () => {
                         key={currentFolderId ?? 'root'}
                         apps={apps}
                         scopeKey={currentFolderId ?? 'root'}
-                        reducedMotion={isCompactViewport}
+                        reducedMotion={reducedMotionExperience}
                         onWorkspaceChange={loadData}
                       />
                     ) : !contentLoading ? (
@@ -525,19 +614,22 @@ const Explorer: React.FC = () => {
           </div>
         </main>
 
-        <DragOverlay dropAnimation={isCompactViewport ? { duration: 150, easing: 'ease-out' } : { duration: 210, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}>
+        <DragOverlay dropAnimation={reducedMotionExperience ? { duration: 130, easing: 'ease-out' } : { duration: 210, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}>
           {activeId ? (
             <div className={cn(
-              'p-4 rounded-3xl bg-card/95 border border-accent/45 shadow-[0_0_50px_rgba(var(--accent),0.28)] opacity-95 scale-105 rotate-2 flex items-center gap-4',
-              isCompactViewport ? 'backdrop-blur-sm' : 'backdrop-blur-xl'
+              'rounded-3xl bg-card/95 border border-accent/45 shadow-[0_0_50px_rgba(var(--accent),0.28)] opacity-95 flex items-center gap-4',
+              reducedMotionExperience ? 'p-3 max-w-[88vw] scale-100 rotate-0 backdrop-blur-sm' : 'p-4 scale-105 rotate-2 backdrop-blur-xl'
             )}>
-              <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center">
-                {activeType === 'folder' ? <FolderIcon size={20} className="text-accent" /> : <Globe size={20} className="text-accent" />}
+              <div className={cn(
+                'rounded-2xl bg-accent/15 flex items-center justify-center',
+                isCompactViewport ? 'w-10 h-10' : 'w-12 h-12'
+              )}>
+                {activeType === 'folder' ? <FolderIcon size={isCompactViewport ? 18 : 20} className="text-accent" /> : <Globe size={isCompactViewport ? 18 : 20} className="text-accent" />}
               </div>
-              <div className="pr-4">
+              <div className={cn('pr-2', isCompactViewport ? 'max-w-[65vw]' : 'pr-4')}>
                 <p className="text-[10px] uppercase tracking-widest text-muted font-bold mb-0.5">Moving Item</p>
-                <p className="text-base font-black text-foreground capitalize">{activeType}: {activeLabel}</p>
-                {dragHint && <p className="mt-1 text-[11px] font-semibold text-muted max-w-65">{dragHint}</p>}
+                <p className={cn('font-black text-foreground capitalize truncate', isCompactViewport ? 'text-sm' : 'text-base')}>{activeType}: {activeLabel}</p>
+                {dragHint && <p className={cn('mt-1 text-[11px] font-semibold text-muted', isCompactViewport ? 'line-clamp-2 max-w-[65vw]' : 'max-w-65')}>{dragHint}</p>}
               </div>
             </div>
           ) : null}

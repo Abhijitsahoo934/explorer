@@ -28,6 +28,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const notifDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
@@ -71,6 +72,17 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
       isMounted = false;
       subscription?.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setPrefersReducedMotion(motionMedia.matches);
+    apply();
+
+    motionMedia.addEventListener('change', apply);
+    return () => motionMedia.removeEventListener('change', apply);
   }, []);
 
   useEffect(() => {
@@ -122,7 +134,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
   return (
     <>
-      <header className="sticky top-0 z-[100] flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-3 backdrop-blur-2xl transition-all duration-300 sm:px-4 md:px-6 lg:px-8">
+      <header className="sticky top-0 z-100 flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-3 backdrop-blur-2xl transition-all duration-300 sm:px-4 md:px-6 lg:px-8">
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button
             type="button"
@@ -176,17 +188,18 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             aria-label="Notifications"
           >
             <Bell size={18} />
-            {unreadCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-background bg-red-500 animate-pulse" />}
+            {unreadCount > 0 && <span className={`absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-background bg-red-500 ${prefersReducedMotion ? '' : 'animate-pulse'}`} />}
           </button>
 
           <AnimatePresence>
             {showNotifications && (
               <motion.div
                 ref={notifDropdownRef}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                className="fixed left-3 right-3 top-[4.5rem] z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-14 sm:top-[calc(100%+16px)] sm:w-[360px] sm:max-w-[calc(100vw-48px)]"
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, ease: 'easeOut' }}
+                className="fixed left-3 right-3 top-18 z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-14 sm:top-[calc(100%+16px)] sm:w-90 sm:max-w-[calc(100vw-48px)]"
               >
                 <div className="flex items-center justify-between gap-3 px-3 py-2">
                   <div>
@@ -245,7 +258,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
               setShowNotifications(false);
               setShowProfile((value) => !value);
             }}
-            className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2"
+            className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2"
             aria-label="Profile"
           >
             {userInitials || <User size={16} strokeWidth={3} />}
@@ -255,10 +268,11 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             {showProfile && (
               <motion.div
                 ref={profileDropdownRef}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="fixed left-3 right-3 top-[4.5rem] z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+16px)] sm:w-64"
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, ease: 'easeOut' }}
+                className="fixed left-3 right-3 top-18 z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+16px)] sm:w-64"
               >
                 <div className="mb-2 rounded-xl bg-background/50 p-3">
                   <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-muted">User Instance</p>
@@ -279,7 +293,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                   onClick={handleLogout}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-500/10"
                 >
-                  <LogOut size={14} /> Terminate Session
+                  <LogOut size={14} /> Sign out
                 </button>
               </motion.div>
             )}

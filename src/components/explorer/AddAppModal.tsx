@@ -277,6 +277,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [activeRecommendationIndex, setActiveRecommendationIndex] = useState(0);
   const [isNameEdited, setIsNameEdited] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const recommendationItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -425,6 +426,17 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     : 'Press Enter to save';
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setPrefersReducedMotion(motionMedia.matches);
+    apply();
+
+    motionMedia.addEventListener('change', apply);
+    return () => motionMedia.removeEventListener('change', apply);
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
       const handleEscape = (e: KeyboardEvent) => {
@@ -464,8 +476,8 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     }
 
     const activeElement = recommendationItemRefs.current[activeRecommendationIndex];
-    activeElement?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, [activeRecommendationIndex, hasRecommendations]);
+    activeElement?.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }, [activeRecommendationIndex, hasRecommendations, prefersReducedMotion]);
 
   useEffect(() => {
     if (url.length > 3) {
@@ -549,24 +561,28 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto overscroll-contain p-2 pt-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pt-8">
+        <div className="fixed inset-0 z-150 flex items-start justify-center overflow-y-auto overscroll-contain p-2 pt-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pt-8">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            transition={{ duration: prefersReducedMotion ? 0.14 : 0.22, ease: 'easeOut' }}
             className="absolute inset-0 bg-[#050505]/80 backdrop-blur-md"
             onClick={onClose}
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-            className="relative my-auto w-full max-w-[420px] overflow-hidden rounded-[2rem] border border-border bg-card/95 p-4 shadow-2xl backdrop-blur-3xl sm:p-8 sm:rounded-[2.5rem] max-h-[calc(100dvh-0.75rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar"
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0.14, ease: 'easeOut' }
+                : { type: 'spring', damping: 25, stiffness: 400 }
+            }
+            className="relative my-auto w-full max-w-105 overflow-hidden rounded-4xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur-3xl sm:p-8 sm:rounded-[2.5rem] max-h-[calc(100dvh-0.75rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar"
           >
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-30" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-accent to-transparent opacity-30" />
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-accent/20 rounded-full blur-[60px] pointer-events-none" />
 
             <div className="relative z-10 mb-6 flex items-start justify-between gap-4 sm:mb-8">
@@ -576,15 +592,22 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                     {faviconUrl ? (
                       <motion.img
                         key="favicon"
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
+                        initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+                        animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+                        transition={{ duration: prefersReducedMotion ? 0.12 : 0.2, ease: 'easeOut' }}
                         src={faviconUrl}
                         alt="Preview"
                         className="w-8 h-8 object-contain relative z-10"
                         onError={() => setFaviconUrl(null)}
                       />
                     ) : (
-                      <motion.div key="globe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10">
+                      <motion.div
+                        key="globe"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: prefersReducedMotion ? 0.1 : 0.16, ease: 'easeOut' }}
+                        className="relative z-10"
+                      >
                         <Globe size={24} className="text-accent" />
                       </motion.div>
                     )}
@@ -595,7 +618,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                 <div>
                   <h3 className="font-black text-foreground tracking-tight text-xl sm:text-2xl">Add app</h3>
                   <p className="text-[10px] text-muted font-bold tracking-[0.15em] mt-1 uppercase flex items-center gap-1.5">
-                    Workspace OS <Sparkles size={12} className="text-accent" />
+                    Workspace <Sparkles size={12} className="text-accent" />
                   </p>
                 </div>
               </div>
@@ -682,8 +705,8 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                           aria-selected={index === activeRecommendationIndex}
                           className={`w-full rounded-xl border px-3 py-2.5 text-left transition-all ${
                             index === activeRecommendationIndex
-                              ? 'border-accent/30 bg-accent/[0.12] shadow-[0_0_0_1px_rgba(var(--accent),0.18)]'
-                              : 'border-transparent bg-background/60 hover:border-accent/30 hover:bg-accent/[0.08]'
+                              ? 'border-accent/30 bg-accent/12 shadow-[0_0_0_1px_rgba(var(--accent),0.18)]'
+                                : 'border-transparent bg-background/60 hover:border-accent/30 hover:bg-accent/8'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-3">
@@ -715,7 +738,7 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
               <div>
                 <label className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted font-black mb-2.5 ml-1">
                   <span>Display name</span>
-                  {url && !name && <span className="text-accent animate-pulse text-[9px]">Auto-detecting...</span>}
+                  {url && !name && <span className={`text-accent text-[9px] ${prefersReducedMotion ? '' : 'animate-pulse'}`}>Auto-detecting...</span>}
                 </label>
                 <div className="relative group">
                   <input
@@ -740,15 +763,15 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted/80">Esc to close</span>
               </div>
 
-              <div className="sticky bottom-0 -mx-1 mt-1 border-t border-border bg-gradient-to-t from-background via-background/90 to-transparent px-1 pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-md">
+              <div className="sticky bottom-0 -mx-1 mt-1 border-t border-border bg-linear-to-t from-background via-background/90 to-transparent px-1 pt-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-md">
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 rounded-2xl border border-border bg-card/70 px-4 py-4 text-xs font-black uppercase tracking-widest text-foreground transition-all hover:border-[var(--border-hover)] hover:bg-card-hover"
-                >
-                  Cancel
-                </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex-1 rounded-2xl border border-border bg-card/70 px-4 py-4 text-xs font-black uppercase tracking-widest text-foreground transition-all hover:border-(--border-hover) hover:bg-card-hover"
+                  >
+                    Cancel
+                  </button>
                 <Button
                   type="submit"
                   className="flex-1 rounded-2xl py-4 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(var(--accent),0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(var(--accent),0.4)]"

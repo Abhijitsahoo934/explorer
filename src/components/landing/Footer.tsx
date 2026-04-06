@@ -9,7 +9,7 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-border bg-sidebar/35 backdrop-blur-xl">
-      <div className="container mx-auto px-6 py-14">
+      <div className="container mx-auto px-4 py-14 sm:px-6">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
             <div className="mb-5 flex items-center gap-3">
@@ -19,17 +19,17 @@ export default function Footer() {
                   Explorero
                 </span>
                 <span className="text-[9px] font-black uppercase tracking-[0.24em] text-muted">
-                  Workspace OS
+                  Browser Workspace
                 </span>
               </div>
             </div>
 
             <p className="leading-7 text-muted">
-              A calmer way to organize the apps, tools, and links you actually use on the web.
+              A calmer way to organize the apps, tools, and links you actually use on the web, without making the product feel like an AI demo.
             </p>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-4">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Product</h3>
               <div className="space-y-3">

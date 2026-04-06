@@ -26,7 +26,7 @@ export default function Navbar() {
               Explorero
             </span>
             <span className="text-[9px] uppercase tracking-[0.24em] text-muted font-black">
-              Workspace OS
+              Browser Workspace
             </span>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function Navbar() {
             onClick={() => goTo('/auth')}
             className="hidden h-11 px-5 text-[11px] font-black uppercase tracking-[0.16em] bg-foreground text-background hover:opacity-90 transition-all duration-300 rounded-2xl shadow-sm sm:inline-flex items-center gap-2"
           >
-            Start Workspace
+            Open Workspace
             <ArrowRight size={14} />
           </button>
         </div>
@@ -97,7 +97,7 @@ export default function Navbar() {
               About
             </button>
             <button onClick={() => goTo('/auth')} className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-background shadow-sm transition-all duration-300 hover:opacity-90">
-              Start Workspace
+              Open Workspace
               <ArrowRight size={14} />
             </button>
           </div>

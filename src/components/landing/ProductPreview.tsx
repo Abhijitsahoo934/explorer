@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FolderTree, Globe, Github, Figma, MessageSquare, Sparkles, ShieldCheck, Command } from 'lucide-react';
+import { FolderTree, Globe, Github, Figma, MessageSquare, ShieldCheck, Command } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,8 +75,8 @@ export default function ProductPreview() {
       <div className="container mx-auto max-w-6xl">
         <div className="preview-header text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.25em] font-black text-accent mb-6">
-            <Sparkles size={12} />
-            Product Surface
+            <FolderTree size={12} />
+            Real Workflow Surface
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
             One place for the
@@ -84,7 +84,7 @@ export default function ProductPreview() {
             tools you actually use.
           </h2>
           <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto mt-6 leading-relaxed">
-            Keep your work stack structured by purpose, not memory. Explorer helps you move from browser chaos to a setup that feels calm, clear, and repeatable.
+            Structure your stack around outcomes, not tab history. Explorer helps teams move from browser chaos to a workflow that stays calm, clear, and repeatable.
           </p>
         </div>
 

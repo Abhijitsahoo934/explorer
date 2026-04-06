@@ -13,8 +13,8 @@
   --color-glass: var(--glass);
   
   --shadow-premium: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
-  --shadow-glow-lg: 0 0 40px rgba(99, 102, 241, 0.25);
+  --shadow-glow: 0 0 20px rgba(11, 102, 255, 0.16);
+  --shadow-glow-lg: 0 0 40px rgba(11, 102, 255, 0.24);
 }
 
 :root {
@@ -25,20 +25,20 @@
   --card: rgba(255, 255, 255, 0.82);
   --card-hover: rgba(255, 255, 255, 0.96);
   --border: rgba(148, 163, 184, 0.22);
-  --border-hover: rgba(99, 102, 241, 0.26);
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
+  --border-hover: rgba(11, 102, 255, 0.28);
+  --accent: #0b66ff;
+  --accent-hover: #0958dc;
   --muted: #64748b;
   --glass: rgba(255, 255, 255, 0.7);
   --surface-strong: #ffffff;
   --surface-soft: rgba(255, 255, 255, 0.7);
   --panel-blur: 18px;
   --panel-shadow: 0 24px 60px -28px rgba(15, 23, 42, 0.18);
-  --hero-glow: rgba(79, 70, 229, 0.14);
-  --hero-glow-secondary: rgba(14, 165, 233, 0.1);
+  --hero-glow: rgba(11, 102, 255, 0.13);
+  --hero-glow-secondary: rgba(6, 182, 212, 0.11);
   
-  --gradient-start: #4f46e5;
-  --gradient-end: #0ea5e9;
+  --gradient-start: #0b66ff;
+  --gradient-end: #06b6d4;
 }
 
 .dark {
@@ -49,20 +49,20 @@
   --card: rgba(15, 23, 42, 0.74);
   --card-hover: rgba(30, 41, 59, 0.82);
   --border: rgba(148, 163, 184, 0.14);
-  --border-hover: rgba(129, 140, 248, 0.34);
-  --accent: #818cf8;
-  --accent-hover: #a5b4fc;
+  --border-hover: rgba(56, 189, 248, 0.38);
+  --accent: #52a8ff;
+  --accent-hover: #8ecbff;
   --muted: #94a3b8;
   --glass: rgba(15, 23, 42, 0.5);
   --surface-strong: #0b1220;
   --surface-soft: rgba(15, 23, 42, 0.72);
   --panel-blur: 18px;
   --panel-shadow: 0 30px 80px -38px rgba(2, 6, 23, 0.85);
-  --hero-glow: rgba(99, 102, 241, 0.18);
-  --hero-glow-secondary: rgba(56, 189, 248, 0.1);
+  --hero-glow: rgba(82, 168, 255, 0.18);
+  --hero-glow-secondary: rgba(34, 211, 238, 0.1);
   
-  --gradient-start: #818cf8;
-  --gradient-end: #38bdf8;
+  --gradient-start: #52a8ff;
+  --gradient-end: #22d3ee;
 }
 
 @layer base {
@@ -108,7 +108,7 @@
 
 /* Custom Selection */
 ::selection {
-  background-color: rgba(99, 102, 241, 0.3);
+  background-color: rgba(11, 102, 255, 0.28);
   color: var(--accent);
 }
 
@@ -179,11 +179,11 @@
 
 /* Glow Effects */
 .glow-accent {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 20px rgba(11, 102, 255, 0.22);
 }
 
 .dark .glow-accent {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 30px rgba(82, 168, 255, 0.34);
 }
 
 .app-shell {

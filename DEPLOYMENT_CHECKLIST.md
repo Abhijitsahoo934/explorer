@@ -16,6 +16,9 @@
 - Verify Realtime enabled for `folders`, `apps`, `notifications`
 - Create `product_events` table used by Insights
 - Create `delete_user` RPC if account deletion is supported
+- Deploy Edge Function: `supabase functions deploy ai-recommend`
+- Set Edge Function secret: `supabase secrets set GROQ_API_KEY=...`
+- Confirm AI recommendations return non-empty results for query `supa` in Add App modal
 
 ## UX + Reliability Smoke Test
 

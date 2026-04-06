@@ -181,6 +181,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   const rowKeys = useMemo(() => visibleItems.map((it) => `${it.type}:${it.id}`), [visibleItems]);
   const firstAiIndex = useMemo(() => visibleItems.findIndex((it) => it.type === 'ai'), [visibleItems]);
+  const reducedMotionExperience = isCompactViewport || prefersReducedMotion;
+  const shouldAnimateRows = !reducedMotionExperience;
 
   const content = (
     <AnimatePresence>
@@ -190,7 +192,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: reducedMotionExperience ? 0.12 : 0.2 }}
         >
           <motion.button
             type="button"
@@ -206,10 +208,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 6 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 380 }}
+            initial={reducedMotionExperience ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+            animate={reducedMotionExperience ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={reducedMotionExperience ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 6 }}
+            transition={
+              reducedMotionExperience
+                ? { duration: 0.12, ease: 'easeOut' }
+                : { type: 'spring', damping: 28, stiffness: 380 }
+            }
             className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/85 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl"
           >
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent" />
@@ -259,8 +265,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     return (
                       <React.Fragment key={rowKeys[index]}>
                         {hasActiveFilter && index === firstAiIndex && isAi && (
-                          <p className="px-3 pb-1 pt-2 text-[10px] font-black uppercase tracking-[0.2em] text-purple-400/90">
-                            AI suggestions
+                          <p className="px-3 pb-1 pt-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300/90">
+                            Smart suggestions
                           </p>
                         )}
 
@@ -292,32 +298,32 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           data-cmd-index={index}
                           onMouseEnter={() => onSelectIndex(index)}
                           onClick={() => onExecute(item)}
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
+                          initial={shouldAnimateRows ? { opacity: 0, y: 4 } : false}
+                          animate={shouldAnimateRows ? { opacity: 1, y: 0 } : undefined}
                           transition={
-                            isCompactViewport || prefersReducedMotion
-                              ? { duration: 0.08 }
-                              : { delay: Math.min(index * 0.012, 0.18), duration: 0.16 }
+                            shouldAnimateRows
+                              ? { delay: Math.min(index * 0.008, 0.1), duration: 0.13 }
+                              : { duration: 0.08 }
                           }
                           className={cn(
                             'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all',
                             isAi &&
-                              'border border-purple-500/20 bg-purple-500/10 hover:border-purple-500/35 hover:bg-purple-500/[0.14]',
+                              'border border-cyan-400/20 bg-cyan-400/10 hover:border-cyan-300/35 hover:bg-cyan-400/14',
                             !isAi && selectedIndex === index && 'bg-accent/15 ring-1 ring-accent/30 shadow-[0_0_24px_rgba(99,102,241,0.12)]',
-                            isAi && selectedIndex === index && 'ring-1 ring-purple-500/45 shadow-[0_0_28px_rgba(168,85,247,0.18)]',
+                            isAi && selectedIndex === index && 'ring-1 ring-cyan-300/45 shadow-[0_0_24px_rgba(34,211,238,0.18)]',
                             !isAi && selectedIndex !== index && 'hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.25)]'
                           )}
                         >
                           <div
                             className={cn(
                               'flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-zinc-900/80',
-                              isAi ? 'border-purple-500/30' : 'border-white/10',
+                              isAi ? 'border-cyan-400/30' : 'border-white/10',
                               selectedIndex === index && !isAi && 'border-accent/40',
-                              selectedIndex === index && isAi && 'border-purple-400/50'
+                              selectedIndex === index && isAi && 'border-cyan-300/50'
                             )}
                           >
                             {item.type === 'ai' ? (
-                              <Sparkles size={18} className="text-purple-300" />
+                              <Sparkles size={18} className="text-cyan-200" />
                             ) : item.type === 'action' ? (
                               (() => {
                                 const Icon = ACTION_ICONS[item.id] ?? Zap;
@@ -334,14 +340,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className={cn('truncate text-sm font-bold', isAi ? 'text-purple-50' : 'text-zinc-100')}>
+                              <span className={cn('truncate text-sm font-bold', isAi ? 'text-cyan-50' : 'text-zinc-100')}>
                                 <HighlightMatch text={item.name} query={debouncedQuery} />
                               </span>
                               <span
                                 className={cn(
                                   'max-w-30 shrink-0 truncate rounded-md border px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide',
                                   item.type === 'ai'
-                                    ? 'border-purple-400/35 bg-purple-500/20 text-purple-200'
+                                    ? 'border-cyan-300/35 bg-cyan-400/20 text-cyan-100'
                                     : item.type === 'action'
                                       ? item.onRun
                                         ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
@@ -352,7 +358,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                                 )}
                               >
                                 {item.type === 'ai'
-                                  ? 'AI suggestion'
+                                  ? 'Suggested'
                                   : item.type === 'action'
                                     ? item.onRun
                                       ? 'Macro'
@@ -362,13 +368,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                                       : 'App'}
                               </span>
                             </div>
-                            <p className={cn('mt-0.5 truncate text-[11px]', isAi ? 'text-purple-200/70' : 'text-zinc-500')}>
+                            <p className={cn('mt-0.5 truncate text-[11px]', isAi ? 'text-cyan-100/70' : 'text-zinc-500')}>
                               <HighlightMatch text={item.subtext} query={debouncedQuery} />
                             </p>
                           </div>
 
                           {selectedIndex === index && (
-                            <CornerDownLeft size={14} className={cn('shrink-0', isAi ? 'text-purple-300' : 'text-accent')} />
+                            <CornerDownLeft size={14} className={cn('shrink-0', isAi ? 'text-cyan-200' : 'text-accent')} />
                           )}
                         </motion.button>
                       </React.Fragment>
@@ -391,7 +397,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 navigate · <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono">↵</kbd>{' '}
                 open
               </span>
-              <span className="hidden sm:inline">Workspace OS</span>
+              <span className="hidden sm:inline">Workspace</span>
             </div>
           </motion.div>
         </motion.div>

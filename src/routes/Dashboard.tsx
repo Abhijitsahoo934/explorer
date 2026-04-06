@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +46,9 @@ export default function Dashboard() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0].id);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const onboardingDialogRef = useRef<HTMLDivElement | null>(null);
+  const onboardingCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
   // Determine time of day for personalized greeting
   useEffect(() => {
@@ -91,6 +94,33 @@ export default function Dashboard() {
       setIsOnboardingOpen(true);
     }
   }, [loading, stats.folders, stats.apps]);
+
+  useEffect(() => {
+    if (!isOnboardingOpen) {
+      if (lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus();
+      }
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+
+    lastActiveElementRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    const focusTimer = window.setTimeout(() => {
+      onboardingCloseButtonRef.current?.focus();
+    }, 40);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+    };
+  }, [isOnboardingOpen]);
 
   const handleFolderSelect = (folderId: string | null) => {
     setMobileSidebarOpen(false);
@@ -147,6 +177,96 @@ export default function Dashboard() {
     setIsOnboardingOpen(false);
   };
 
+  const selectedTemplateIndex = Math.max(
+    0,
+    WORKSPACE_TEMPLATES.findIndex((template) => template.id === selectedTemplateId)
+  );
+
+  useEffect(() => {
+    if (!isOnboardingOpen) {
+      return;
+    }
+
+    const handleKeyboardControls = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        handleDismissOnboarding();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const dialogRoot = onboardingDialogRef.current;
+        if (!dialogRoot) {
+          return;
+        }
+
+        const focusableElements = dialogRoot.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) {
+          return;
+        }
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      }
+
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        const nextIndex = (selectedTemplateIndex + 1) % WORKSPACE_TEMPLATES.length;
+        setSelectedTemplateId(WORKSPACE_TEMPLATES[nextIndex].id);
+      }
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const previousIndex = (selectedTemplateIndex - 1 + WORKSPACE_TEMPLATES.length) % WORKSPACE_TEMPLATES.length;
+        setSelectedTemplateId(WORKSPACE_TEMPLATES[previousIndex].id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboardControls);
+    return () => {
+      window.removeEventListener('keydown', handleKeyboardControls);
+    };
+  }, [isOnboardingOpen, selectedTemplateIndex]);
+
+  useEffect(() => {
+    if (!isOnboardingOpen) {
+      return;
+    }
+
+    const detailsPanel = document.getElementById('onboarding-template-details');
+    if (!detailsPanel) {
+      return;
+    }
+
+    detailsPanel.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [isOnboardingOpen, selectedTemplateId]);
+
+  useEffect(() => {
+    if (!isOnboardingOpen) {
+      return;
+    }
+
+    const selectedTemplateCard = document.getElementById(`onboarding-template-option-${selectedTemplateId}`);
+    if (!selectedTemplateCard) {
+      return;
+    }
+
+    selectedTemplateCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [isOnboardingOpen, selectedTemplateId]);
+
   const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ?? WORKSPACE_TEMPLATES[0];
   const userName = getUserFirstName(user);
 
@@ -175,7 +295,7 @@ export default function Dashboard() {
         <Topbar onOpenSidebar={() => setMobileSidebarOpen(true)} />
 
         <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 lg:p-12">
-          <div className="max-w-[1200px] mx-auto">
+          <div className="max-w-300 mx-auto">
             
             <AnimatePresence mode="wait">
               {loading ? (
@@ -188,7 +308,7 @@ export default function Dashboard() {
                     <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
                     <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
                   </div>
-                  <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">Initializing Workspace...</p>
+                  <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">Opening workspace...</p>
                 </motion.div>
               ) : (
                 <motion.div 
@@ -206,10 +326,10 @@ export default function Dashboard() {
                       {greeting.text}
                     </div>
                     <h1 className="mb-3 max-w-full pb-1 text-3xl font-black leading-[1.02] tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                      Hello, <span className="inline-block break-words capitalize text-accent">{userName}</span>
+                      Hello, <span className="inline-block wrap-break-word capitalize text-accent">{userName}</span>
                     </h1>
                     <p className="text-muted text-sm md:text-base font-medium tracking-wide max-w-xl">
-                      Your digital vault is ready. Here's a quick overview of your workspace today.
+                      Your workspace is ready. Here is a quick overview of what is already in place.
                     </p>
                   </motion.div>
 
@@ -224,7 +344,7 @@ export default function Dashboard() {
                           <Activity size={18} className="text-muted/50" />
                         </div>
                         <h3 className="text-5xl font-black text-foreground mb-2 tracking-tight">{stats.folders}</h3>
-                        <p className="text-[11px] uppercase tracking-widest text-muted font-bold">Active Folders</p>
+                        <p className="text-[11px] uppercase tracking-widest text-muted font-bold">Folders</p>
                       </SpotlightCard>
                     </motion.div>
 
@@ -237,21 +357,21 @@ export default function Dashboard() {
                           <Activity size={18} className="text-muted/50" />
                         </div>
                         <h3 className="text-5xl font-black text-foreground mb-2 tracking-tight">{stats.apps}</h3>
-                        <p className="text-[11px] uppercase tracking-widest text-muted font-bold">Saved Apps</p>
+                        <p className="text-[11px] uppercase tracking-widest text-muted font-bold">Apps</p>
                       </SpotlightCard>
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="h-full">
                       <SpotlightCard 
-                        className="p-7 bg-gradient-to-br from-card to-background border-border h-full backdrop-blur-md flex flex-col justify-center items-center text-center cursor-pointer hover:border-accent/40 hover:shadow-glow hover:-translate-y-1 transition-all duration-300 group" 
+                        className="p-7 bg-linear-to-br from-card to-background border-border h-full backdrop-blur-md flex flex-col justify-center items-center text-center cursor-pointer hover:border-accent/40 hover:shadow-glow hover:-translate-y-1 transition-all duration-300 group" 
                         onClick={() => navigate('/explorer')}
                       >
                         <div className="w-16 h-16 rounded-3xl bg-foreground text-background flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent group-hover:rounded-2xl transition-all duration-500 shadow-md relative overflow-hidden">
                           <Zap size={28} className="fill-current relative z-10" />
                           <div className="absolute inset-0 bg-white/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                        <h3 className="text-base font-black text-foreground mb-1 group-hover:text-accent transition-colors">Launch Explorer</h3>
-                        <p className="text-[10px] uppercase tracking-widest text-muted font-bold">Deep dive into your vault</p>
+                        <h3 className="text-base font-black text-foreground mb-1 group-hover:text-accent transition-colors">Open Explorer</h3>
+                        <p className="text-[10px] uppercase tracking-widest text-muted font-bold">Go to the workspace</p>
                       </SpotlightCard>
                     </motion.div>
                   </div>
@@ -261,11 +381,11 @@ export default function Dashboard() {
                       <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
                           <Sparkles size={12} />
-                          Time To Wow
+                          Starter templates
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">Install a real workspace in one click</h2>
+                        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">Install a workspace that already makes sense</h2>
                         <p className="text-sm md:text-base text-muted mt-3 max-w-2xl leading-relaxed">
-                          This is our unfair advantage path: users should not start from zero. They should feel the product become useful in under a minute.
+                          Start from a usable setup instead of an empty shell. The first run should already feel organized.
                         </p>
                       </div>
                       <Button variant="outline" className="h-11 px-5 rounded-2xl text-[11px] uppercase tracking-widest font-black" onClick={() => navigate('/explorer')}>
@@ -275,7 +395,7 @@ export default function Dashboard() {
 
                     {templateFeedback && (
                       <div
-                        className={`flex items-start gap-3 rounded-[1.5rem] border p-4 ${
+                        className={`flex items-start gap-3 rounded-3xl border p-4 ${
                           templateFeedbackTone === 'success'
                             ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300'
                             : 'border-amber-500/20 bg-amber-500/5 text-amber-700 dark:text-amber-300'
@@ -304,11 +424,11 @@ export default function Dashboard() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                       {WORKSPACE_TEMPLATES.map((template) => (
                         <SpotlightCard key={template.id} className="p-6 bg-card border-border h-full backdrop-blur-md hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-premium group">
-                          <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${template.accent} border border-border flex items-center justify-center mb-5`}>
+                          <div className={`w-14 h-14 rounded-[1.25rem] bg-linear-to-br ${template.accent} border border-border flex items-center justify-center mb-5`}>
                             <template.icon size={22} className="text-accent" />
                           </div>
                           <h3 className="text-xl font-black text-foreground tracking-tight">{template.title}</h3>
-                          <p className="text-sm text-muted mt-3 leading-relaxed min-h-[66px]">{template.subtitle}</p>
+                          <p className="text-sm text-muted mt-3 leading-relaxed min-h-16.5">{template.subtitle}</p>
                           <div className="mt-5 space-y-2">
                             {template.template.folders.map((folder) => (
                               <div key={folder.name} className="flex items-center justify-between rounded-xl border border-border bg-background/60 px-3 py-2">
@@ -335,7 +455,7 @@ export default function Dashboard() {
                   <motion.div variants={itemVariants} className="pt-4">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-[11px] font-black tracking-widest uppercase text-muted flex items-center gap-2">
-                        <Clock size={14} className="text-accent" /> Recently Indexed
+                        <Clock size={14} className="text-accent" /> Recently Added
                       </h2>
                       {recentApps.length > 0 && (
                         <button 
@@ -395,8 +515,8 @@ export default function Dashboard() {
                           <Plus size={24} className="text-accent" />
                         </div>
                         <div>
-                          <p className="text-sm font-black text-foreground">Vault is empty</p>
-                          <p className="text-xs text-muted font-medium mt-1 max-w-sm mx-auto">Add your first application or folder to start organizing your digital workflow.</p>
+                          <p className="text-sm font-black text-foreground">Workspace is empty</p>
+                          <p className="text-xs text-muted font-medium mt-1 max-w-sm mx-auto">Add your first application or folder to start organizing your workflow.</p>
                         </div>
                       </motion.div>
                     )}
@@ -427,7 +547,7 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {isOnboardingOpen && (
-          <div className="fixed inset-0 z-[170] flex items-start justify-center overflow-y-auto p-4 pt-6 md:p-6 md:pt-10">
+          <div className="fixed inset-0 z-170">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -436,123 +556,154 @@ export default function Dashboard() {
               onClick={handleDismissOnboarding}
             />
 
-            <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-              className="relative my-auto w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border bg-card/95 shadow-premium backdrop-blur-3xl"
-            >
+            <div className="relative flex min-h-dvh items-start justify-center overflow-y-auto overscroll-contain p-3 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 sm:pt-6 md:p-6 md:pt-10">
+              <motion.div
+                ref={onboardingDialogRef}
+                initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+                className="relative my-auto flex w-full max-w-5xl max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-3xl border border-border bg-card/95 shadow-premium backdrop-blur-3xl sm:max-h-[min(92vh,860px)] sm:rounded-4xl"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="onboarding-modal-title"
+                aria-describedby="onboarding-modal-description"
+              >
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute -top-16 left-20 w-56 h-56 rounded-full bg-accent/15 blur-[120px]" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-sky-400/10 blur-[140px]" />
               </div>
 
-              <div className="relative z-10 p-6 md:p-8 border-b border-border flex items-start justify-between gap-6">
+              <div className="relative z-10 p-4 sm:p-6 md:p-8 border-b border-border flex items-start justify-between gap-4 sm:gap-6">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
                     <Sparkles size={12} />
                     Guided Setup
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Let’s build your workspace in 30 seconds</h2>
-                  <p className="text-sm md:text-base text-muted mt-3 max-w-2xl leading-relaxed">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted font-black mb-3">
+                    Template {selectedTemplateIndex + 1} of {WORKSPACE_TEMPLATES.length}
+                  </p>
+                  <h2 id="onboarding-modal-title" className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-foreground">Let’s build your workspace in 30 seconds</h2>
+                  <p id="onboarding-modal-description" className="text-sm md:text-base text-muted mt-2 sm:mt-3 max-w-2xl leading-relaxed">
                     Pick the operating setup closest to your role. We will create a starter workspace that already feels useful, structured, and premium.
                   </p>
+                  <p className="text-[11px] text-muted/80 mt-3 font-semibold tracking-wide">Use arrow keys to preview templates, press Esc to close.</p>
                 </div>
 
                 <button
+                  ref={onboardingCloseButtonRef}
                   onClick={handleDismissOnboarding}
-                  className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all shrink-0"
+                  className="p-2.5 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all shrink-0"
                   aria-label="Close onboarding"
                 >
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="relative z-10 max-h-[calc(100vh-8rem)] overflow-hidden p-4 sm:p-6 md:p-8">
-                <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="max-h-[28vh] space-y-3 overflow-y-auto pr-1 custom-scrollbar sm:max-h-[32vh] lg:max-h-[calc(100vh-18rem)]">
-                  {WORKSPACE_TEMPLATES.map((template) => (
-                    <button
-                      key={template.id}
-                      onClick={() => setSelectedTemplateId(template.id)}
-                      className={`w-full text-left rounded-[1.5rem] border px-4 py-4 transition-all ${
-                        selectedTemplateId === template.id
-                          ? 'border-accent/25 bg-accent/10 shadow-sm'
-                          : 'border-border bg-background/60 hover:bg-card-hover'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${template.accent} border border-border flex items-center justify-center`}>
-                          <template.icon size={18} className="text-accent" />
+              <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
+                <div className="grid h-full gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="relative max-h-[24vh] overflow-hidden sm:max-h-[36vh] lg:max-h-none">
+                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1">
+                    {WORKSPACE_TEMPLATES.map((template) => (
+                      <button
+                        id={`onboarding-template-option-${template.id}`}
+                        key={template.id}
+                        onClick={() => setSelectedTemplateId(template.id)}
+                        aria-pressed={selectedTemplateId === template.id}
+                        className={`w-full text-left rounded-[1.25rem] sm:rounded-3xl border px-3 py-3 sm:px-4 sm:py-4 transition-all ${
+                          selectedTemplateId === template.id
+                            ? 'border-accent/25 bg-accent/10 shadow-sm'
+                            : 'border-border bg-background/60 hover:bg-card-hover'
+                        } min-w-60 sm:min-w-75 lg:min-w-0`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
+                            <template.icon size={16} className="text-accent sm:w-4.5 sm:h-4.5" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-foreground">{template.title}</p>
+                            <p className="text-xs text-muted mt-1">{template.template.folders.length} folders preloaded</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-black text-foreground">{template.title}</p>
-                          <p className="text-xs text-muted mt-1">{template.template.folders.length} folders preloaded</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <SpotlightCard className="max-h-[calc(100vh-22rem)] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar sm:max-h-[calc(100vh-20rem)] md:p-7 lg:max-h-[calc(100vh-18rem)]">
-                  <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-5`}>
-                        <selectedTemplate.icon size={22} className="text-accent" />
-                      </div>
-                      <h3 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
-                      <p className="text-sm text-muted mt-3 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
-                    </div>
-                    <div className="rounded-2xl border border-border bg-card/70 px-4 py-3 md:min-w-[150px]">
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
-                      <p className="text-sm font-bold text-foreground mt-2">Structured from day one</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 grid gap-4 md:grid-cols-2">
-                    {selectedTemplate.template.folders.map((folder) => (
-                      <div key={folder.name} className="rounded-[1.25rem] border border-border bg-card/70 p-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-black text-foreground">{folder.name}</p>
-                          <span className="text-[10px] uppercase tracking-widest text-muted font-black">{folder.apps.length} apps</span>
-                        </div>
-                        <div className="mt-4 space-y-2">
-                          {folder.apps.map((app) => (
-                            <div key={app.name} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2">
-                              <span className="text-sm text-foreground font-medium">{app.name}</span>
-                              <span className="text-[10px] uppercase tracking-widest text-muted font-black">ready</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-card/95 to-transparent lg:hidden" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
+                </div>
 
-                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <Button
-                      className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
-                      loading={activeTemplateId === selectedTemplate.id}
-                      onClick={async () => {
-                        await handleTemplateLaunch(selectedTemplate.id);
-                        writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
-                        setIsOnboardingOpen(false);
-                      }}
+                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[52vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar sm:max-h-[60vh] md:p-7 lg:max-h-none">
+                  <div className="flex min-h-full flex-col">
+                    <motion.div
+                      key={selectedTemplate.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
                     >
-                      Install {selectedTemplate.title}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full sm:w-auto h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
-                      onClick={handleDismissOnboarding}
-                    >
-                      I’ll Set It Up Myself
-                    </Button>
+                    <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <div className={`w-14 h-14 rounded-[1.25rem] bg-linear-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-5`}>
+                          <selectedTemplate.icon size={22} className="text-accent" />
+                        </div>
+                        <h3 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
+                        <p className="text-sm text-muted mt-3 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
+                      </div>
+                      <div className="rounded-2xl border border-border bg-card/70 px-4 py-3 md:min-w-37.5">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
+                        <p className="text-sm font-bold text-foreground mt-2">Structured from day one</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 grid gap-4 md:grid-cols-2">
+                      {selectedTemplate.template.folders.map((folder) => (
+                        <div key={folder.name} className="rounded-[1.25rem] border border-border bg-card/70 p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-black text-foreground">{folder.name}</p>
+                            <span className="text-[10px] uppercase tracking-widest text-muted font-black">{folder.apps.length} apps</span>
+                          </div>
+                          <div className="mt-4 space-y-2">
+                            {folder.apps.map((app) => (
+                              <div key={app.name} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2">
+                                <span className="text-sm text-foreground font-medium">{app.name}</span>
+                                <span className="text-[10px] uppercase tracking-widest text-muted font-black">ready</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    </motion.div>
+
+                    <div className="sticky bottom-0 mt-6 border-t border-border/70 bg-background/85 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <Button
+                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                          loading={activeTemplateId === selectedTemplate.id}
+                          onClick={async () => {
+                            await handleTemplateLaunch(selectedTemplate.id);
+                            writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
+                            setIsOnboardingOpen(false);
+                          }}
+                        >
+                          Install {selectedTemplate.title}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                          onClick={handleDismissOnboarding}
+                        >
+                          I’ll Set It Up Myself
+                        </Button>
+                      </div>
+                    </div>
                   </div>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-background/90 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background/95 to-transparent" />
                 </SpotlightCard>
                 </div>
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         )}
       </AnimatePresence>

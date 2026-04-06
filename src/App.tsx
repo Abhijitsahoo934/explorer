@@ -20,12 +20,12 @@ const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
 const Insights = lazy(() => import('./routes/Insights'));
 
 const RouteLoader = () => (
-  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 transition-colors duration-300">
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
     <div className="relative w-12 h-12">
       <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
       <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
     </div>
-    <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">
+    <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse text-center px-4">
       Loading Experience...
     </p>
   </div>
@@ -64,14 +64,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 transition-colors duration-300">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
         <div className="relative w-12 h-12">
           {/* Premium Startup Spinner */}
           <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
           <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
         </div>
-        <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse">
-          Authenticating Vault...
+        <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse text-center px-4">
+          Authenticating workspace...
         </p>
       </div>
     );
@@ -87,7 +87,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 /**
  * Auth Route Wrapper
  * Ensures that logged-in users cannot access the login/signup page.
- * Redirects them straight to their Dashboard.
+ * Redirects them straight to their dashboard.
  */
 const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();

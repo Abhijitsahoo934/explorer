@@ -102,22 +102,25 @@ export default function FeaturesGrid() {
   }, []);
 
   return (
-    <section ref={containerRef} id="features" className="relative py-28 px-6">
+    <section ref={containerRef} id="features" className="relative py-24 px-4 sm:px-6 sm:py-28">
       <div className="container mx-auto max-w-6xl">
-        <div className="features-header text-center mb-18">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-6 leading-tight">
+        <div className="features-header text-center mb-14 sm:mb-18">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md">
+            Core capabilities
+          </div>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-5 leading-tight">
             A cleaner way to
             <br />
             <span className="gradient-text">work on the web.</span>
           </h2>
 
-          <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-            Explorer is designed to reduce friction, not add more software ceremony. The experience should feel calm,
-            obvious, and fast.
+          <p className="text-base md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
+            Explorer keeps your tools visible, organized, and one step away. The interface should feel calm,
+            obvious, and fast without pretending to be a generic AI dashboard.
           </p>
         </div>
 
-        <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {FEATURES.map((feature) => {
             const Icon = feature.icon;
             const colors = COLOR_MAP[feature.color];
@@ -125,19 +128,24 @@ export default function FeaturesGrid() {
             return (
               <div
                 key={feature.title}
-                className="feature-card rounded-[1.8rem] border border-border bg-card/68 p-8 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium"
+                className="feature-card rounded-[1.6rem] border border-border bg-card/72 p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium sm:p-8"
               >
-                <div className={`w-14 h-14 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center mb-6`}>
-                  <Icon size={26} className={colors.text} />
+                <div className="flex items-start justify-between gap-4 mb-6">
+                  <div className={`w-14 h-14 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center`}>
+                    <Icon size={26} className={colors.text} />
+                  </div>
+                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                    {feature.example}
+                  </span>
                 </div>
 
                 <h3 className="text-xl font-black tracking-tight text-foreground mb-3">{feature.title}</h3>
 
                 <p className="text-muted leading-relaxed mb-5">{feature.description}</p>
 
-                <div className="pt-4 border-t border-border">
-                  <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-black mb-2">Example</p>
-                  <p className="text-sm text-foreground font-semibold">{feature.example}</p>
+                <div className="pt-4 border-t border-border flex items-center justify-between gap-4">
+                  <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-black">Operational detail</p>
+                  <p className="text-sm text-foreground font-semibold text-right">{feature.example}</p>
                 </div>
               </div>
             );
