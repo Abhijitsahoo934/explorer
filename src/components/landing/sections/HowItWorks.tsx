@@ -73,8 +73,8 @@ export const HowItWorks: React.FC = () => {
       <div className="container mx-auto px-6 relative z-10">
         
         {/* HEADER AREA */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-20 md:mb-32 gap-8">
-          <div className="max-w-2xl">
+        <div className="mb-20 md:mb-32 text-center">
+          <div className="mx-auto flex max-w-4xl flex-col items-center">
             <div className="hiw-header inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 border border-accent/20 text-[10px] font-black text-muted mb-6 tracking-[0.2em] uppercase backdrop-blur-md shadow-sm">
               <Sparkles size={12} className="text-accent" /> The Protocol
             </div>
@@ -84,10 +84,10 @@ export const HowItWorks: React.FC = () => {
                 Efficiency.
               </span>
             </h2>
+            <p className="hiw-header mt-7 max-w-xl text-muted font-mono text-[10px] uppercase tracking-widest font-bold">
+              Standard Operating Procedure for deep work
+            </p>
           </div>
-          <p className="hiw-header text-muted font-mono text-[10px] uppercase tracking-widest font-bold pb-4 border-b border-border max-w-xs">
-            Standard Operating Procedure for deep work
-          </p>
         </div>
 
         {/* BENTO CARDS GRID WITH CONNECTING LINE */}
