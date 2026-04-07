@@ -109,6 +109,7 @@ const Explorer: React.FC = () => {
   const folderIdRef = useRef<string | null>(currentFolderId);
   const loadGenerationRef = useRef(0);
   const isFirstExplorerLoadRef = useRef(true);
+  const realtimeRefreshTimerRef = useRef<number | null>(null);
 
   const { user } = useAuth();
 
@@ -212,23 +213,25 @@ const Explorer: React.FC = () => {
     if (!user?.id) return;
 
     const subscription = explorerService.subscribeToWorkspace(user.id, () => {
-      void (async () => {
-        try {
-          const nextFolders = await explorerService.getFolders();
-          setFolders(nextFolders);
-          const fid = folderIdRef.current;
-          const nextApps = await explorerService.getApps(fid);
-          setApps(nextApps);
-        } catch (e) {
-          logger.warn('explorer_realtime_refresh', 'Realtime workspace refresh failed', { error: e });
-        }
-      })();
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+      }
+
+      // Debounce burst realtime events to avoid fetch storms on high update throughput.
+      realtimeRefreshTimerRef.current = window.setTimeout(() => {
+        void loadData();
+        realtimeRefreshTimerRef.current = null;
+      }, 180);
     });
     const unsubscribeLocal = explorerService.onWorkspaceChange(() => {
       void loadData();
     });
 
     return () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+        realtimeRefreshTimerRef.current = null;
+      }
       void subscription.unsubscribe();
       unsubscribeLocal();
     };

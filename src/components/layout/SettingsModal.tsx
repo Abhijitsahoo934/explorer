@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Moon, Sun, Monitor, User, Shield, Key, Database, AlertTriangle, CheckCircle2, Sparkles } from 'lucide-react';
 import { useTheme } from '../ThemeProvider';
@@ -21,6 +21,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [activeTab, setActiveTab] = useState<TabType>('appearance');
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return;
+
+    setActiveTab('appearance');
+    setFeedback(null);
+
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const applyMotionPreference = () => setReducedMotion(media.matches);
+    applyMotionPreference();
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    window.addEventListener('keydown', handleEsc);
+    media.addEventListener('change', applyMotionPreference);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEsc);
+      media.removeEventListener('change', applyMotionPreference);
+    };
+  }, [isOpen, onClose]);
 
   const handleClearCache = async () => {
     setLoadingAction('cache');
@@ -121,15 +151,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.97, y: reducedMotion ? 0 : 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative my-auto flex w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-premium max-h-[calc(100dvh-1rem)] sm:rounded-4xl sm:max-h-[calc(100vh-3rem)] md:flex-row"
+            exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.98, y: reducedMotion ? 0 : 8 }}
+            transition={{ duration: reducedMotion ? 0.12 : 0.22, ease: 'easeOut' }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settings-modal-title"
+            className="relative my-auto flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-border/80 bg-card/96 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.5)] max-h-[calc(100dvh-1rem)] sm:rounded-4xl sm:max-h-[calc(100vh-3rem)] md:flex-row"
           >
-            <div className="w-full shrink-0 border-b border-border bg-sidebar p-4 sm:p-5 md:w-64 md:border-b-0 md:border-r md:p-6">
+            <div className="w-full shrink-0 border-b border-border/80 bg-[linear-gradient(165deg,color-mix(in_srgb,var(--sidebar)_88%,white_12%),var(--sidebar))] p-4 sm:p-5 md:w-72 md:border-b-0 md:border-r md:p-6">
               <div className="mb-5">
                 <p className="text-[10px] uppercase tracking-widest text-muted font-black">Settings</p>
-                <h2 className="text-xl font-black text-foreground mt-2">Control Center</h2>
+                <h2 id="settings-modal-title" className="text-xl font-black text-foreground mt-2">Control Center</h2>
                 <p className="text-xs text-muted mt-2 leading-relaxed">Tune the product experience, recovery flows, and device-level behavior.</p>
               </div>
 
@@ -138,30 +172,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   onClick={() => setActiveTab('appearance')}
                   className={`w-full flex items-center gap-3 min-h-11 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                     activeTab === 'appearance'
-                      ? 'bg-accent/10 text-accent border border-accent/20'
+                      ? 'bg-accent/12 text-accent border border-accent/25 shadow-[0_10px_24px_-18px_rgba(11,102,255,0.6)]'
                       : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
                   }`}
                 >
-                  <User size={16} /> Appearance
+                  <span className={activeTab === 'appearance' ? 'text-accent' : 'text-muted'}><User size={16} /></span> Appearance
                 </button>
 
                 <button
                   onClick={() => setActiveTab('privacy')}
                   className={`w-full flex items-center gap-3 min-h-11 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                     activeTab === 'privacy'
-                      ? 'bg-accent/10 text-accent border border-accent/20'
+                      ? 'bg-accent/12 text-accent border border-accent/25 shadow-[0_10px_24px_-18px_rgba(11,102,255,0.6)]'
                       : 'text-muted hover:text-foreground hover:bg-card-hover border border-transparent'
                   }`}
                 >
-                  <Shield size={16} /> Privacy & Security
+                  <span className={activeTab === 'privacy' ? 'text-accent' : 'text-muted'}><Shield size={16} /></span> Privacy & Security
                 </button>
               </div>
             </div>
 
-            <div className="relative flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-10">
+            <div className="relative flex-1 overflow-y-auto custom-scrollbar bg-[linear-gradient(180deg,color-mix(in_srgb,var(--card)_94%,white_6%),var(--card))] p-4 sm:p-6 md:p-10">
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 z-10 rounded-xl p-2.5 text-muted transition-all hover:bg-card-hover hover:text-foreground sm:right-5 sm:top-5 md:right-8 md:top-8"
+                className="absolute right-4 top-4 z-10 rounded-xl border border-transparent p-2.5 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground sm:right-5 sm:top-5 md:right-8 md:top-8"
                 aria-label="Close settings"
               >
                 <X size={20} strokeWidth={2.5} />
@@ -206,12 +240,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                             onClick={() => setTheme(t.id as ThemeOption)}
                             className={`flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all ${
                               theme === t.id
-                                ? 'border-accent bg-accent/5 ring-4 ring-accent/10 shadow-sm'
-                                : 'border-border bg-background hover:border-accent/40 hover:bg-card-hover'
+                                ? 'border-accent bg-accent/7 ring-4 ring-accent/10 shadow-[0_16px_34px_-22px_rgba(11,102,255,0.62)]'
+                                : 'border-border bg-background hover:border-accent/35 hover:bg-card-hover'
                             }`}
+                            aria-pressed={theme === t.id}
                           >
                             <t.icon size={24} className={theme === t.id ? 'text-accent' : 'text-muted'} />
                             <span className={`text-xs font-bold ${theme === t.id ? 'text-accent' : 'text-muted'}`}>{t.label}</span>
+                            {theme === t.id && <span className="text-[10px] font-black uppercase tracking-[0.14em] text-accent/90">Active</span>}
                           </button>
                         ))}
                       </div>
@@ -270,6 +306,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           variant="secondary"
                           size="sm"
                           onClick={handlePasswordReset}
+                          disabled={loadingAction !== null}
                           loading={loadingAction === 'password'}
                           className="shrink-0 text-xs font-bold"
                         >
@@ -294,6 +331,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           variant="secondary"
                           size="sm"
                           onClick={handleClearCache}
+                          disabled={loadingAction !== null}
                           loading={loadingAction === 'cache'}
                           className="shrink-0 text-xs font-bold"
                         >
@@ -316,6 +354,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           variant="danger"
                           size="sm"
                           onClick={handleDeleteAccount}
+                          disabled={loadingAction !== null}
                           loading={loadingAction === 'delete'}
                           className="shrink-0 text-xs font-bold"
                         >
