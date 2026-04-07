@@ -74,7 +74,7 @@ export default function ProductPreview() {
     <section ref={containerRef} className="relative py-20 sm:py-28 px-4 sm:px-6">
       <div className="container mx-auto max-w-6xl">
         <div className="preview-header text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.25em] font-black text-accent mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-linear-to-r from-accent/12 via-sky-400/12 to-emerald-400/12 border border-accent/20 text-[10px] uppercase tracking-[0.25em] font-black text-accent mb-6 shadow-sm">
             <FolderTree size={12} />
             Real Workflow Surface
           </div>
@@ -88,16 +88,17 @@ export default function ProductPreview() {
           </p>
         </div>
 
-        <div className="preview-mockup relative rounded-[1.5rem] sm:rounded-[2rem] border border-border bg-card/60 backdrop-blur-2xl p-3 sm:p-4 md:p-6 shadow-premium overflow-hidden">
+        <div className="preview-mockup relative rounded-3xl sm:rounded-4xl border border-border bg-card/60 backdrop-blur-2xl p-3 sm:p-4 md:p-6 shadow-premium overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-16 left-16 w-48 h-48 rounded-full bg-accent/10 blur-[100px]" />
             <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full bg-sky-400/10 blur-[120px]" />
+            <div className="absolute top-1/3 right-1/4 w-44 h-44 rounded-full bg-emerald-400/10 blur-[120px]" />
           </div>
 
-          <div className="relative z-10 rounded-[1.5rem] border border-border bg-background/80 overflow-hidden">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-4 sm:px-5 py-4 border-b border-border">
+          <div className="relative z-10 rounded-3xl border border-border bg-background/80 overflow-hidden">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-4 sm:px-5 py-4 border-b border-border bg-linear-to-r from-background/90 via-background/80 to-accent/5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-accent via-sky-500 to-indigo-500 text-white flex items-center justify-center shadow-lg">
                   <FolderTree size={18} />
                 </div>
                 <div>
@@ -106,33 +107,37 @@ export default function ProductPreview() {
                 </div>
               </div>
               <div className="hidden md:flex items-center gap-2">
-                <div className="px-3 py-1 rounded-full bg-background/80 text-foreground text-[10px] uppercase tracking-widest font-black border border-border inline-flex items-center gap-1.5">
+                <div className="px-3 py-1 rounded-full bg-linear-to-r from-accent/8 to-sky-400/8 text-foreground text-[10px] uppercase tracking-widest font-black border border-accent/15 inline-flex items-center gap-1.5">
                   <Command size={11} />
                   Ctrl K
                 </div>
-                <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 text-[10px] uppercase tracking-widest font-black">
+                <div className="px-3 py-1 rounded-full bg-linear-to-r from-emerald-500/10 to-teal-400/10 text-emerald-600 dark:text-emerald-300 text-[10px] uppercase tracking-widest font-black border border-emerald-500/15">
                   Live Sync
                 </div>
-                <div className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] uppercase tracking-widest font-black inline-flex items-center gap-1.5">
+                <div className="px-3 py-1 rounded-full bg-linear-to-r from-accent/10 to-indigo-500/10 text-accent text-[10px] uppercase tracking-widest font-black inline-flex items-center gap-1.5 border border-accent/15">
                   <ShieldCheck size={11} />
                   Secure
                 </div>
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-[260px_1fr] min-h-[460px]">
+            <div className="grid lg:grid-cols-[260px_1fr] min-h-115">
               <aside className="border-b lg:border-b-0 lg:border-r border-border bg-sidebar/60 p-5">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black mb-4">Workspace Folders</p>
                 <div className="space-y-2">
                   {['Product', 'Engineering', 'Growth', 'Operations'].map((folder, index) => (
                     <div
-                      key={folder}
-                      className={`preview-card flex items-center gap-3 rounded-2xl border px-4 py-3 ${
-                        index === 0
-                          ? 'border-accent/20 bg-accent/10 text-accent'
-                          : 'border-border bg-background/70 text-foreground'
-                      }`}
-                    >
+                        key={folder}
+                        className={`preview-card flex items-center gap-3 rounded-2xl border px-4 py-3 transition-all ${
+                          index === 0
+                            ? 'border-accent/20 bg-linear-to-r from-accent/12 to-sky-400/10 text-accent shadow-sm'
+                            : index === 1
+                              ? 'border-emerald-500/15 bg-linear-to-r from-emerald-500/8 to-teal-500/8 text-foreground'
+                              : index === 2
+                                ? 'border-fuchsia-500/15 bg-linear-to-r from-fuchsia-500/8 to-purple-500/8 text-foreground'
+                                : 'border-amber-500/15 bg-linear-to-r from-amber-500/8 to-orange-500/8 text-foreground'
+                        }`}
+                      >
                       <FolderTree size={16} />
                       <span className="text-sm font-bold">{folder}</span>
                     </div>
@@ -154,8 +159,8 @@ export default function ProductPreview() {
 
                 <div className="preview-cards-grid grid sm:grid-cols-2 gap-4">
                   {APPS.map((app) => (
-                    <div key={app.name} className="preview-card rounded-[1.5rem] border border-border bg-card/70 p-5 hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 shadow-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center text-accent mb-4">
+                    <div key={app.name} className="preview-card rounded-3xl border border-border bg-linear-to-br from-card via-card to-accent/5 p-5 hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 shadow-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-background via-background to-accent/6 border border-border flex items-center justify-center text-accent mb-4">
                         <app.icon size={20} />
                       </div>
                       <h5 className="text-lg font-black text-foreground">{app.name}</h5>

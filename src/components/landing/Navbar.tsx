@@ -13,14 +13,17 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 border-b border-border/70 bg-background/70 backdrop-blur-2xl transition-all duration-300">
+    <nav className="fixed top-0 w-full z-50 border-b border-border/70 bg-background/72 backdrop-blur-2xl transition-all duration-300">
+      <div className="h-px w-full bg-linear-to-r from-accent/0 via-accent/40 via-sky-400/60 to-emerald-400/0" />
       <div className="container mx-auto flex h-18 items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
           onClick={() => goTo('/')}
         >
-          <BrandLogo className="h-11 w-11 group-hover:-translate-y-0.5 transition-all duration-300" />
+          <div className="rounded-2xl bg-linear-to-br from-accent/12 via-sky-400/12 to-emerald-400/12 p-1.5 border border-accent/15 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5">
+            <BrandLogo className="h-9 w-9" />
+          </div>
           <div>
             <span className="font-black tracking-tight text-base text-foreground uppercase block leading-none">
               Explorero
@@ -70,7 +73,7 @@ export default function Navbar() {
 
           <button
             onClick={() => goTo('/auth')}
-            className="hidden h-11 px-5 text-[11px] font-black uppercase tracking-[0.16em] bg-foreground text-background hover:opacity-90 transition-all duration-300 rounded-2xl shadow-sm sm:inline-flex items-center gap-2"
+            className="hidden h-11 px-5 text-[11px] font-black uppercase tracking-[0.16em] bg-linear-to-r from-accent via-sky-500 to-indigo-500 text-white hover:brightness-110 transition-all duration-300 rounded-2xl shadow-[0_16px_34px_-22px_rgba(11,102,255,0.6)] sm:inline-flex items-center gap-2"
           >
             Open Workspace
             <ArrowRight size={14} />
@@ -79,7 +82,7 @@ export default function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-border/70 bg-background/92 px-4 py-4 backdrop-blur-2xl md:hidden">
+        <div className="border-t border-border/70 bg-linear-to-b from-background/96 to-accent/4 px-4 py-4 backdrop-blur-2xl md:hidden">
           <div className="flex flex-col gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-muted">
             <a href="#product-preview" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
               Product
@@ -96,7 +99,7 @@ export default function Navbar() {
             <button onClick={() => goTo('/about-explorero')} className="rounded-xl px-3 py-3 text-left transition-colors hover:bg-card-hover hover:text-foreground">
               About
             </button>
-            <button onClick={() => goTo('/auth')} className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-background shadow-sm transition-all duration-300 hover:opacity-90">
+            <button onClick={() => goTo('/auth')} className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-5 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_34px_-22px_rgba(11,102,255,0.6)] transition-all duration-300 hover:brightness-110">
               Open Workspace
               <ArrowRight size={14} />
             </button>

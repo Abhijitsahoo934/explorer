@@ -105,7 +105,7 @@ export default function FeaturesGrid() {
     <section ref={containerRef} id="features" className="relative py-24 px-4 sm:px-6 sm:py-28">
       <div className="container mx-auto max-w-6xl">
         <div className="features-header text-center mb-14 sm:mb-18">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-accent/15 bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md shadow-sm">
             Core capabilities
           </div>
           <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-5 leading-tight">
@@ -128,13 +128,13 @@ export default function FeaturesGrid() {
             return (
               <div
                 key={feature.title}
-                className="feature-card rounded-[1.6rem] border border-border bg-card/72 p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium sm:p-8"
+                className="feature-card rounded-[1.6rem] border border-border bg-linear-to-br from-card via-card to-accent/4 p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-premium sm:p-8"
               >
                 <div className="flex items-start justify-between gap-4 mb-6">
-                  <div className={`w-14 h-14 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center`}>
+                  <div className={`w-14 h-14 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center shadow-sm`}>
                     <Icon size={26} className={colors.text} />
                   </div>
-                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                  <span className="rounded-full border border-border bg-linear-to-r from-background/70 to-accent/6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
                     {feature.example}
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export default function FeaturesGrid() {
 
                 <div className="pt-4 border-t border-border flex items-center justify-between gap-4">
                   <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-black">Operational detail</p>
-                  <p className="text-sm text-foreground font-semibold text-right">{feature.example}</p>
+                  <p className="text-sm font-semibold text-right bg-linear-to-r from-foreground to-accent bg-clip-text text-transparent">{feature.example}</p>
                 </div>
               </div>
             );
