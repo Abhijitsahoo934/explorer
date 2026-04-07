@@ -6,6 +6,7 @@ import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import ProductPreview from '../components/landing/ProductPreview';
 import FeaturesGrid from '../components/landing/sections/FeaturesGrid';
+import { HowItWorks } from '../components/landing/sections/HowItWorks';
 import UseCases from '../components/landing/sections/UseCases';
 import FinalCTA from '../components/landing/sections/FinalCTA';
 import Footer from '../components/landing/Footer';
@@ -72,6 +73,11 @@ export default function Landing() {
         {/* Product Preview */}
         <section id="product-preview" className="relative">
           <ProductPreview />
+        </section>
+
+        {/* How It Works */}
+        <section id="how-it-works" className="relative">
+          <HowItWorks />
         </section>
 
         {/* Features Grid */}
