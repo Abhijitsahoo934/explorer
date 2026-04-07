@@ -138,7 +138,7 @@ export default function UseCases() {
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="usecases-header text-center mb-14 sm:mb-20">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-accent/15 bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md shadow-sm">
             Use cases
           </div>
           <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-5 leading-tight">
@@ -161,7 +161,7 @@ export default function UseCases() {
             return (
               <div
                 key={index}
-                className={`usecase-card glass-card rounded-[1.6rem] p-7 border ${colors.border} hover:border-accent/50 transition-all duration-300 group cursor-pointer ${colors.bg} sm:p-8`}
+                className={`usecase-card glass-card rounded-[1.6rem] p-7 border ${colors.border} hover:border-accent/50 transition-all duration-300 group cursor-pointer bg-linear-to-br from-card via-card to-accent/4 sm:p-8`}
               >
                 <div className="flex items-start justify-between gap-4 mb-6">
                   <div
@@ -169,7 +169,7 @@ export default function UseCases() {
                   >
                     <Icon size={28} className={colors.text} />
                   </div>
-                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                  <span className="rounded-full border border-border bg-linear-to-r from-background/70 to-accent/6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
                     Workflow
                   </span>
                 </div>
@@ -217,7 +217,7 @@ export default function UseCases() {
               <button
                 key={link.path}
                 onClick={() => navigate(link.path)}
-                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/60 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent/30 hover:bg-card"
+                className="inline-flex items-center gap-2 rounded-2xl border border-accent/15 bg-linear-to-r from-card via-card to-accent/6 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent/30 hover:brightness-105"
               >
                 {link.title}
                 <ArrowRight size={14} className="text-accent" />

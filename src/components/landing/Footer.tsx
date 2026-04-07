@@ -9,11 +9,14 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-border bg-sidebar/35 backdrop-blur-xl">
+      <div className="h-px w-full bg-linear-to-r from-accent/0 via-sky-400/45 to-emerald-400/0" />
       <div className="container mx-auto px-4 py-14 sm:px-6">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
             <div className="mb-5 flex items-center gap-3">
-              <BrandLogo className="h-11 w-11" />
+              <div className="rounded-2xl bg-linear-to-br from-accent/12 via-sky-400/12 to-emerald-400/12 p-1.5 border border-accent/15 shadow-sm">
+                <BrandLogo className="h-8 w-8" />
+              </div>
               <div>
                 <span className="block leading-none text-lg font-black uppercase tracking-tight text-foreground">
                   Explorero
@@ -91,7 +94,7 @@ export default function Footer() {
               <h3 className="mb-4 text-[11px] font-black uppercase tracking-[0.18em] text-foreground">Contact</h3>
               <a
                 href="mailto:sahooabhijit934@gmail.com"
-                className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
+                className="inline-flex items-center gap-2 rounded-xl border border-accent/15 bg-linear-to-r from-background/75 to-accent/8 px-3 py-2 text-sm text-muted transition-colors hover:text-foreground"
               >
                 <Mail size={14} />
                 sahooabhijit934@gmail.com
