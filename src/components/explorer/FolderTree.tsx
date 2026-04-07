@@ -118,25 +118,25 @@ const FolderNode: React.FC<FolderNodeProps> = ({
               ? isInvalidDropTarget
                 ? "bg-rose-500/10 border-rose-400 text-rose-600 dark:text-rose-300 scale-[1.01] z-10 ring-2 ring-rose-400/50"
                 : "bg-accent/14 border-accent/40 text-foreground scale-[1.02] z-10 ring-2 ring-accent/35 shadow-[0_14px_28px_-18px_rgba(var(--accent),0.55)]"
-              : "border-transparent text-zinc-700 dark:text-zinc-400 hover:bg-card-hover hover:border-border hover:text-foreground",
+              : "border-transparent text-zinc-600 dark:text-zinc-300 hover:bg-card-hover hover:border-border hover:text-foreground",
           isDragging ? "opacity-30 border-dashed border-accent/50 pointer-events-none cursor-move" : ""
         )}
         style={{ paddingLeft: `${level * 16 + 8}px`, touchAction: 'pan-y', ...motionStyle }}
       >
         {level > 0 && Array.from({ length: level }).map((_, i) => (
-          <div key={i} className="absolute top-0 bottom-0 border-l border-zinc-200 dark:border-white/10" style={{ left: `${(i + 1) * 16}px` }} />
+          <div key={i} className="absolute top-0 bottom-0 border-l border-zinc-300 dark:border-white/15" style={{ left: `${(i + 1) * 16}px` }} />
         ))}
 
         {/* 1. SEPARATED TOGGLE CHEVRON */}
         <div 
           className={cn(
-            "flex items-center justify-center w-6 h-6 rounded-lg hover:bg-card shrink-0 z-20 transition-colors", 
+            "flex items-center justify-center w-6 h-6 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 shrink-0 z-20 transition-colors", 
             !hasSubFolders && "opacity-0 pointer-events-none"
           )}
           onClick={(e) => { e.stopPropagation(); setIsOpen(!isExpanded); }}
         >
           <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.16, ease: 'easeOut' }}>
-            <ChevronRight size={16} className={isActive ? "text-accent" : "text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300"} />
+            <ChevronRight size={16} className={isActive ? "text-accent" : "text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200"} />
           </motion.div>
         </div>
 
@@ -144,21 +144,21 @@ const FolderNode: React.FC<FolderNodeProps> = ({
         <div 
           {...attributes} {...listeners}
           className={cn(
-            "flex items-center justify-center w-5 h-6 hover:bg-card rounded-lg transition-opacity shrink-0 z-20 touch-none select-none cursor-move",
+            "flex items-center justify-center w-5 h-6 hover:bg-white/10 dark:hover:bg-white/10 rounded-lg transition-opacity shrink-0 z-20 touch-none select-none cursor-move",
             isAnyFolderDragging || isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           )}
           onClick={(e) => e.stopPropagation()}
           aria-label={`Drag ${folder.name}`}
         >
-          <GripVertical size={14} className="text-zinc-400 hover:text-foreground" />
+          <GripVertical size={14} className="text-zinc-500 dark:text-zinc-400 hover:text-foreground" />
         </div>
         
         {/* 3. ICON & NAME */}
         <div className="relative z-10 flex items-center gap-2.5 flex-1 min-w-0">
           {isExpanded || isActive ? (
-            <FolderOpen size={16} className={cn("shrink-0", isActive ? "text-accent" : "text-zinc-500 dark:text-zinc-400")} />
+            <FolderOpen size={16} className={cn("shrink-0", isActive ? "text-accent" : "text-zinc-600 dark:text-zinc-300")} />
           ) : (
-            <Folder size={16} className="text-zinc-400 shrink-0 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors" />
+            <Folder size={16} className="text-zinc-500 dark:text-zinc-400 shrink-0 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 transition-colors" />
           )}
           <span className={cn(
             "text-[13px] truncate transition-all tracking-tight z-10 w-full",
@@ -176,12 +176,12 @@ const FolderNode: React.FC<FolderNodeProps> = ({
 
         {/* 4. ACTIONS */}
         <div className={cn(
-          "absolute right-2 flex gap-0.5 transition-all duration-150 z-20 rounded-xl border border-border bg-background/95 p-1 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl",
+          "absolute right-2 flex gap-0.5 transition-all duration-150 z-20 rounded-xl border border-border/70 bg-card/80 dark:bg-zinc-900/95 p-1.5 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.45)] backdrop-blur-md",
           isAnyFolderDragging ? "opacity-0 pointer-events-none" : isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
-          <button onClick={(e) => { e.stopPropagation(); setIsAddSubfolderOpen(true); }} className="p-1.5 text-zinc-500 hover:text-accent hover:bg-accent/10 rounded-md transition-colors"><Plus size={14} /></button>
-          <button onClick={(e) => { e.stopPropagation(); setIsRenaming(true); }} className="p-1.5 text-zinc-500 hover:text-foreground hover:bg-card rounded-md transition-colors"><Edit3 size={14} /></button>
-          <button onClick={handleDelete} className="p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors"><Trash2 size={14} /></button>
+          <button onClick={(e) => { e.stopPropagation(); setIsAddSubfolderOpen(true); }} className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:text-accent hover:bg-accent/10 rounded-md transition-colors"><Plus size={14} /></button>
+          <button onClick={(e) => { e.stopPropagation(); setIsRenaming(true); }} className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground hover:bg-white/10 dark:hover:bg-white/10 rounded-md transition-colors"><Edit3 size={14} /></button>
+          <button onClick={handleDelete} className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors"><Trash2 size={14} /></button>
         </div>
       </motion.div>
       
@@ -290,7 +290,7 @@ export const FolderTree: React.FC<{
         onClick={() => onFolderSelect(null)}
         className={cn(
           "flex items-center gap-3 px-4 py-3.5 min-h-12 rounded-xl cursor-pointer transition-all duration-200 mb-4 border will-change-transform",
-          currentFolderId === null ? "bg-accent/10 border-accent/20 text-accent font-bold shadow-sm" : "border-transparent text-zinc-600 hover:bg-card-hover hover:border-border dark:text-zinc-400 hover:text-foreground",
+          currentFolderId === null ? "bg-accent/10 border-accent/20 text-accent font-bold shadow-sm" : "border-transparent text-zinc-500 dark:text-zinc-300 hover:bg-card-hover hover:border-border hover:text-foreground",
           isRootOver ? "bg-accent/14 border-accent/40 text-foreground scale-[1.02] ring-2 ring-accent/35 shadow-[0_16px_30px_-20px_rgba(var(--accent),0.6)] z-10" : ""
         )}
       >
@@ -306,7 +306,7 @@ export const FolderTree: React.FC<{
         )}
       </div>
 
-      <div className="h-px bg-zinc-200 dark:bg-white/10 mx-3 mb-4" />
+      <div className="h-px bg-zinc-300 dark:bg-white/20 mx-3 mb-4" />
 
       {folders.filter(f => !f.parent_id).map((folder) => (
         <FolderNode
