@@ -13,6 +13,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "qa:mobile": "npm run build && node scripts/mobile-qa-signoff.mjs",
+    "smoke:prod": "node scripts/smoke-prod.mjs",
+    "evidence:release": "node scripts/release-evidence.mjs",
+    "launch:check": "node scripts/launch-check.mjs",
     "ci:check": "npm run lint && npm run build",
     "preflight:prod": "node scripts/prod-preflight.mjs",
     "preflight:prod:strict": "node scripts/prod-preflight.mjs --strict"
