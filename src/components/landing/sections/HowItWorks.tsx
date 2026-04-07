@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { FolderPlus, Link as LinkIcon, Monitor, Sparkles } from 'lucide-react';
+import { FolderPlus, Link as LinkIcon, Monitor } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,7 +76,7 @@ export const HowItWorks: React.FC = () => {
         <div className="mb-20 md:mb-32 text-center">
           <div className="mx-auto flex max-w-4xl flex-col items-center">
             <div className="hiw-header inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 border border-accent/20 text-[10px] font-black text-muted mb-6 tracking-[0.2em] uppercase backdrop-blur-md shadow-sm">
-              <Sparkles size={12} className="text-accent" /> The Protocol
+              The Protocol
             </div>
             <h2 className="hiw-header text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-[1.1] uppercase">
               The Architecture of <br /> 
