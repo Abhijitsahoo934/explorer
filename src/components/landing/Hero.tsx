@@ -70,7 +70,7 @@ export default function Hero() {
       style={{ perspective: '2000px' }}
     >
       <div className="relative z-20 container mx-auto text-center flex flex-col items-center max-w-6xl">
-        <div className="hero-badge mb-6 inline-flex items-center rounded-full border border-accent/20 bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-foreground shadow-[0_8px_24px_-18px_rgba(11,102,255,0.28)] backdrop-blur-md sm:mb-8 sm:text-xs">
+        <div className="hero-badge mb-6 inline-flex items-center rounded-full border border-accent/18 bg-linear-to-r from-accent/8 via-background/70 to-sky-400/8 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-foreground shadow-[0_10px_24px_-18px_rgba(15,23,42,0.32)] backdrop-blur-md sm:mb-8 sm:text-xs">
           Built for focused web work
         </div>
 
@@ -79,7 +79,7 @@ export default function Hero() {
             <div className="hero-title-line">Browse Like</div>
           </div>
           <div className="overflow-hidden">
-            <div className="hero-title-line gradient-text">A File System.</div>
+            <div className="hero-title-line bg-linear-to-r from-accent via-sky-500 to-cyan-500 bg-clip-text text-transparent">A File System.</div>
           </div>
         </h1>
 
@@ -91,7 +91,7 @@ export default function Hero() {
         <div className="z-30 mb-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:items-center md:flex-row md:justify-center md:gap-4">
           <button
             onClick={() => navigate('/auth')}
-            className="hero-cta group flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-8 text-sm font-bold tracking-[0.14em] uppercase text-white shadow-[0_18px_40px_-24px_rgba(11,102,255,0.65)] transition-all duration-300 hover:brightness-110 sm:w-auto"
+            className="hero-cta group flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-8 text-sm font-bold tracking-[0.14em] uppercase text-white shadow-[0_16px_36px_-22px_rgba(11,102,255,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 sm:w-auto"
           >
             Start Workspace
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -101,7 +101,7 @@ export default function Hero() {
             href="#product-preview"
             className="hero-cta flex items-center justify-center gap-3 text-sm font-semibold text-muted transition-colors group hover:text-foreground"
           >
-            <div className="w-12 h-12 rounded-full border border-accent/20 flex items-center justify-center bg-linear-to-br from-accent/10 to-sky-400/10 group-hover:from-accent/20 group-hover:to-indigo-500/20 transition-colors backdrop-blur-md shadow-sm">
+            <div className="w-12 h-12 rounded-full border border-accent/15 flex items-center justify-center bg-linear-to-br from-background/80 to-accent/7 group-hover:to-accent/14 transition-colors backdrop-blur-md shadow-sm">
               <Play size={16} className="ml-0.5 fill-current text-accent" />
             </div>
             See product walkthrough
@@ -117,13 +117,13 @@ export default function Hero() {
         </button>
 
         <div className="mb-14 grid w-full max-w-4xl grid-cols-1 gap-3 sm:mb-16 md:grid-cols-3">
-          <div className="hero-proof rounded-2xl border border-accent/15 bg-linear-to-br from-accent/6 to-sky-400/8 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
+          <div className="hero-proof rounded-2xl border border-accent/12 bg-linear-to-br from-accent/5 to-background/82 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
             Structured workspaces instead of scattered links
           </div>
-          <div className="hero-proof rounded-2xl border border-emerald-500/15 bg-linear-to-br from-emerald-500/8 to-teal-400/8 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
+          <div className="hero-proof rounded-2xl border border-sky-500/12 bg-linear-to-br from-sky-500/6 to-background/82 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
             Fast launch and command palette access
           </div>
-          <div className="hero-proof rounded-2xl border border-amber-500/15 bg-linear-to-br from-amber-500/8 to-orange-400/8 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
+          <div className="hero-proof rounded-2xl border border-indigo-500/12 bg-linear-to-br from-indigo-500/6 to-background/82 px-4 py-4 text-sm font-semibold text-foreground shadow-sm backdrop-blur-md">
             The same setup across browsers and devices
           </div>
         </div>
@@ -132,9 +132,9 @@ export default function Hero() {
       <div className="relative z-10 w-full max-w-6xl" style={{ transformStyle: 'preserve-3d' }}>
         <div
           ref={mockupRef}
-          className="w-full overflow-hidden rounded-[1.75rem] border border-border bg-card/55 shadow-premium backdrop-blur-xl sm:rounded-3xl"
+          className="w-full overflow-hidden rounded-[1.75rem] border border-border bg-card/60 shadow-premium backdrop-blur-xl sm:rounded-3xl"
         >
-          <div className="h-12 border-b border-border bg-linear-to-r from-slate-950/10 via-background/70 to-accent/10 flex items-center px-4 sm:px-6 gap-2 backdrop-blur-md">
+          <div className="h-12 border-b border-border bg-linear-to-r from-background/85 via-background/72 to-accent/8 flex items-center px-4 sm:px-6 gap-2 backdrop-blur-md">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500/80 shadow-[0_0_0_3px_rgba(244,63,94,0.08)]" />
               <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_0_3px_rgba(245,158,11,0.08)]" />
@@ -233,9 +233,9 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl opacity-20 animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 right-1/3 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/8 rounded-full blur-3xl opacity-16 animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-400/8 rounded-full blur-3xl opacity-16 animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 right-1/3 w-72 h-72 bg-indigo-400/8 rounded-full blur-3xl opacity-16 animate-float" style={{ animationDelay: '2s' }} />
     </section>
   );
 }
