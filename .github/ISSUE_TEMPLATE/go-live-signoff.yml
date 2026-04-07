@@ -1,0 +1,108 @@
+name: Go Live Signoff
+about: Track production launch readiness and signoff evidence
+title: "Go Live Signoff: <release-name>"
+labels:
+  - release
+  - go-live
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Complete this checklist before releasing to production.
+
+  - type: input
+    id: release_name
+    attributes:
+      label: Release name
+      description: Human-friendly release label
+      placeholder: "2026-04-07 production cut"
+    validations:
+      required: true
+
+  - type: input
+    id: target_commit
+    attributes:
+      label: Target commit SHA
+      description: Commit to deploy
+      placeholder: "abc1234"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope summary
+      description: What is included in this release
+      placeholder: "UI polish, stability improvements, CI gates"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: prelaunch_quality
+    attributes:
+      label: Pre-launch quality gates
+      options:
+        - label: npm run lint passed
+        - label: npm run build passed
+        - label: npm run qa:mobile passed
+        - label: npm run preflight:prod:strict passed
+
+  - type: checkboxes
+    id: config_checks
+    attributes:
+      label: Environment and secrets checks
+      options:
+        - label: VITE_SUPABASE_URL configured in deployment target
+        - label: VITE_SUPABASE_ANON_KEY configured in deployment target
+        - label: VITE_APP_ENV set to production
+        - label: CI repository secrets configured
+
+  - type: checkboxes
+    id: backend_checks
+    attributes:
+      label: Supabase readiness checks
+      options:
+        - label: Migrations applied
+        - label: Realtime verified for key tables
+        - label: RLS verified for key tables
+        - label: delete_user RPC verified (if enabled)
+        - label: ai-recommend function deployed and secret configured
+
+  - type: checkboxes
+    id: smoke_checks
+    attributes:
+      label: Post-deploy smoke checks
+      options:
+        - label: Smoke gate executed (npm script or workflow)
+        - label: Route / is healthy
+        - label: Route /auth is healthy
+        - label: Route /explorer is healthy
+        - label: Route /auth/callback is healthy
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence links
+      description: Add CI run URL, mobile QA report path, smoke output, and screenshots
+      placeholder: "- CI: ...\n- Mobile QA: ...\n- Smoke: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback plan
+      description: What is the exact rollback action if issues appear after launch?
+      placeholder: "Rollback to previous deployment in hosting dashboard and announce incident channel update"
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Launch owner
+      description: Person accountable for go/no-go decision
+      placeholder: "@username"
+    validations:
+      required: true

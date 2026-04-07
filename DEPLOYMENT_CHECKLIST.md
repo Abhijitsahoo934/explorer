@@ -5,6 +5,7 @@
 - Set `VITE_SUPABASE_URL`
 - Set `VITE_SUPABASE_ANON_KEY`
 - Set `VITE_APP_ENV=production`
+- Set repository secrets for CI: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (and optional `VITE_FOUNDER_EMAILS`)
 - Confirm `https://yourdomain.com/auth/callback` is added in Supabase Auth redirect URLs
 - Confirm `http://localhost:5173/auth/callback` remains enabled for local development
 
@@ -37,6 +38,7 @@
 
 - Run `npm run preflight:prod`
 - Run `npm run preflight:prod:strict` before final release cut
+- Run `npm run launch:check -- https://your-domain.com` for one-command release validation
 - Run `npm run lint`
 - Run `npx tsc --noEmit -p tsconfig.app.json`
 - Run `npx tsc --noEmit -p tsconfig.node.json`
@@ -50,3 +52,5 @@
 - Add uptime monitoring
 - Add analytics review cadence
 - Add backup/export process for critical data
+- Follow `LAUNCH_RUNBOOK.md` for rollout and rollback discipline
+- Run post-deploy smoke workflow (`.github/workflows/post-deploy-smoke.yml`) on the production URL

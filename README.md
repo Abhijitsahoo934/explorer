@@ -21,12 +21,22 @@ npm run dev -- --port 5174
 ```bash
 npm run ci:check
 npm run qa:mobile
+npm run smoke:prod -- https://your-domain.com
+npm run evidence:release -- https://your-domain.com
+npm run launch:check -- https://your-domain.com
 npm run preflight:prod
 npm run preflight:prod:strict
 ```
 
 `preflight:prod` runs environment validation, `ci:check`, and mobile QA sign-off in one command.
 `preflight:prod:strict` additionally fails if `VITE_APP_ENV` is not set to `production` (recommended for CI/release branches).
+`smoke:prod` validates critical production routes on a deployed URL.
+`evidence:release` generates a release evidence report and optionally runs smoke against the provided URL.
+`launch:check` runs strict preflight, smoke, and evidence generation in one command.
+
+Production rollout and rollback checklist is documented in `LAUNCH_RUNBOOK.md`.
+Release governance templates are available at `.github/pull_request_template.md` and `.github/ISSUE_TEMPLATE/go-live-signoff.yml`.
+Merge controls are documented at `.github/CODEOWNERS` and `.github/BRANCH_PROTECTION_SETUP.md`.
 
 ## Git Push Protection
 
@@ -60,6 +70,12 @@ Create `.env` from `.env.example` and set real values for:
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_APP_ENV=production`
 - `VITE_FOUNDER_EMAILS` (comma-separated emails allowed to access `/insights`)
+
+For GitHub Actions quality gate, set repository secrets:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_FOUNDER_EMAILS` (optional)
 
 ---
 

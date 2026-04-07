@@ -1,0 +1,24 @@
+# Update the handles below with actual GitHub usernames/teams before enforcement.
+# Format: path owner
+
+* @your-org/engineering
+
+# Release and deployment controls
+.github/workflows/ @your-org/platform
+scripts/prod-preflight.mjs @your-org/platform
+scripts/smoke-prod.mjs @your-org/platform
+LAUNCH_RUNBOOK.md @your-org/platform
+DEPLOYMENT_CHECKLIST.md @your-org/platform
+
+# Security and auth-sensitive surfaces
+src/lib/supabase.ts @your-org/security
+src/platform/supabase/ @your-org/security
+src/routes/Auth.tsx @your-org/security
+src/routes/AuthCallback.tsx @your-org/security
+src/routes/UpdatePassword.tsx @your-org/security
+
+# Core workspace reliability surfaces
+src/routes/Explorer.tsx @your-org/frontend-core
+src/components/layout/SettingsModal.tsx @your-org/frontend-core
+src/components/layout/Topbar.tsx @your-org/frontend-core
+src/components/layout/Sidebar.tsx @your-org/frontend-core
