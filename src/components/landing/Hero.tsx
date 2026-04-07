@@ -70,9 +70,8 @@ export default function Hero() {
       style={{ perspective: '2000px' }}
     >
       <div className="relative z-20 container mx-auto text-center flex flex-col items-center max-w-6xl">
-        <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full bg-glass border border-border px-4 py-2 text-[10px] font-bold text-muted uppercase tracking-[0.18em] backdrop-blur-md shadow-sm sm:mb-8 sm:text-xs">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          <span className="text-foreground">Built for focused web work</span>
+        <div className="hero-badge mb-6 inline-flex items-center rounded-full border border-border bg-card/70 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.35)] backdrop-blur-md sm:mb-8 sm:text-xs">
+          Built for focused web work
         </div>
 
         <h1 className="mb-6 text-4xl font-black leading-[0.92] tracking-tighter text-foreground sm:text-5xl md:text-7xl lg:text-8xl">
@@ -229,8 +228,8 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-sky-400/5 pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-tr from-accent/5 via-transparent to-sky-400/5 pointer-events-none" />
         </div>
       </div>
 

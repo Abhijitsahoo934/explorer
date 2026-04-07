@@ -617,19 +617,19 @@ const Explorer: React.FC = () => {
         <DragOverlay dropAnimation={reducedMotionExperience ? { duration: 130, easing: 'ease-out' } : { duration: 210, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}>
           {activeId ? (
             <div className={cn(
-              'rounded-3xl bg-card/95 border border-accent/45 shadow-[0_0_50px_rgba(var(--accent),0.28)] opacity-95 flex items-center gap-4',
-              reducedMotionExperience ? 'p-3 max-w-[88vw] scale-100 rotate-0 backdrop-blur-sm' : 'p-4 scale-105 rotate-2 backdrop-blur-xl'
+              'rounded-3xl bg-card/92 border border-accent/40 shadow-[0_0_28px_rgba(var(--accent),0.18)] opacity-95 flex items-center gap-3',
+              reducedMotionExperience ? 'p-2.5 max-w-[72vw] scale-100 rotate-0 backdrop-blur-sm' : 'p-2.5 max-w-70 scale-100 rotate-0 backdrop-blur-lg'
             )}>
               <div className={cn(
-                'rounded-2xl bg-accent/15 flex items-center justify-center',
-                isCompactViewport ? 'w-10 h-10' : 'w-12 h-12'
+                'rounded-2xl bg-accent/15 flex items-center justify-center shrink-0',
+                isCompactViewport ? 'w-9 h-9' : 'w-10 h-10'
               )}>
-                {activeType === 'folder' ? <FolderIcon size={isCompactViewport ? 18 : 20} className="text-accent" /> : <Globe size={isCompactViewport ? 18 : 20} className="text-accent" />}
+                {activeType === 'folder' ? <FolderIcon size={isCompactViewport ? 16 : 18} className="text-accent" /> : <Globe size={isCompactViewport ? 16 : 18} className="text-accent" />}
               </div>
-              <div className={cn('pr-2', isCompactViewport ? 'max-w-[65vw]' : 'pr-4')}>
-                <p className="text-[10px] uppercase tracking-widest text-muted font-bold mb-0.5">Moving Item</p>
-                <p className={cn('font-black text-foreground capitalize truncate', isCompactViewport ? 'text-sm' : 'text-base')}>{activeType}: {activeLabel}</p>
-                {dragHint && <p className={cn('mt-1 text-[11px] font-semibold text-muted', isCompactViewport ? 'line-clamp-2 max-w-[65vw]' : 'max-w-65')}>{dragHint}</p>}
+              <div className={cn('min-w-0', isCompactViewport ? 'max-w-[56vw]' : 'max-w-50')}>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-muted font-black mb-0.5">Moving Item</p>
+                <p className={cn('font-black text-foreground capitalize truncate leading-tight', isCompactViewport ? 'text-xs' : 'text-sm')}>{activeType}: {activeLabel}</p>
+                {dragHint && <p className={cn('mt-1 text-[10px] font-semibold text-muted line-clamp-2 leading-snug', isCompactViewport ? 'max-w-[56vw]' : 'max-w-50')}>{dragHint}</p>}
               </div>
             </div>
           ) : null}
