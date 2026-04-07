@@ -8,6 +8,7 @@ Use release governance templates:
 - Go-live issue template: `.github/ISSUE_TEMPLATE/go-live-signoff.yml`
 - Code ownership: `.github/CODEOWNERS`
 - Branch protection guide: `.github/BRANCH_PROTECTION_SETUP.md`
+- Monitoring runbook: `MONITORING_RUNBOOK.md`
 
 ## 1) Pre-Launch Gates (Must Pass)
 

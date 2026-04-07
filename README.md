@@ -37,6 +37,7 @@ npm run preflight:prod:strict
 Production rollout and rollback checklist is documented in `LAUNCH_RUNBOOK.md`.
 Release governance templates are available at `.github/pull_request_template.md` and `.github/ISSUE_TEMPLATE/go-live-signoff.yml`.
 Merge controls are documented at `.github/CODEOWNERS` and `.github/BRANCH_PROTECTION_SETUP.md`.
+First-hour production monitoring guidance is documented in `MONITORING_RUNBOOK.md`.
 
 ## Git Push Protection
 
