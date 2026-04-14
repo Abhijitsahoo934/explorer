@@ -21,6 +21,7 @@ export default function AuthCallback() {
         const authCode = url.searchParams.get('code');
         const nextRoute = url.searchParams.get('next');
         const flow = url.searchParams.get('flow');
+        const queryType = url.searchParams.get('type');
         const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
         const hashType = hashParams.get('type');
         const authError =
@@ -48,7 +49,11 @@ export default function AuthCallback() {
         }
 
         if (data.session) {
-          const isRecoveryFlow = flow === 'recovery' || hashType === 'recovery';
+          const isRecoveryFlow =
+            flow === 'recovery' ||
+            queryType === 'recovery' ||
+            hashType === 'recovery' ||
+            nextRoute === '/update-password';
           if (!isRecoveryFlow) {
             trackFunnelEvent('oauth_login');
           }
