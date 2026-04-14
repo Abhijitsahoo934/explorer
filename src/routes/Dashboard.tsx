@@ -621,8 +621,8 @@ export default function Dashboard() {
 
               <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
                 <div className="grid h-full min-h-0 gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[28vh] overflow-hidden sm:max-h-[36vh] lg:h-full lg:max-h-none">
-                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:h-full lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
+                <div className="relative min-h-0 max-h-[28vh] overflow-hidden sm:max-h-[36vh] lg:max-h-[60vh]">
+                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
                       <button
                         id={`onboarding-template-option-${template.id}`}
