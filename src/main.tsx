@@ -8,7 +8,7 @@ import { BootErrorScreen } from './components/system/BootErrorScreen.tsx';
 import { AppErrorBoundary } from './components/system/AppErrorBoundary.tsx';
 import { STORAGE_KEYS } from './platform/storage/keys.ts';
 import { supabaseRuntimeValidation } from './lib/supabase.ts';
-import { initializeMonitoring } from './platform/observability/monitoring.ts';
+import { captureHealthPing, initializeMonitoring } from './platform/observability/monitoring.ts';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 
@@ -24,6 +24,12 @@ if (!supabaseRuntimeValidation.isValid) {
   );
 } else {
   initializeMonitoring();
+  captureHealthPing({
+    stage: 'bootstrap_start',
+    extra: {
+      path: window.location.pathname,
+    },
+  });
   initPerformanceTelemetry();
 
   root.render(
@@ -35,4 +41,13 @@ if (!supabaseRuntimeValidation.isValid) {
       </AppErrorBoundary>
     </React.StrictMode>
   );
+
+  window.requestAnimationFrame(() => {
+    captureHealthPing({
+      stage: 'first_render_committed',
+      extra: {
+        path: window.location.pathname,
+      },
+    });
+  });
 }

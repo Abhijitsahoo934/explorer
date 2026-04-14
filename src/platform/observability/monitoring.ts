@@ -3,6 +3,11 @@ interface MonitoringPayload {
   extra?: Record<string, unknown>;
 }
 
+interface HealthPingPayload {
+  stage: string;
+  extra?: Record<string, unknown>;
+}
+
 interface MonitoringAdapter {
   captureError?: (error: unknown, payload?: MonitoringPayload) => void;
   captureMessage?: (message: string, payload?: MonitoringPayload) => void;
@@ -119,4 +124,14 @@ export function captureMessage(message: string, payload?: MonitoringPayload) {
   });
 
   adapter?.captureMessage?.(message, payload);
+}
+
+export function captureHealthPing({ stage, extra }: HealthPingPayload) {
+  captureMessage('App health ping', {
+    tags: {
+      source: 'app.health',
+      stage,
+    },
+    extra,
+  });
 }
