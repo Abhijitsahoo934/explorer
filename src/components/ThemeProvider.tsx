@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -59,8 +60,8 @@ export function ThemeProvider({
       }
     };
 
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    const unsubscribe = subscribeMediaQuery(mediaQuery, handleSystemThemeChange);
+    return unsubscribe;
   }, [theme]);
 
   const value = {

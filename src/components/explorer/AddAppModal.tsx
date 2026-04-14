@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { trackFunnelEvent } from '../../lib/analyticsService';
 import { getErrorMessage } from '../../lib/errorMessage';
 import { logger } from '../../platform/observability/logger';
+import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 import { buildFaviconUrl, normalizeExternalUrl } from '../../platform/security/url';
 import { WORKSPACE_TEMPLATES } from '../../lib/workspaceTemplates';
 import { COMMUNITY_TEMPLATE_LIBRARY } from '../../lib/communityTemplateLibrary';
@@ -432,8 +433,8 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     const apply = () => setPrefersReducedMotion(motionMedia.matches);
     apply();
 
-    motionMedia.addEventListener('change', apply);
-    return () => motionMedia.removeEventListener('change', apply);
+    const unsubscribe = subscribeMediaQuery(motionMedia, apply);
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

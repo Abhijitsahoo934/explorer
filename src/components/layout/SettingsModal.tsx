@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { getErrorMessage } from '../../lib/errorMessage';
 import { APP_LOCAL_STORAGE_KEYS, APP_SESSION_STORAGE_KEYS } from '../../platform/storage/keys';
 import { clearStorageKeys } from '../../platform/storage/browserStorage';
+import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -43,12 +44,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     document.body.style.overflow = 'hidden';
 
     window.addEventListener('keydown', handleEsc);
-    media.addEventListener('change', applyMotionPreference);
+    const unsubscribeMedia = subscribeMediaQuery(media, applyMotionPreference);
 
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleEsc);
-      media.removeEventListener('change', applyMotionPreference);
+      unsubscribeMedia();
     };
   }, [isOpen, onClose]);
 

@@ -9,6 +9,7 @@ import { useCommandPalette } from '../../hooks/useCommandPalette';
 import { useAuth } from '../../hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '../../lib/authProfile';
 import { logger } from '../../platform/observability/logger';
+import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 const SettingsModal = lazy(() =>
   import('./SettingsModal').then((module) => ({ default: module.SettingsModal }))
@@ -84,8 +85,8 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     const apply = () => setPrefersReducedMotion(motionMedia.matches);
     apply();
 
-    motionMedia.addEventListener('change', apply);
-    return () => motionMedia.removeEventListener('change', apply);
+    const unsubscribe = subscribeMediaQuery(motionMedia, apply);
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

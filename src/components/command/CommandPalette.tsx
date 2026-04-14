@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { CommandPaletteItem } from '../../lib/commandPaletteUtils';
 import { cn } from '../../lib/utils';
+import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 const MAX_RENDERED_ITEMS_DEFAULT = 80;
 const MAX_RENDERED_ITEMS_ACTIVE_FILTER = 120;
@@ -102,12 +103,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
     apply();
 
-    compactMedia.addEventListener('change', apply);
-    motionMedia.addEventListener('change', apply);
+    const unsubscribeCompact = subscribeMediaQuery(compactMedia, apply);
+    const unsubscribeMotion = subscribeMediaQuery(motionMedia, apply);
 
     return () => {
-      compactMedia.removeEventListener('change', apply);
-      motionMedia.removeEventListener('change', apply);
+      unsubscribeCompact();
+      unsubscribeMotion();
     };
   }, []);
 

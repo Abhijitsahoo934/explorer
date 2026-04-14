@@ -33,6 +33,7 @@ import { logger } from '../platform/observability/logger';
 import { getErrorMessage } from '../lib/errorMessage';
 import { Seo } from '../components/system/Seo';
 import { trackProductEvent } from '../lib/analyticsService';
+import { subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 // --- MAIN WORKSPACE DROPPABLE FOLDER CARD ---
 const WorkspaceFolderCard = ({
@@ -254,11 +255,11 @@ const Explorer: React.FC = () => {
     apply();
     applyReducedMotion();
 
-    media.addEventListener('change', apply);
-    reducedMotionMedia.addEventListener('change', applyReducedMotion);
+    const unsubscribeViewport = subscribeMediaQuery(media, apply);
+    const unsubscribeMotion = subscribeMediaQuery(reducedMotionMedia, applyReducedMotion);
     return () => {
-      media.removeEventListener('change', apply);
-      reducedMotionMedia.removeEventListener('change', applyReducedMotion);
+      unsubscribeViewport();
+      unsubscribeMotion();
     };
   }, []);
 
