@@ -27,6 +27,22 @@ import { isFounderUser } from '../lib/accessControl';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
+const safeScrollToTop = (element: HTMLElement) => {
+  try {
+    element.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {
+    element.scrollTop = 0;
+  }
+};
+
+const safeScrollTemplateIntoView = (element: HTMLElement) => {
+  try {
+    element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  } catch {
+    element.scrollIntoView();
+  }
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -250,7 +266,7 @@ export default function Dashboard() {
       return;
     }
 
-    detailsPanel.scrollTo({ top: 0, behavior: 'smooth' });
+    safeScrollToTop(detailsPanel);
   }, [isOnboardingOpen, selectedTemplateId]);
 
   useEffect(() => {
@@ -263,7 +279,7 @@ export default function Dashboard() {
       return;
     }
 
-    selectedTemplateCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    safeScrollTemplateIntoView(selectedTemplateCard);
   }, [isOnboardingOpen, selectedTemplateId]);
 
   const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ?? WORKSPACE_TEMPLATES[0];
