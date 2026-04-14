@@ -24,6 +24,7 @@ import { useAuth } from '../hooks/useAuth';
 import { getUserFirstName } from '../lib/authProfile';
 import { Seo } from '../components/system/Seo';
 import { isFounderUser } from '../lib/accessControl';
+import type { WorkspaceTemplateDefinition } from '../lib/workspaceTemplates';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 
@@ -60,7 +61,7 @@ export default function Dashboard() {
   const [templateFeedback, setTemplateFeedback] = useState<string | null>(null);
   const [templateFeedbackTone, setTemplateFeedbackTone] = useState<'success' | 'warning'>('success');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0].id);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0]?.id ?? '');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const onboardingDialogRef = useRef<HTMLDivElement | null>(null);
   const onboardingCloseButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -106,7 +107,7 @@ export default function Dashboard() {
     const isDismissed = readStorageValue(localStorage, ONBOARDING_STORAGE_KEY) === 'true';
     const isWorkspaceEmpty = !loading && stats.folders === 0 && stats.apps === 0;
 
-    if (isWorkspaceEmpty && !isDismissed) {
+    if (isWorkspaceEmpty && !isDismissed && WORKSPACE_TEMPLATES.length > 0) {
       setIsOnboardingOpen(true);
     }
   }, [loading, stats.folders, stats.apps]);
@@ -202,6 +203,10 @@ export default function Dashboard() {
       return;
     }
 
+    if (WORKSPACE_TEMPLATES.length === 0) {
+      return;
+    }
+
     const handleKeyboardControls = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -282,7 +287,25 @@ export default function Dashboard() {
     safeScrollTemplateIntoView(selectedTemplateCard);
   }, [isOnboardingOpen, selectedTemplateId]);
 
-  const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ?? WORKSPACE_TEMPLATES[0];
+  const fallbackTemplate: WorkspaceTemplateDefinition = {
+    id: 'fallback-starter-workspace',
+    title: 'Starter Workspace',
+    subtitle: 'Templates are loading. You can continue with an empty workspace for now.',
+    icon: Sparkles,
+    accent: 'from-sky-500/20 to-indigo-500/10',
+    category: 'specialized',
+    audience: 'Default workspace',
+    template: {
+      name: 'Starter Workspace',
+      folders: [],
+    },
+    source: 'curated',
+  };
+
+  const selectedTemplate =
+    WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ??
+    WORKSPACE_TEMPLATES[0] ??
+    fallbackTemplate;
   const userName = getUserFirstName(user);
   const featuredTemplates = useMemo(() => WORKSPACE_TEMPLATES.slice(0, 3), []);
 
