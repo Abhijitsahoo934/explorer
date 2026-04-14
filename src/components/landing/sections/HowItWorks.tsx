@@ -1,7 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
 import { FolderPlus, Link as LinkIcon, Monitor } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -9,144 +8,115 @@ gsap.registerPlugin(ScrollTrigger);
 const STEPS = [
   {
     id: '01',
-    title: 'Create Hierarchy',
-    desc: 'Map your workflow with infinite nested folders. Work > Clients > Project Alpha.',
+    title: 'Create your structure',
+    desc: 'Set up folders for projects, roles, or workflows so the browser reflects how you actually operate.',
     icon: FolderPlus,
   },
   {
     id: '02',
-    title: 'Inject Resources',
-    desc: 'Add web apps, docs, and dashboards directly into your folder structure.',
+    title: 'Add the real tools',
+    desc: 'Save apps, docs, dashboards, and references directly into that structure instead of scattering them.',
     icon: LinkIcon,
   },
   {
     id: '03',
-    title: 'Execute Focus',
-    desc: 'Launch your workspace. No more hunting through history or bookmarks.',
+    title: 'Start faster every day',
+    desc: 'Open the workspace and continue from a clean system instead of rebuilding context from tabs.',
     icon: Monitor,
-  }
-];
+  },
+] as const;
 
 export const HowItWorks: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 75%",
-        end: "center center",
-        toggleActions: "play none none reverse",
-      }
-    });
+  useEffect(() => {
+    const shouldReduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)').matches;
 
-    // Header Animation
-    tl.fromTo(".hiw-header",
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power3.out" }
-    );
+    if (shouldReduceMotion) {
+      return;
+    }
 
-    // Connecting Progress Line Animation (Desktop only)
-    tl.fromTo(".progress-line",
-      { scaleX: 0 },
-      { scaleX: 1, duration: 1.5, ease: "power4.inOut" },
-      "-=0.4"
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.hiw-header',
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
 
-    // Cards Pop-in
-    tl.fromTo(".step-card",
-      { opacity: 0, y: 40, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.2, ease: "back.out(1.2)" },
-      "-=1.2"
-    );
+      gsap.fromTo(
+        '.hiw-step',
+        { opacity: 0, y: 28 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: '.hiw-grid',
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    }, sectionRef);
 
-  }, { scope: sectionRef });
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-32 relative overflow-hidden bg-transparent border-t border-border/70">
-      
-      {/* Subtle background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-100 bg-accent/8 rounded-[100%] blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-emerald-400/8 blur-[120px] pointer-events-none" />
+    <section ref={sectionRef} className="relative border-t border-border/70 px-4 py-22 sm:px-6 sm:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-20 mx-auto h-52 max-w-4xl rounded-full bg-accent/7 blur-[140px]" />
 
-      <div className="container mx-auto px-6 relative z-10">
-        
-        {/* HEADER AREA */}
-        <div className="mb-20 md:mb-32 text-center">
-          <div className="mx-auto flex max-w-4xl flex-col items-center">
-            <div className="hiw-header inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 border border-accent/20 text-[10px] font-black text-muted mb-6 tracking-[0.2em] uppercase backdrop-blur-md shadow-sm">
-              The Protocol
-            </div>
-            <h2 className="hiw-header text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-[1.1] uppercase">
-              The Architecture of <br /> 
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-accent via-sky-500 to-indigo-500">
-                Efficiency.
-              </span>
-            </h2>
-            <p className="hiw-header mt-7 max-w-xl text-muted font-mono text-[10px] uppercase tracking-widest font-bold">
-              Standard Operating Procedure for deep work
-            </p>
+      <div className="mx-auto max-w-6xl">
+        <div className="hiw-header mx-auto mb-12 max-w-3xl text-center sm:mb-16">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-accent/15 bg-background/75 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted shadow-sm backdrop-blur-md">
+            How it works
           </div>
+          <h2 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl">
+            Three steps to a browser
+            <span className="block bg-linear-to-r from-accent via-sky-500 to-cyan-500 bg-clip-text text-transparent">
+              that feels organized.
+            </span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+            The product should feel obvious: shape the system once, attach the right tools, and reopen the same clean setup every time.
+          </p>
         </div>
 
-        {/* BENTO CARDS GRID WITH CONNECTING LINE */}
-        <div ref={gridRef} className="relative">
-          
-          {/* Desktop Connecting Line */}
-          <div className="hidden md:block absolute top-15 left-[10%] right-[10%] h-px bg-border z-0">
-            <div className="progress-line h-full w-full bg-linear-to-r from-transparent via-accent/60 to-transparent origin-left" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 relative z-10">
-            {STEPS.map((step) => (
-              <div
-                key={step.id}
-                className="step-card group relative p-8 md:p-10 rounded-[2.5rem] bg-linear-to-br from-card via-card to-accent/6 backdrop-blur-xl border border-accent/15 hover:border-accent/35 transition-all duration-500 overflow-hidden flex flex-col h-full min-h-85 shadow-premium"
-              >
-                {/* Hollow Background Number (The $100B touch) */}
-                <div 
-                  className="absolute -right-4 -bottom-8 text-[12rem] font-black select-none pointer-events-none transition-all duration-500"
-                  style={{
-                    WebkitTextStroke: "2px rgba(100,116,139,0.13)",
-                    color: "transparent",
-                  }}
-                >
-                  {step.id}
-                </div>
-                <div className="absolute -right-4 -bottom-8 text-[12rem] font-black select-none pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-sm"
-                  style={{
-                    WebkitTextStroke: "2px rgba(11,102,255,0.22)",
-                    color: "transparent",
-                  }}
-                >
-                  {step.id}
-                </div>
-
-                {/* Icon Container */}
-                <div className="relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-accent/12 to-sky-400/10 border border-accent/20 flex items-center justify-center text-accent mb-10 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(11,102,255,0.2)] transition-all duration-500">
-                    <step.icon size={26} strokeWidth={2} />
+        <div className="hiw-grid grid grid-cols-1 gap-5 md:grid-cols-3">
+          {STEPS.map((step) => (
+            <article
+              key={step.id}
+              className="hiw-step relative overflow-hidden rounded-[1.9rem] border border-border bg-card/75 p-7 shadow-[0_22px_55px_-36px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/22 hover:shadow-[0_26px_60px_-36px_rgba(79,70,229,0.18)] sm:p-8"
+            >
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/4 via-transparent to-sky-500/5" />
+              <div className="relative z-10">
+                <div className="mb-8 flex items-center justify-between gap-3">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-background/85 shadow-sm">
+                    <step.icon size={24} className="text-accent" />
+                  </div>
+                  <div className="rounded-full border border-border bg-background/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                    Step {step.id}
                   </div>
                 </div>
 
-                {/* Text Content */}
-                <div className="relative z-10 mt-auto">
-                  <h3 className="text-2xl font-black text-foreground mb-4 tracking-tight uppercase group-hover:translate-x-2 transition-transform duration-300">
-                    {step.title}
-                  </h3>
-                  <p className="text-muted text-sm leading-relaxed max-w-70 font-medium group-hover:text-foreground/80 transition-colors">
-                    {step.desc}
-                  </p>
-                </div>
-                
-                {/* Subtle top glare inside the card */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-linear-to-r from-transparent via-accent/45 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <h3 className="text-2xl font-black tracking-tight text-foreground">{step.title}</h3>
+                <p className="mt-4 text-base leading-8 text-muted">{step.desc}</p>
               </div>
-            ))}
-          </div>
+            </article>
+          ))}
         </div>
-        
       </div>
     </section>
   );

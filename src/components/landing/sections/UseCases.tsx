@@ -1,48 +1,90 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Code, Palette, GraduationCap, TrendingUp, Microscope, ArrowRight } from 'lucide-react';
+import { ArrowRight, Code, GraduationCap, Microscope, Palette, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PUBLIC_TEMPLATE_LINKS } from '../../../lib/publicSiteLinks';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const USE_CASES = [
+  {
+    icon: Code,
+    title: 'Developers',
+    description: 'Keep repos, docs, release tools, and references in a single working surface.',
+    stack: ['GitHub', 'API docs', 'Release tools', 'Internal notes'],
+    accent: 'text-accent',
+  },
+  {
+    icon: Palette,
+    title: 'Designers',
+    description: 'Group design files, tokens, inspiration, and handoff flows without tab sprawl.',
+    stack: ['Figma', 'References', 'Tokens', 'Handoff'],
+    accent: 'text-violet-500',
+  },
+  {
+    icon: Microscope,
+    title: 'Researchers',
+    description: 'Keep sources, papers, notes, and reading lists easy to revisit and maintain.',
+    stack: ['Papers', 'Sources', 'Reading list', 'Notes'],
+    accent: 'text-cyan-500',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Founders',
+    description: 'Structure growth, analytics, product, and investor materials around company flow.',
+    stack: ['Analytics', 'Product', 'Ops', 'Investor docs'],
+    accent: 'text-emerald-500',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Students',
+    description: 'Organize learning resources so studying starts faster and feels lighter every session.',
+    stack: ['Courses', 'Notes', 'Videos', 'Assignments'],
+    accent: 'text-orange-500',
+  },
+] as const;
 
 export default function UseCases() {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const shouldReduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)').matches;
+
+    if (shouldReduceMotion) {
+      return;
+    }
+
     const ctx = gsap.context(() => {
-      // Header animation
       gsap.fromTo(
         '.usecases-header',
-        { opacity: 0, y: 50 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 0.7,
           scrollTrigger: {
             trigger: containerRef.current,
-            start: 'top 80%',
-            end: 'top 50%',
-            scrub: 1,
+            start: 'top 82%',
+            toggleActions: 'play none none none',
           },
         }
       );
 
-      // Use case cards stagger
       gsap.fromTo(
         '.usecase-card',
-        { opacity: 0, y: 40, scale: 0.95 },
+        { opacity: 0, y: 22 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.15,
+          duration: 0.45,
+          stagger: 0.08,
           scrollTrigger: {
             trigger: '.usecases-grid',
-            start: 'top 85%',
+            start: 'top 88%',
             toggleActions: 'play none none none',
           },
         }
@@ -52,172 +94,69 @@ export default function UseCases() {
     return () => ctx.revert();
   }, []);
 
-  const useCases = [
-    {
-      icon: Code,
-      title: 'Developers',
-      description: 'Keep repos, docs, and release tools in a single workspace.',
-      structure: [
-        { folder: 'Build', items: ['GitHub', 'API docs', 'Stack Overflow', 'Release notes'] },
-      ],
-      color: 'accent',
-    },
-    {
-      icon: Palette,
-      title: 'Designers',
-      description: 'Group design files, inspiration, and handoff tools without tab sprawl.',
-      structure: [
-        { folder: 'Design', items: ['Figma', 'References', 'Tokens', 'Handoff'] },
-      ],
-      color: 'purple',
-    },
-    {
-      icon: Microscope,
-      title: 'Researchers',
-      description: 'Keep sources, notes, and reading lists easy to revisit.',
-      structure: [
-        { folder: 'Research', items: ['Papers', 'Sources', 'Reading list', 'Notes'] },
-      ],
-      color: 'blue',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Startup Founders',
-      description: 'Keep metrics, ops, and go-to-market tools structured around the company flow.',
-      structure: [
-        { folder: 'Company', items: ['Analytics', 'Product', 'Notion', 'Investor docs'] },
-      ],
-      color: 'green',
-    },
-    {
-      icon: GraduationCap,
-      title: 'Students',
-      description: 'Organize learning resources so studying starts faster and feels lighter.',
-      structure: [
-        { folder: 'Study', items: ['YouTube', 'Courses', 'Notes', 'Docs'] },
-      ],
-      color: 'orange',
-    },
-  ];
-
-  const colorMap: Record<string, { bg: string; border: string; text: string; iconBg: string }> = {
-    accent: {
-      bg: 'bg-accent/5',
-      border: 'border-accent/20',
-      text: 'text-accent',
-      iconBg: 'bg-accent/10',
-    },
-    purple: {
-      bg: 'bg-purple-500/5',
-      border: 'border-purple-500/20',
-      text: 'text-purple-500',
-      iconBg: 'bg-purple-500/10',
-    },
-    blue: {
-      bg: 'bg-blue-500/5',
-      border: 'border-blue-500/20',
-      text: 'text-blue-500',
-      iconBg: 'bg-blue-500/10',
-    },
-    green: {
-      bg: 'bg-green-500/5',
-      border: 'border-green-500/20',
-      text: 'text-green-500',
-      iconBg: 'bg-green-500/10',
-    },
-    orange: {
-      bg: 'bg-orange-500/5',
-      border: 'border-orange-500/20',
-      text: 'text-orange-500',
-      iconBg: 'bg-orange-500/10',
-    },
-  };
-
   return (
-    <section ref={containerRef} className="relative py-24 px-4 sm:px-6 sm:py-32">
-      <div className="container mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="usecases-header text-center mb-14 sm:mb-20">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-accent/15 bg-linear-to-r from-accent/10 via-sky-400/10 to-emerald-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted backdrop-blur-md shadow-sm">
+    <section ref={containerRef} className="relative px-4 py-22 sm:px-6 sm:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="usecases-header mx-auto mb-12 max-w-3xl text-center sm:mb-16">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-accent/15 bg-background/75 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-muted shadow-sm backdrop-blur-md">
             Use cases
           </div>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-5 leading-tight">
+          <h2 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl">
             Built for people
-            <br />
-            <span className="gradient-text">who work in the browser.</span>
+            <span className="block bg-linear-to-r from-accent via-sky-500 to-cyan-500 bg-clip-text text-transparent">
+              who work inside the browser.
+            </span>
           </h2>
-
-          <p className="text-base md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-            Explorer adapts to how you work, letting you shape the web around your projects instead of around browser habits.
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+            Explorer adapts to different professional systems while keeping the interface clear, repeatable, and easy to reopen.
           </p>
         </div>
 
-        {/* Use Cases Grid */}
-        <div className="usecases-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {useCases.map((useCase, index) => {
-            const Icon = useCase.icon;
-            const colors = colorMap[useCase.color];
-
-            return (
-              <div
-                key={index}
-                className={`usecase-card glass-card rounded-[1.6rem] p-7 border ${colors.border} hover:border-accent/50 transition-all duration-300 group cursor-pointer bg-linear-to-br from-card via-card to-accent/4 sm:p-8`}
-              >
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div
-                    className={`w-14 h-14 rounded-xl ${colors.iconBg} border ${colors.border} flex items-center justify-center group-hover:scale-110 transition-transform`}
-                  >
-                    <Icon size={28} className={colors.text} />
-                  </div>
-                  <span className="rounded-full border border-border bg-linear-to-r from-background/70 to-accent/6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-                    Workflow
-                  </span>
+        <div className="usecases-grid grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {USE_CASES.map((useCase) => (
+            <article
+              key={useCase.title}
+              className="usecase-card rounded-[1.75rem] border border-border bg-card/75 p-7 shadow-[0_22px_55px_-36px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/22 hover:shadow-[0_26px_60px_-36px_rgba(79,70,229,0.18)] sm:p-8"
+            >
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-background/85 shadow-sm">
+                  <useCase.icon size={24} className={useCase.accent} />
                 </div>
+                <div className="rounded-full border border-border bg-background/80 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                  Workflow
+                </div>
+              </div>
 
-                <h3 className="text-xl font-black tracking-tight text-foreground mb-3">
-                  {useCase.title}
-                </h3>
+              <h3 className="text-2xl font-black tracking-tight text-foreground">{useCase.title}</h3>
+              <p className="mt-4 text-base leading-8 text-muted">{useCase.description}</p>
 
-                <p className="text-muted leading-relaxed mb-6">
-                  {useCase.description}
-                </p>
-
-                <div className="space-y-3 pt-5 border-t border-border/50">
-                  {useCase.structure.map((folder, idx) => (
-                    <div key={idx}>
-                      <div className="text-sm font-bold text-foreground mb-2">
-                        {folder.folder}
-                      </div>
-                      <div className="ml-4 space-y-1.5">
-                        {folder.items.map((item, itemIdx) => (
-                          <div
-                            key={itemIdx}
-                            className="flex items-center gap-2 text-xs text-muted"
-                          >
-                            <div className={`w-1.5 h-1.5 rounded-full ${colors.text.replace('text-', 'bg-')}`} />
-                            {item}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              <div className="mt-7 rounded-2xl border border-border bg-background/72 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Typical stack</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {useCase.stack.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground/88"
+                    >
+                      {item}
+                    </span>
                   ))}
                 </div>
               </div>
-            );
-          })}
+            </article>
+          ))}
         </div>
 
-        {/* Bottom Message */}
-        <div className="mt-14 sm:mt-16 text-center">
-          <p className="text-muted italic">
-            "A workspace should feel like a system, not a pile of saved tabs."
+        <div className="mt-14 rounded-[2rem] border border-border bg-card/55 p-6 text-center shadow-sm backdrop-blur-xl sm:mt-16 sm:p-8">
+          <p className="text-sm font-semibold italic text-muted">
+            “A workspace should feel like a system, not a pile of remembered tabs.”
           </p>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             {PUBLIC_TEMPLATE_LINKS.map((link) => (
               <button
                 key={link.path}
                 onClick={() => navigate(link.path)}
-                className="inline-flex items-center gap-2 rounded-2xl border border-accent/15 bg-linear-to-r from-card via-card to-accent/6 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent/30 hover:brightness-105"
+                className="inline-flex items-center gap-2 rounded-2xl border border-accent/15 bg-background/82 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent/28 hover:bg-card-hover"
               >
                 {link.title}
                 <ArrowRight size={14} className="text-accent" />

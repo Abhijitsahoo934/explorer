@@ -1,9 +1,7 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth';
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
 import { GoogleAnalyticsTracker } from './components/system/GoogleAnalyticsTracker';
-import { isFounderUser } from './lib/accessControl';
 
 const Landing = lazy(() => import('./routes/Landing'));
 const Auth = lazy(() => import('./routes/Auth'));
@@ -18,6 +16,7 @@ const LearnHub = lazy(() => import('./routes/LearnHub'));
 const UpdatePassword = lazy(() => import('./routes/UpdatePassword'));
 const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
 const Insights = lazy(() => import('./routes/Insights'));
+const AuthGate = lazy(() => import('./components/system/AuthGate'));
 
 const RouteLoader = () => (
   <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
@@ -54,74 +53,26 @@ const RecoveryHashRedirect = () => {
   return null;
 };
 
-/**
- * Protected Route Wrapper
- * Checks if the user is authenticated. 
- * If not, redirects securely to the /auth page.
- */
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
-        <div className="relative w-12 h-12">
-          {/* Premium Startup Spinner */}
-          <div className="absolute inset-0 rounded-2xl border-2 border-border border-t-accent animate-spin" />
-          <div className="absolute inset-2 rounded-xl bg-accent/10 animate-pulse" />
-        </div>
-        <p className="text-[10px] uppercase tracking-widest font-black text-muted animate-pulse text-center px-4">
-          Authenticating workspace...
-        </p>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-/**
- * Auth Route Wrapper
- * Ensures that logged-in users cannot access the login/signup page.
- * Redirects them straight to their dashboard.
- */
-const AuthRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return <div className="min-h-screen bg-background transition-colors duration-300" />; // Premium blank state while checking
-  }
-
-  if (session) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const FounderRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, user, loading } = useAuth();
-
-  if (loading) {
-    return <div className="min-h-screen bg-background transition-colors duration-300" />;
-  }
-
-  if (!session) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (!isFounderUser(user)) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 function App() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const warmRoutes = () => {
+      void import('./routes/Auth');
+      void import('./routes/Dashboard');
+      void import('./routes/Explorer');
+      void import('./routes/TemplateMarketplace');
+    };
+
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(warmRoutes, { timeout: 1800 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timer = globalThis.setTimeout(warmRoutes, 1200);
+    return () => globalThis.clearTimeout(timer);
+  }, []);
+
   return (
     <Router>
       <CommandPaletteProvider>
@@ -136,9 +87,9 @@ function App() {
           <Route 
             path="/auth" 
             element={
-              <AuthRoute>
+              <AuthGate mode="auth">
                 <Auth />
-              </AuthRoute>
+              </AuthGate>
             } 
           />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -150,25 +101,25 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute>
+              <AuthGate mode="protected">
                 <Dashboard />
-              </ProtectedRoute>
+              </AuthGate>
             } 
           />
           <Route 
             path="/explorer" 
             element={
-              <ProtectedRoute>
+              <AuthGate mode="protected">
                 <Explorer />
-              </ProtectedRoute>
+              </AuthGate>
             } 
           />
           <Route
             path="/templates"
             element={
-              <ProtectedRoute>
+              <AuthGate mode="protected">
                 <TemplateMarketplace />
-              </ProtectedRoute>
+              </AuthGate>
             }
           />
           <Route path="/templates/:slug" element={<TemplateSeoPage />} />
@@ -178,9 +129,9 @@ function App() {
           <Route
             path="/insights"
             element={
-              <FounderRoute>
+              <AuthGate mode="founder">
                 <Insights />
-              </FounderRoute>
+              </AuthGate>
             }
           />
 

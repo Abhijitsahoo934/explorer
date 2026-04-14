@@ -69,7 +69,7 @@ const DraggableAppCard = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="h-full w-full rounded-4xl border-2 border-dashed border-accent/50 bg-accent/5 opacity-40 min-h-55"
+        className="h-full w-full rounded-[2rem] border-2 border-dashed border-accent/50 bg-accent/5 opacity-40 min-h-[220px]"
       />
     );
   }
@@ -96,7 +96,7 @@ const DraggableAppCard = ({
         className="h-full pointer-events-none"
       >
         <SpotlightCard
-          className={`p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 transition-all duration-200 h-full flex flex-col rounded-4xl pointer-events-auto relative select-none cursor-pointer ${
+          className={`p-6 group border-border bg-card/80 hover:bg-card hover:border-accent/30 transition-all duration-200 h-full flex flex-col rounded-[2rem] pointer-events-auto relative select-none cursor-pointer ${
             reducedMotion ? 'backdrop-blur-sm shadow-sm' : 'backdrop-blur-xl hover:shadow-premium'
           }`}
           onClick={handleOpenApp}
@@ -109,7 +109,7 @@ const DraggableAppCard = ({
           </div>
 
           <div className="flex justify-between items-start mb-8 relative z-10">
-            <div className="relative w-16 h-16 rounded-[1.25rem] bg-(--surface-strong) flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-200 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
+            <div className="relative w-16 h-16 rounded-[1.25rem] bg-[var(--surface-strong)] flex items-center justify-center overflow-hidden border border-border group-hover:border-accent/30 transition-all duration-200 group-hover:scale-105 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.35)]">
               {favicon && !imgError ? (
                 <img
                   src={favicon}

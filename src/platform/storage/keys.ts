@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   contextApps: `${STORAGE_PREFIX}:context:apps`,
   contextFolders: `${STORAGE_PREFIX}:context:folders`,
   userTemplates: `${STORAGE_PREFIX}:templates:user`,
+  experiments: `${STORAGE_PREFIX}:experiments`,
 } as const;
 
 export const APP_LOCAL_STORAGE_KEYS = [
@@ -19,6 +20,7 @@ export const APP_LOCAL_STORAGE_KEYS = [
   STORAGE_KEYS.contextApps,
   STORAGE_KEYS.contextFolders,
   STORAGE_KEYS.userTemplates,
+  STORAGE_KEYS.experiments,
 ] as const;
 
 export const APP_SESSION_STORAGE_KEYS = [STORAGE_KEYS.authReturnTo] as const;

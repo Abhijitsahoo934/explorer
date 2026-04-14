@@ -15,9 +15,12 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
 
+          if (id.includes('lucide-react')) return 'vendor-icons';
+          if (id.includes('gsap')) return 'vendor-gsap';
           if (id.includes('@supabase')) return 'vendor-supabase';
           if (id.includes('@dnd-kit')) return 'vendor-dnd';
           if (id.includes('framer-motion')) return 'vendor-motion';
+          if (id.includes('react-router')) return 'vendor-router';
           if (id.includes('three') || id.includes('@react-three')) return 'vendor-3d';
           if (id.includes('react') || id.includes('react-dom')) return 'vendor-react';
 

@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Search, Bell, User, Sun, Moon, LogOut, Settings, Command, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { notificationService } from '../../lib/notificationService';
 import { supabase } from '../../lib/supabase';
 import { useTheme } from '../ThemeProvider';
-import { SettingsModal } from './SettingsModal';
 import { useCommandPalette } from '../../hooks/useCommandPalette';
 import { useAuth } from '../../hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '../../lib/authProfile';
 import { logger } from '../../platform/observability/logger';
+
+const SettingsModal = lazy(() =>
+  import('./SettingsModal').then((module) => ({ default: module.SettingsModal }))
+);
 
 interface AppNotification {
   id: string;
@@ -301,7 +304,9 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
         </div>
       </header>
 
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Suspense fallback={null}>
+        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      </Suspense>
     </>
   );
 };

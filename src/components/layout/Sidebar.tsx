@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useCallback } from 'react';
 import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft, X, LayoutDashboard } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FolderTree } from '../explorer/FolderTree';
-import { SettingsModal } from './SettingsModal';
 import { cn } from '../../lib/utils'; // <--- YE IMPORT MISSING THA! FIX HO GAYA!
 import { BrandLogo } from '../ui/BrandLogo';
+
+const SettingsModal = lazy(() =>
+  import('./SettingsModal').then((module) => ({ default: module.SettingsModal }))
+);
 
 interface SidebarProps {
   onAddFolder: () => void;
@@ -249,7 +252,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </motion.aside>
 
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Suspense fallback={null}>
+        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      </Suspense>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -104,12 +104,10 @@ export default function Dashboard() {
     }
 
     const previousOverflow = document.body.style.overflow;
-    const previousTouchAction = document.body.style.touchAction;
 
     lastActiveElementRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
 
     const focusTimer = window.setTimeout(() => {
       onboardingCloseButtonRef.current?.focus();
@@ -118,7 +116,6 @@ export default function Dashboard() {
     return () => {
       window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
-      document.body.style.touchAction = previousTouchAction;
     };
   }, [isOnboardingOpen]);
 
@@ -151,7 +148,7 @@ export default function Dashboard() {
   const handleTemplateLaunch = async (templateId: string) => {
     const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === templateId);
     if (!selectedTemplate) {
-      return;
+      return false;
     }
 
     setActiveTemplateId(templateId);
@@ -163,10 +160,12 @@ export default function Dashboard() {
       await fetchDashboardData();
       setTemplateFeedbackTone('success');
       setTemplateFeedback(`${selectedTemplate.title} installed. Your workspace now starts with a real operating setup.`);
+      return true;
     } catch (error) {
       logger.error('template_launch', error, { templateId });
       setTemplateFeedbackTone('warning');
       setTemplateFeedback(getErrorMessage(error, 'Template setup failed. Please try again.'));
+      return false;
     } finally {
       setActiveTemplateId(null);
     }
@@ -269,6 +268,7 @@ export default function Dashboard() {
 
   const selectedTemplate = WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ?? WORKSPACE_TEMPLATES[0];
   const userName = getUserFirstName(user);
+  const featuredTemplates = useMemo(() => WORKSPACE_TEMPLATES.slice(0, 3), []);
 
   return (
     <div className="app-shell flex h-screen bg-background text-foreground overflow-hidden selection:bg-accent/20 selection:text-accent transition-colors duration-300">
@@ -421,8 +421,8 @@ export default function Dashboard() {
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                      {WORKSPACE_TEMPLATES.map((template) => (
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+                      {featuredTemplates.map((template) => (
                         <SpotlightCard key={template.id} className="p-6 bg-card border-border h-full backdrop-blur-md hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-premium group">
                           <div className={`w-14 h-14 rounded-[1.25rem] bg-linear-to-br ${template.accent} border border-border flex items-center justify-center mb-5`}>
                             <template.icon size={22} className="text-accent" />
@@ -448,6 +448,25 @@ export default function Dashboard() {
                           </Button>
                         </SpotlightCard>
                       ))}
+                    </div>
+
+                    <div className="rounded-[1.75rem] border border-border bg-card/55 p-5 backdrop-blur-xl sm:p-6">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-muted font-black">Need a different setup?</p>
+                          <h3 className="mt-2 text-xl font-black tracking-tight text-foreground">The full marketplace has role-specific systems.</h3>
+                          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+                            Browse all curated ecosystems, or save your current workspace later to build reusable templates from your own setup.
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="h-11 rounded-2xl px-5 text-[11px] uppercase tracking-widest font-black"
+                          onClick={() => navigate('/templates')}
+                        >
+                          Explore all templates
+                        </Button>
+                      </div>
                     </div>
                   </motion.section>
 
@@ -601,9 +620,9 @@ export default function Dashboard() {
               </div>
 
               <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
-                <div className="grid h-full gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative max-h-[24vh] overflow-hidden sm:max-h-[36vh] lg:max-h-none">
-                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1">
+                <div className="grid h-full min-h-0 gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="relative min-h-0 max-h-[28vh] overflow-hidden sm:max-h-[36vh] lg:h-full lg:max-h-none">
+                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:h-full lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
                       <button
                         id={`onboarding-template-option-${template.id}`}
@@ -632,8 +651,8 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[52vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar sm:max-h-[60vh] md:p-7 lg:max-h-none">
-                  <div className="flex min-h-full flex-col">
+                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[52vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[60vh] md:p-7 lg:touch-auto">
+                  <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
                       initial={{ opacity: 0, y: 8 }}
@@ -680,9 +699,11 @@ export default function Dashboard() {
                           className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
                           loading={activeTemplateId === selectedTemplate.id}
                           onClick={async () => {
-                            await handleTemplateLaunch(selectedTemplate.id);
-                            writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
-                            setIsOnboardingOpen(false);
+                            const installed = await handleTemplateLaunch(selectedTemplate.id);
+                            if (installed) {
+                              writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
+                              setIsOnboardingOpen(false);
+                            }
                           }}
                         >
                           Install {selectedTemplate.title}

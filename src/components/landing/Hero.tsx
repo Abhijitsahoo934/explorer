@@ -1,8 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Play, Github, Figma, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getExperimentVariant } from '../../lib/experiments';
+import { trackProductEvent } from '../../lib/analyticsService';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,6 +12,15 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mockupRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const heroVariant = useMemo(
+    () => getExperimentVariant('landing-hero-primary-cta', ['workspace', 'free']),
+    []
+  );
+  const primaryCtaLabel = heroVariant === 'free' ? 'Start Free' : 'Start Workspace';
+  const secondaryStoryLabel =
+    heroVariant === 'free'
+      ? 'See why teams switch from bookmarks'
+      : 'See why modern teams outgrow bookmarks';
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -90,15 +101,28 @@ export default function Hero() {
 
         <div className="z-30 mb-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:items-center md:flex-row md:justify-center md:gap-4">
           <button
-            onClick={() => navigate('/auth')}
+            onClick={() => {
+              trackProductEvent('landing_primary_cta_clicked', {
+                variant: heroVariant,
+                label: primaryCtaLabel,
+                location: 'hero',
+              });
+              navigate('/auth');
+            }}
             className="hero-cta group flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-8 text-sm font-bold tracking-[0.14em] uppercase text-white shadow-[0_16px_36px_-22px_rgba(11,102,255,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 sm:w-auto"
           >
-            Start Workspace
+            {primaryCtaLabel}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
 
           <a
             href="#product-preview"
+            onClick={() => {
+              trackProductEvent('landing_walkthrough_clicked', {
+                variant: heroVariant,
+                location: 'hero',
+              });
+            }}
             className="hero-cta flex items-center justify-center gap-3 text-sm font-semibold text-muted transition-colors group hover:text-foreground"
           >
             <div className="w-12 h-12 rounded-full border border-accent/15 flex items-center justify-center bg-linear-to-br from-background/80 to-accent/7 group-hover:to-accent/14 transition-colors backdrop-blur-md shadow-sm">
@@ -109,10 +133,16 @@ export default function Hero() {
         </div>
 
         <button
-          onClick={() => navigate('/blog/stop-using-bookmarks')}
+          onClick={() => {
+            trackProductEvent('landing_story_cta_clicked', {
+              variant: heroVariant,
+              location: 'hero',
+            });
+            navigate('/blog/stop-using-bookmarks');
+          }}
           className="hero-cta mb-10 inline-flex items-center gap-2 text-center text-sm font-semibold text-muted transition-colors hover:text-foreground"
         >
-          See why modern teams outgrow bookmarks
+          {secondaryStoryLabel}
           <ArrowRight className="h-4 w-4" />
         </button>
 

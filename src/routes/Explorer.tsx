@@ -60,8 +60,8 @@ const WorkspaceFolderCard = ({
       animate={isOver && !reducedMotion ? { scale: 1.03 } : { scale: 1 }}
       transition={{ duration: 0.16, ease: 'easeOut' }}
       onClick={onClick}
-      className={cn(
-        "h-48 rounded-[2.5rem] border transition-all duration-300 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel will-change-transform",
+        className={cn(
+          "h-48 rounded-[2.5rem] border transition-all duration-200 cursor-pointer group flex flex-col items-center justify-center gap-5 shadow-sm hover:shadow-xl relative surface-panel will-change-transform",
         isOver 
           ? "bg-accent/14 border-accent/45 ring-2 ring-accent/35 shadow-[0_0_40px_rgba(var(--accent),0.32)] scale-[1.04] z-10" 
           : "hover:bg-card-hover hover:border-accent/30"
@@ -71,7 +71,7 @@ const WorkspaceFolderCard = ({
         "transition-all duration-300 flex flex-col items-center gap-4",
         isOver ? "opacity-0 scale-50 absolute" : "opacity-100 scale-100"
       )}>
-        <div className="relative isolate w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-(--surface-strong) group-hover:bg-accent/20 group-hover:shadow-[0_26px_50px_-26px_rgba(79,70,229,0.5)] transition-all duration-500">
+        <div className="relative isolate w-20 h-20 rounded-3xl border border-border flex items-center justify-center bg-[var(--surface-strong)] group-hover:bg-accent/20 group-hover:shadow-[0_26px_50px_-26px_rgba(79,70,229,0.5)] transition-all duration-300">
           <FolderIcon size={32} className="text-muted group-hover:text-accent transition-colors" />
         </div>
         <span className="text-sm font-black tracking-wide text-muted group-hover:text-foreground transition-colors truncate w-full px-4 text-center">
@@ -502,7 +502,7 @@ const Explorer: React.FC = () => {
                   <div className="relative z-10 mb-8 flex flex-col justify-between gap-6 sm:mb-10 md:flex-row md:items-end lg:mb-12">
                     <div className="flex items-start gap-4 sm:items-center sm:gap-6">
                       <motion.div 
-                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-border bg-card shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-4xl"
+                        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-border bg-card shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] backdrop-blur-2xl group sm:h-20 sm:w-20 sm:rounded-[2rem]"
                       >
                         <div className="absolute inset-0 bg-linear-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {currentFolderId ? <FolderIcon size={32} className="text-accent relative z-10" /> : <LayoutGrid size={32} className="text-accent relative z-10" />}
@@ -571,7 +571,7 @@ const Explorer: React.FC = () => {
                     </section>
                   )}
 
-                  <section className={cn("relative", contentLoading && "min-h-50")}>
+                  <section className={cn("relative", contentLoading && "min-h-[200px]")}>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black mb-6 flex items-center gap-3">
                       Resources <span className="h-px flex-1 bg-border" />
                     </p>
@@ -598,10 +598,10 @@ const Explorer: React.FC = () => {
                     ) : !contentLoading ? (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-                        className="surface-panel h-80 w-full rounded-[3rem] border-2 border-dashed border-border flex flex-col items-center justify-center text-center p-10 hover:bg-card-hover transition-all duration-500 cursor-pointer group"
+                        className="surface-panel h-80 w-full rounded-[3rem] border-2 border-dashed border-border flex flex-col items-center justify-center text-center p-10 hover:bg-card-hover transition-all duration-300 cursor-pointer group"
                         onClick={() => setIsAppModalOpen(true)}
                       >
-                        <div className="w-20 h-20 rounded-3xl bg-(--surface-strong) border border-border flex items-center justify-center text-muted mb-6 group-hover:text-accent transition-all shadow-xl">
+                        <div className="w-20 h-20 rounded-3xl bg-[var(--surface-strong)] border border-border flex items-center justify-center text-muted mb-6 group-hover:text-accent transition-all shadow-xl">
                            <Plus size={36} className="stroke-[2.5px]" />
                         </div>
                         <h3 className="text-xl font-black text-foreground mb-3">Vault is empty</h3>

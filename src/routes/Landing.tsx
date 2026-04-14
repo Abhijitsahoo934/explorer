@@ -18,36 +18,43 @@ export default function Landing() {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+    if (typeof window === 'undefined') return;
 
-    // Initialize Lenis smooth scroll
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (isTouchDevice || prefersReducedMotion) {
+      document.documentElement.classList.remove('lenis', 'lenis-smooth');
+      document.body.classList.remove('lenis', 'lenis-smooth');
+      return () => {
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      };
+    }
+
     const lenis = new Lenis({
-      duration: isTouchDevice ? 0.95 : 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.9,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: isTouchDevice ? 1.12 : 1.35,
+      wheelMultiplier: 0.92,
+      touchMultiplier: 1,
       infinite: false,
     });
 
     lenisRef.current = lenis;
 
-    // Sync Lenis with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
     const updateTicker = (time: number) => {
       lenis.raf(time * 1000);
     };
-
     gsap.ticker.add(updateTicker);
-
     gsap.ticker.lagSmoothing(0);
 
-    // Cleanup
     return () => {
       lenis.destroy();
+      lenisRef.current = null;
       gsap.ticker.remove(updateTicker);
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };

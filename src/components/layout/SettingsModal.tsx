@@ -127,6 +127,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         throw error;
       }
 
+      clearStorageKeys(localStorage, APP_LOCAL_STORAGE_KEYS);
+      clearStorageKeys(sessionStorage, APP_SESSION_STORAGE_KEYS);
       await supabase.auth.signOut();
       window.location.href = '/auth';
     } catch (error: unknown) {
