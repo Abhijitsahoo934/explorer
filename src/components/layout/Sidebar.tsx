@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect, useCallback } from 'react';
+import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import { FolderPlus, Plus, LogOut, Settings, PanelLeftClose, PanelLeft, X, LayoutDashboard } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FolderTree } from '../explorer/FolderTree';
 import { cn } from '../../lib/utils'; // <--- YE IMPORT MISSING THA! FIX HO GAYA!
 import { BrandLogo } from '../ui/BrandLogo';
+import { lazyWithRetry } from '../../lib/lazyWithRetry';
 
-const SettingsModal = lazy(() =>
-  import('./SettingsModal').then((module) => ({ default: module.SettingsModal }))
+const SettingsModal = lazyWithRetry(
+  () => import('./SettingsModal').then((module) => ({ default: module.SettingsModal })),
+  'component-sidebar-settings-modal'
 );
 
 interface SidebarProps {

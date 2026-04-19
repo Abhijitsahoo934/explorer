@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Search, Bell, User, Sun, Moon, LogOut, Settings, Command, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -10,9 +10,11 @@ import { useAuth } from '../../hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '../../lib/authProfile';
 import { logger } from '../../platform/observability/logger';
 import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { lazyWithRetry } from '../../lib/lazyWithRetry';
 
-const SettingsModal = lazy(() =>
-  import('./SettingsModal').then((module) => ({ default: module.SettingsModal }))
+const SettingsModal = lazyWithRetry(
+  () => import('./SettingsModal').then((module) => ({ default: module.SettingsModal })),
+  'component-topbar-settings-modal'
 );
 
 interface AppNotification {

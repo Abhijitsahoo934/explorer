@@ -1,22 +1,23 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
 import { GoogleAnalyticsTracker } from './components/system/GoogleAnalyticsTracker';
+import { lazyWithRetry } from './lib/lazyWithRetry';
 
-const Landing = lazy(() => import('./routes/Landing'));
-const Auth = lazy(() => import('./routes/Auth'));
-const AuthCallback = lazy(() => import('./routes/AuthCallback'));
-const Dashboard = lazy(() => import('./routes/Dashboard'));
-const Explorer = lazy(() => import('./routes/Explorer'));
-const TemplateMarketplace = lazy(() => import('./routes/TemplateMarketplace'));
-const TemplateSeoPage = lazy(() => import('./routes/TemplateSeoPage'));
-const AboutExplorero = lazy(() => import('./routes/AboutExplorero'));
-const BlogArticlePage = lazy(() => import('./routes/BlogArticlePage'));
-const LearnHub = lazy(() => import('./routes/LearnHub'));
-const UpdatePassword = lazy(() => import('./routes/UpdatePassword'));
-const BlueprintImport = lazy(() => import('./routes/BlueprintImport'));
-const Insights = lazy(() => import('./routes/Insights'));
-const AuthGate = lazy(() => import('./components/system/AuthGate'));
+const Landing = lazyWithRetry(() => import('./routes/Landing'), 'route-landing');
+const Auth = lazyWithRetry(() => import('./routes/Auth'), 'route-auth');
+const AuthCallback = lazyWithRetry(() => import('./routes/AuthCallback'), 'route-auth-callback');
+const Dashboard = lazyWithRetry(() => import('./routes/Dashboard'), 'route-dashboard');
+const Explorer = lazyWithRetry(() => import('./routes/Explorer'), 'route-explorer');
+const TemplateMarketplace = lazyWithRetry(() => import('./routes/TemplateMarketplace'), 'route-template-marketplace');
+const TemplateSeoPage = lazyWithRetry(() => import('./routes/TemplateSeoPage'), 'route-template-seo');
+const AboutExplorero = lazyWithRetry(() => import('./routes/AboutExplorero'), 'route-about-explorero');
+const BlogArticlePage = lazyWithRetry(() => import('./routes/BlogArticlePage'), 'route-blog-article');
+const LearnHub = lazyWithRetry(() => import('./routes/LearnHub'), 'route-learn-hub');
+const UpdatePassword = lazyWithRetry(() => import('./routes/UpdatePassword'), 'route-update-password');
+const BlueprintImport = lazyWithRetry(() => import('./routes/BlueprintImport'), 'route-blueprint-import');
+const Insights = lazyWithRetry(() => import('./routes/Insights'), 'route-insights');
+const AuthGate = lazyWithRetry(() => import('./components/system/AuthGate'), 'component-auth-gate');
 
 const RouteLoader = () => (
   <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
