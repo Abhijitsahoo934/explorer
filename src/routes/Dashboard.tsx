@@ -11,7 +11,7 @@ import { SpotlightCard } from '../components/ui/SpotlightCard';
 import { Button } from '../components/ui/Button';
 import { AddFolderModal } from '../components/explorer/AddFolderModal';
 import { AddAppModal } from '../components/explorer/AddAppModal';
-import { Activity, Folder, Globe, ArrowRight, Zap, ExternalLink, Clock, Sunrise, Sun, Moon, Plus, CheckCircle2, Sparkles, X } from 'lucide-react';
+import { Activity, Folder, Globe, ArrowRight, Zap, ExternalLink, Clock, Sunrise, Sun, Moon, Plus, CheckCircle2, Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { App } from '../types/explorer';
 import { trackFunnelEvent } from '../lib/analyticsService';
 import { recordAppUsage, recordFolderUsage } from '../lib/contextEngine';
@@ -25,7 +25,6 @@ import { getUserFirstName } from '../lib/authProfile';
 import { Seo } from '../components/system/Seo';
 import { isFounderUser } from '../lib/accessControl';
 import type { WorkspaceTemplateDefinition } from '../lib/workspaceTemplates';
-import { getMediaQueryList, subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 const safeLocalStorage = getSafeLocalStorage();
@@ -69,7 +68,6 @@ export default function Dashboard() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0]?.id ?? '');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isTouchOptimizedUI, setIsTouchOptimizedUI] = useState(false);
   const onboardingDialogRef = useRef<HTMLDivElement | null>(null);
   const onboardingCloseButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -80,15 +78,6 @@ export default function Dashboard() {
     if (hour < 12) setGreeting({ text: 'Good morning', icon: Sunrise });
     else if (hour < 18) setGreeting({ text: 'Good afternoon', icon: Sun });
     else setGreeting({ text: 'Good evening', icon: Moon });
-  }, []);
-
-  useEffect(() => {
-    const media = getMediaQueryList('(pointer: coarse), (max-width: 1024px)');
-    const apply = () => setIsTouchOptimizedUI(media?.matches ?? false);
-    apply();
-
-    const unsubscribe = subscribeMediaQuery(media, apply);
-    return unsubscribe;
   }, []);
 
   const fetchDashboardData = async () => {
@@ -215,6 +204,15 @@ export default function Dashboard() {
     0,
     WORKSPACE_TEMPLATES.findIndex((template) => template.id === selectedTemplateId)
   );
+
+  const moveTemplateSelection = (direction: 1 | -1) => {
+    if (WORKSPACE_TEMPLATES.length === 0) {
+      return;
+    }
+
+    const nextIndex = (selectedTemplateIndex + direction + WORKSPACE_TEMPLATES.length) % WORKSPACE_TEMPLATES.length;
+    setSelectedTemplateId(WORKSPACE_TEMPLATES[nextIndex].id);
+  };
 
   useEffect(() => {
     if (!isOnboardingOpen) {
@@ -668,51 +666,73 @@ export default function Dashboard() {
                 <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-sky-400/10 blur-[140px]" />
               </div>
 
-              <div className="relative z-10 border-b border-border p-4 sm:p-6 md:p-8 flex items-start justify-between gap-4 sm:gap-6">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
+              <div className="relative z-10 border-b border-border px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-accent">
                     <Sparkles size={12} />
                     Guided Setup
                   </div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-muted font-black mb-3">
-                    Template {selectedTemplateIndex + 1} of {WORKSPACE_TEMPLATES.length}
-                  </p>
-                  <h2 id="onboarding-modal-title" className="text-[2rem] leading-[1.05] sm:text-3xl md:text-4xl font-black tracking-tight text-foreground">Let’s build your workspace in 30 seconds</h2>
-                  <p id="onboarding-modal-description" className="text-sm md:text-base text-muted mt-3 max-w-2xl leading-relaxed">
-                    Pick the operating setup closest to your role. We will create a starter workspace that already feels useful, structured, and premium.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
-                      {selectedTemplateFolderCount} folders
-                    </span>
-                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
-                      {selectedTemplateAppCount} apps
-                    </span>
-                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
-                      {selectedTemplate.source}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-muted/80 mt-3 font-semibold tracking-wide">
-                    {isTouchOptimizedUI
-                      ? 'Swipe templates to compare, then tap one to preview details.'
-                      : 'Use arrow keys to preview templates, press Esc to close.'}
-                  </p>
+                  <button
+                    ref={onboardingCloseButtonRef}
+                    onClick={handleDismissOnboarding}
+                    className="shrink-0 rounded-xl p-2.5 text-muted transition-all hover:bg-card-hover hover:text-foreground"
+                    aria-label="Close onboarding"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
 
-                <button
-                  ref={onboardingCloseButtonRef}
-                  onClick={handleDismissOnboarding}
-                  className="p-2.5 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all shrink-0"
-                  aria-label="Close onboarding"
-                >
-                  <X size={18} />
-                </button>
+                <div className="mt-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-muted">
+                    Template {selectedTemplateIndex + 1} of {WORKSPACE_TEMPLATES.length}
+                  </p>
+                  <h2 id="onboarding-modal-title" className="mt-2 text-2xl leading-[1.05] font-black tracking-tight text-foreground sm:text-3xl">
+                    Choose your starter template
+                  </h2>
+                  <p id="onboarding-modal-description" className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">
+                    Pick the setup closest to your role, then install it in one tap.
+                  </p>
+                  <p className="mt-2 text-xs font-semibold tracking-wide text-muted/80 sm:hidden">
+                    Swipe templates, preview details, then tap install.
+                  </p>
+                </div>
               </div>
 
               <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 pb-34 sm:p-6 sm:pb-40 md:p-8 md:pb-44 lg:pb-8">
                 <div className="flex h-full min-h-0 flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
                 <div className="relative min-h-0 max-h-[24vh] overflow-hidden sm:max-h-[34vh] lg:max-h-[60vh]">
-                  <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted lg:hidden">Choose a setup</p>
+                  <div className="mb-2 flex items-center justify-between gap-2 px-1">
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
+                    <div className="inline-flex items-center gap-1.5">
+                      <span className="rounded-full border border-border bg-background/70 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+                        {selectedTemplateIndex + 1}/{Math.max(WORKSPACE_TEMPLATES.length, 1)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => moveTemplateSelection(-1)}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-background/70 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95"
+                        aria-label="Previous template"
+                      >
+                        <ChevronLeft size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveTemplateSelection(1)}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-background/70 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95"
+                        aria-label="Next template"
+                      >
+                        <ChevronRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mb-2 h-1 overflow-hidden rounded-full bg-border/60">
+                    <motion.div
+                      className="h-full rounded-full bg-linear-to-r from-accent to-sky-400"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.max(6, onboardingProgress)}%` }}
+                      transition={{ ...MOTION_SPRING_CARD }}
+                    />
+                  </div>
                   <div className="flex h-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
                       <button
@@ -720,13 +740,13 @@ export default function Dashboard() {
                         key={template.id}
                         onClick={() => setSelectedTemplateId(template.id)}
                         aria-pressed={selectedTemplateId === template.id}
-                        className={`w-full text-left rounded-[1.25rem] sm:rounded-3xl border px-3 py-3 sm:px-4 sm:py-4 transition-all ${
+                        className={`w-full h-24 text-left rounded-[1.25rem] sm:rounded-3xl border px-3 py-3 sm:px-4 sm:py-3 transition-all ${
                           selectedTemplateId === template.id
                             ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
                             : 'border-border bg-background/60 hover:bg-card-hover'
                         } min-w-[82vw] max-w-[82vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex h-full items-center gap-3">
                           <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
                             <template.icon size={16} className="text-accent sm:w-4.5 sm:h-4.5" />
                           </div>
@@ -735,8 +755,8 @@ export default function Dashboard() {
                               <p className="text-sm font-black text-foreground truncate">{template.title}</p>
                               {selectedTemplateId === template.id && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
                             </div>
-                            <p className="text-xs text-muted mt-1">{template.template.folders.length} folders preloaded</p>
-                            <p className="text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
+                            <p className="text-xs text-muted mt-1 truncate">{template.template.folders.length} folders preloaded</p>
+                            <p className="hidden sm:block text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
                           </div>
                         </div>
                       </button>
