@@ -700,28 +700,31 @@ export default function Dashboard() {
 
               <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
                 <div className="flex flex-col gap-2.5 sm:gap-3 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[15vh] overflow-hidden sm:max-h-[22vh] lg:max-h-[60vh]">
-                  <div className="mb-2 flex items-center justify-between gap-2 px-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
-                    <div className="inline-flex items-center gap-1.5">
-                      <span className="rounded-full border border-border bg-background/70 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+                <div className="relative min-h-0 max-h-[15vh] overflow-hidden rounded-[1.25rem] border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-[22vh] lg:max-h-[60vh]">
+                  <div className="mb-2 flex items-center justify-between gap-3 px-1">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
+                      <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe or tap arrows</p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="rounded-full border border-border bg-background/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
                         {selectedTemplateIndex + 1}/{Math.max(WORKSPACE_TEMPLATES.length, 1)}
                       </span>
                       <button
                         type="button"
                         onClick={() => moveTemplateSelection(-1)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-background/70 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95"
+                        className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl border border-border bg-background/90 text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
                         aria-label="Previous template"
                       >
-                        <ChevronLeft size={14} />
+                        <ChevronLeft size={15} />
                       </button>
                       <button
                         type="button"
                         onClick={() => moveTemplateSelection(1)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-background/70 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95"
+                        className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl border border-border bg-background/90 text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
                         aria-label="Next template"
                       >
-                        <ChevronRight size={14} />
+                        <ChevronRight size={15} />
                       </button>
                     </div>
                   </div>
@@ -740,7 +743,7 @@ export default function Dashboard() {
                         key={template.id}
                         onClick={() => setSelectedTemplateId(template.id)}
                         aria-pressed={selectedTemplateId === template.id}
-                        className={`w-full h-20 text-left rounded-[1.125rem] sm:rounded-3xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all ${
+                        className={`w-full h-20 text-left rounded-[1.125rem] sm:rounded-3xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all shadow-[0_1px_0_rgba(255,255,255,0.35)_inset] ${
                           selectedTemplateId === template.id
                             ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
                             : 'border-border bg-background/60 hover:bg-card-hover'
@@ -762,8 +765,8 @@ export default function Dashboard() {
                       </button>
                     ))}
                   </div>
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-card/95 to-transparent lg:hidden" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-linear-to-b from-card/95 to-transparent lg:hidden" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
                 <SpotlightCard id="onboarding-template-details" className="relative flex-1 min-h-0 overflow-visible border-border bg-background/70 p-3 custom-scrollbar overscroll-contain md:p-5 lg:p-7">
