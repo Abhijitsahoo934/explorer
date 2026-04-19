@@ -701,40 +701,42 @@ export default function Dashboard() {
               <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
                 <div className="flex flex-col gap-2.5 sm:gap-3 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
                 <div className="relative min-h-0 max-h-[15vh] overflow-hidden rounded-[1.25rem] border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-[22vh] lg:max-h-[60vh]">
-                  <div className="mb-2 flex items-center justify-between gap-3 px-1">
+                  <div className="mb-2 flex items-center justify-between gap-2 px-1">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
-                      <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe or tap arrows</p>
+                      <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe or use arrows below</p>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="rounded-full border border-border bg-background/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
-                        {selectedTemplateIndex + 1}/{Math.max(WORKSPACE_TEMPLATES.length, 1)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => moveTemplateSelection(-1)}
-                        className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl border border-border bg-background/90 text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
-                        aria-label="Previous template"
-                      >
-                        <ChevronLeft size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveTemplateSelection(1)}
-                        className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl border border-border bg-background/90 text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
-                        aria-label="Next template"
-                      >
-                        <ChevronRight size={15} />
-                      </button>
-                    </div>
+                    <span className="rounded-full border border-border bg-background/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
+                      {selectedTemplateIndex + 1}/{Math.max(WORKSPACE_TEMPLATES.length, 1)}
+                    </span>
                   </div>
-                  <div className="mb-2 h-1 overflow-hidden rounded-full bg-border/60">
-                    <motion.div
-                      className="h-full rounded-full bg-linear-to-r from-accent to-sky-400"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.max(6, onboardingProgress)}%` }}
-                      transition={{ ...MOTION_SPRING_CARD }}
-                    />
+                  <div className="mb-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-1">
+                    <button
+                      type="button"
+                      onClick={() => moveTemplateSelection(-1)}
+                      className="inline-flex h-8 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background/90 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
+                      aria-label="Previous template"
+                    >
+                      <ChevronLeft size={15} />
+                      <span className="hidden sm:inline">Prev</span>
+                    </button>
+                    <div className="h-1.5 w-18 overflow-hidden rounded-full bg-border/60 sm:w-22">
+                      <motion.div
+                        className="h-full rounded-full bg-linear-to-r from-accent to-sky-400"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.max(6, onboardingProgress)}%` }}
+                        transition={{ ...MOTION_SPRING_CARD }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => moveTemplateSelection(1)}
+                      className="inline-flex h-8 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background/90 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
+                      aria-label="Next template"
+                    >
+                      <span className="hidden sm:inline">Next</span>
+                      <ChevronRight size={15} />
+                    </button>
                   </div>
                   <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
