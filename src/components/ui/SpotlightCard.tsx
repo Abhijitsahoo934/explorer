@@ -15,9 +15,23 @@ export function SpotlightCard({
   spotlightColor = "rgba(99, 102, 241, 0.08)",
   ...props 
 }: SpotlightCardProps) {
-  const [interactiveSpotlight, setInteractiveSpotlight] = useState(true);
+  const [interactiveSpotlight, setInteractiveSpotlight] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const spotlightBackground = useMotionTemplate`
+    radial-gradient(
+      500px circle at ${mouseX}px ${mouseY}px,
+      ${spotlightColor},
+      transparent 70%
+    )
+  `;
+  const highlightBackground = useMotionTemplate`
+    radial-gradient(
+      150px circle at ${mouseX}px ${mouseY}px,
+      rgba(255, 255, 255, 0.08),
+      transparent 80%
+    )
+  `;
 
   useEffect(() => {
     const media = getMediaQueryList('(pointer: coarse), (prefers-reduced-motion: reduce)');
@@ -48,25 +62,13 @@ export function SpotlightCard({
           <motion.div
             className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-500 group-hover:opacity-100"
             style={{
-              background: useMotionTemplate`
-                radial-gradient(
-                  500px circle at ${mouseX}px ${mouseY}px,
-                  ${spotlightColor},
-                  transparent 70%
-                )
-              `,
+              background: spotlightBackground,
             }}
           />
           <motion.div
             className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 mix-blend-overlay"
             style={{
-              background: useMotionTemplate`
-                radial-gradient(
-                  150px circle at ${mouseX}px ${mouseY}px,
-                  rgba(255, 255, 255, 0.08),
-                  transparent 80%
-                )
-              `,
+              background: highlightBackground,
             }}
           />
         </>

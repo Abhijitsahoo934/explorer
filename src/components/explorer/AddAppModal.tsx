@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { trackFunnelEvent } from '../../lib/analyticsService';
 import { getErrorMessage } from '../../lib/errorMessage';
 import { logger } from '../../platform/observability/logger';
-import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 import { buildFaviconUrl, normalizeExternalUrl } from '../../platform/security/url';
 import { WORKSPACE_TEMPLATES } from '../../lib/workspaceTemplates';
 import { COMMUNITY_TEMPLATE_LIBRARY } from '../../lib/communityTemplateLibrary';
@@ -265,6 +265,21 @@ function scoreRecommendation(rec: AppRecommendation, query: string): number {
   return score;
 }
 
+function safeScrollIntoView(element: HTMLElement, prefersReducedMotion: boolean) {
+  try {
+    element.scrollIntoView({
+      block: 'nearest',
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
+  } catch {
+    try {
+      element.scrollIntoView();
+    } catch {
+      // No-op for legacy WebViews where scrollIntoView may be unavailable or incompatible.
+    }
+  }
+}
+
 export const AddAppModal: React.FC<AddAppModalProps> = ({
   isOpen,
   onClose,
@@ -427,10 +442,8 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     : 'Press Enter to save';
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const apply = () => setPrefersReducedMotion(motionMedia.matches);
+    const motionMedia = getMediaQueryList('(prefers-reduced-motion: reduce)');
+    const apply = () => setPrefersReducedMotion(motionMedia?.matches ?? false);
     apply();
 
     const unsubscribe = subscribeMediaQuery(motionMedia, apply);
@@ -474,7 +487,9 @@ export const AddAppModal: React.FC<AddAppModalProps> = ({
     }
 
     const activeElement = recommendationItemRefs.current[activeRecommendationIndex];
-    activeElement?.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    if (activeElement) {
+      safeScrollIntoView(activeElement, prefersReducedMotion);
+    }
   }, [activeRecommendationIndex, hasRecommendations, prefersReducedMotion]);
 
   useEffect(() => {

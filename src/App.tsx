@@ -3,11 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { CommandPaletteProvider } from './hooks/useCommandPalette';
 import { GoogleAnalyticsTracker } from './components/system/GoogleAnalyticsTracker';
 import { lazyWithRetry } from './lib/lazyWithRetry';
+import Dashboard from './routes/Dashboard';
+import AuthGate from './components/system/AuthGate';
 
 const Landing = lazyWithRetry(() => import('./routes/Landing'), 'route-landing');
 const Auth = lazyWithRetry(() => import('./routes/Auth'), 'route-auth');
 const AuthCallback = lazyWithRetry(() => import('./routes/AuthCallback'), 'route-auth-callback');
-const Dashboard = lazyWithRetry(() => import('./routes/Dashboard'), 'route-dashboard');
 const Explorer = lazyWithRetry(() => import('./routes/Explorer'), 'route-explorer');
 const TemplateMarketplace = lazyWithRetry(() => import('./routes/TemplateMarketplace'), 'route-template-marketplace');
 const TemplateSeoPage = lazyWithRetry(() => import('./routes/TemplateSeoPage'), 'route-template-seo');
@@ -17,8 +18,6 @@ const LearnHub = lazyWithRetry(() => import('./routes/LearnHub'), 'route-learn-h
 const UpdatePassword = lazyWithRetry(() => import('./routes/UpdatePassword'), 'route-update-password');
 const BlueprintImport = lazyWithRetry(() => import('./routes/BlueprintImport'), 'route-blueprint-import');
 const Insights = lazyWithRetry(() => import('./routes/Insights'), 'route-insights');
-const AuthGate = lazyWithRetry(() => import('./components/system/AuthGate'), 'component-auth-gate');
-
 const RouteLoader = () => (
   <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 p-4 transition-colors duration-300">
     <div className="relative w-12 h-12">
@@ -60,7 +59,6 @@ function App() {
 
     const warmRoutes = () => {
       void import('./routes/Auth');
-      void import('./routes/Dashboard');
       void import('./routes/Explorer');
       void import('./routes/TemplateMarketplace');
     };
