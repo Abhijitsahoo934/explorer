@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeLocalStorage, readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 type Theme = 'dark' | 'light' | 'system';
@@ -32,8 +32,9 @@ export function ThemeProvider({
   storageKey = STORAGE_KEYS.theme,
   ...props
 }: ThemeProviderProps) {
+  const safeLocalStorage = getSafeLocalStorage();
   const [theme, setTheme] = useState<Theme>(
-    () => (readStorageValue(localStorage, storageKey) as Theme) || defaultTheme
+    () => (safeLocalStorage ? (readStorageValue(safeLocalStorage, storageKey) as Theme) : null) || defaultTheme
   );
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('light');
 
@@ -68,7 +69,9 @@ export function ThemeProvider({
     theme,
     resolvedTheme,
     setTheme: (theme: Theme) => {
-      writeStorageValue(localStorage, storageKey, theme);
+      if (safeLocalStorage) {
+        writeStorageValue(safeLocalStorage, storageKey, theme);
+      }
       setTheme(theme);
     },
   };

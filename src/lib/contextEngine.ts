@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, writeStorageValue, removeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeLocalStorage, readStorageValue, writeStorageValue, removeStorageValue } from '../platform/storage/browserStorage';
 
 export interface ContextUsageEntry {
   id: string;
@@ -33,10 +33,11 @@ function isContextUsageEntry(value: unknown): value is ContextUsageEntry {
 }
 
 function readEntries(storageKey: string): ContextUsageEntry[] {
-  if (typeof window === 'undefined') return [];
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return [];
 
   try {
-    const raw = readStorageValue(window.localStorage, storageKey);
+    const raw = readStorageValue(safeLocalStorage, storageKey);
     if (!raw) return [];
 
     const parsed = JSON.parse(raw) as unknown;
@@ -49,10 +50,11 @@ function readEntries(storageKey: string): ContextUsageEntry[] {
 }
 
 function writeEntries(storageKey: string, entries: ContextUsageEntry[]) {
-  if (typeof window === 'undefined') return;
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return;
 
   try {
-    writeStorageValue(window.localStorage, storageKey, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
+    writeStorageValue(safeLocalStorage, storageKey, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
   } catch {
     /* localStorage quota / privacy mode */
   }
@@ -125,11 +127,12 @@ export function getTopContextItems(limit = 5): TopContextItems {
 }
 
 export function clearContextMemory() {
-  if (typeof window === 'undefined') return;
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return;
 
   try {
-    removeStorageValue(window.localStorage, APPS_STORAGE_KEY);
-    removeStorageValue(window.localStorage, FOLDERS_STORAGE_KEY);
+    removeStorageValue(safeLocalStorage, APPS_STORAGE_KEY);
+    removeStorageValue(safeLocalStorage, FOLDERS_STORAGE_KEY);
   } catch {
     /* ignore */
   }

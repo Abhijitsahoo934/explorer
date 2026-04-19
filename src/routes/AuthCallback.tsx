@@ -5,7 +5,7 @@ import { prefetchAuthenticatedRoutes } from '../lib/routePrefetch';
 import { trackFunnelEvent } from '../lib/analyticsService';
 import { Grain } from '../components/ui/Grain';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, removeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeSessionStorage, readStorageValue, removeStorageValue } from '../platform/storage/browserStorage';
 import { Seo } from '../components/system/Seo';
 
 export default function AuthCallback() {
@@ -58,8 +58,13 @@ export default function AuthCallback() {
             trackFunnelEvent('oauth_login');
           }
           prefetchAuthenticatedRoutes();
-          const storedReturnTo = readStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo);
-          removeStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo);
+          const safeSessionStorage = getSafeSessionStorage();
+          const storedReturnTo = safeSessionStorage
+            ? readStorageValue(safeSessionStorage, STORAGE_KEYS.authReturnTo)
+            : null;
+          if (safeSessionStorage) {
+            removeStorageValue(safeSessionStorage, STORAGE_KEYS.authReturnTo);
+          }
           navigate(isRecoveryFlow ? nextRoute || '/update-password' : storedReturnTo || '/dashboard', { replace: true });
         } else {
           throw new Error('Google sign-in did not create a session.');

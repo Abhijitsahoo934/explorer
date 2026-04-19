@@ -16,7 +16,7 @@ import type { App } from '../types/explorer';
 import { trackFunnelEvent } from '../lib/analyticsService';
 import { recordAppUsage, recordFolderUsage } from '../lib/contextEngine';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeLocalStorage, readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { buildFaviconUrl, openExternalUrl } from '../platform/security/url';
 import { getErrorMessage } from '../lib/errorMessage';
 import { logger } from '../platform/observability/logger';
@@ -27,6 +27,7 @@ import { isFounderUser } from '../lib/accessControl';
 import type { WorkspaceTemplateDefinition } from '../lib/workspaceTemplates';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
+const safeLocalStorage = getSafeLocalStorage();
 
 const safeScrollToTop = (element: HTMLElement) => {
   try {
@@ -104,7 +105,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const isDismissed = readStorageValue(localStorage, ONBOARDING_STORAGE_KEY) === 'true';
+    const isDismissed = safeLocalStorage ? readStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY) === 'true' : false;
     const isWorkspaceEmpty = !loading && stats.folders === 0 && stats.apps === 0;
 
     if (isWorkspaceEmpty && !isDismissed && WORKSPACE_TEMPLATES.length > 0) {
@@ -189,7 +190,9 @@ export default function Dashboard() {
   };
 
   const handleDismissOnboarding = () => {
-    writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
+    if (safeLocalStorage) {
+      writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
+    }
     setIsOnboardingOpen(false);
   };
 
@@ -740,7 +743,9 @@ export default function Dashboard() {
                           onClick={async () => {
                             const installed = await handleTemplateLaunch(selectedTemplate.id);
                             if (installed) {
-                              writeStorageValue(localStorage, ONBOARDING_STORAGE_KEY, 'true');
+                              if (safeLocalStorage) {
+                                writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
+                              }
                               setIsOnboardingOpen(false);
                             }
                           }}

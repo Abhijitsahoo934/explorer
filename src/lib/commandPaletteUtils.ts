@@ -1,6 +1,6 @@
 import type { Folder, App } from '../types/explorer';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeLocalStorage, readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { buildFaviconUrl, getHostnameFromUrl } from '../platform/security/url';
 
 /** Passed to optional `onRun` for static / AI automations. */
@@ -56,8 +56,11 @@ export interface RecentEntry {
 }
 
 function readRecents(key: string): RecentEntry[] {
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return [];
+
   try {
-    const raw = readStorageValue(localStorage, key);
+    const raw = readStorageValue(safeLocalStorage, key);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -70,8 +73,11 @@ function readRecents(key: string): RecentEntry[] {
 }
 
 function writeRecents(key: string, entries: RecentEntry[]) {
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return;
+
   try {
-    writeStorageValue(localStorage, key, JSON.stringify(entries.slice(0, MAX_RECENT)));
+    writeStorageValue(safeLocalStorage, key, JSON.stringify(entries.slice(0, MAX_RECENT)));
   } catch {
     /* ignore quota */
   }

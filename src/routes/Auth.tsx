@@ -5,7 +5,7 @@ import { prefetchAuthenticatedRoutes } from '../lib/routePrefetch';
 import { trackFunnelEvent } from '../lib/analyticsService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { removeStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeSessionStorage, removeStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { Button } from '../components/ui/Button';
 import { Grain } from '../components/ui/Grain';
 import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
@@ -99,9 +99,12 @@ const Auth: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
+      const safeSessionStorage = getSafeSessionStorage();
       // OAuth callback route par hum sessionStorage se returnTo recover karenge.
-      if (returnTo) writeStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo, returnTo);
-      else removeStorageValue(sessionStorage, STORAGE_KEYS.authReturnTo);
+      if (safeSessionStorage) {
+        if (returnTo) writeStorageValue(safeSessionStorage, STORAGE_KEYS.authReturnTo, returnTo);
+        else removeStorageValue(safeSessionStorage, STORAGE_KEYS.authReturnTo);
+      }
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

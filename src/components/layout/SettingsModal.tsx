@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import { getErrorMessage } from '../../lib/errorMessage';
 import { APP_LOCAL_STORAGE_KEYS, APP_SESSION_STORAGE_KEYS } from '../../platform/storage/keys';
-import { clearStorageKeys } from '../../platform/storage/browserStorage';
+import { clearStorageKeys, getSafeLocalStorage, getSafeSessionStorage } from '../../platform/storage/browserStorage';
 import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 interface SettingsModalProps {
@@ -58,8 +58,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setFeedback(null);
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const removedLocal = clearStorageKeys(localStorage, APP_LOCAL_STORAGE_KEYS);
-    const removedSession = clearStorageKeys(sessionStorage, APP_SESSION_STORAGE_KEYS);
+    const safeLocalStorage = getSafeLocalStorage();
+    const safeSessionStorage = getSafeSessionStorage();
+    const removedLocal = safeLocalStorage ? clearStorageKeys(safeLocalStorage, APP_LOCAL_STORAGE_KEYS) : 0;
+    const removedSession = safeSessionStorage ? clearStorageKeys(safeSessionStorage, APP_SESSION_STORAGE_KEYS) : 0;
     const totalRemoved = removedLocal + removedSession;
     setTheme('system');
 
@@ -128,8 +130,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         throw error;
       }
 
-      clearStorageKeys(localStorage, APP_LOCAL_STORAGE_KEYS);
-      clearStorageKeys(sessionStorage, APP_SESSION_STORAGE_KEYS);
+      const safeLocalStorage = getSafeLocalStorage();
+      const safeSessionStorage = getSafeSessionStorage();
+      if (safeLocalStorage) {
+        clearStorageKeys(safeLocalStorage, APP_LOCAL_STORAGE_KEYS);
+      }
+      if (safeSessionStorage) {
+        clearStorageKeys(safeSessionStorage, APP_SESSION_STORAGE_KEYS);
+      }
       await supabase.auth.signOut();
       window.location.href = '/auth';
     } catch (error: unknown) {

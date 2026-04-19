@@ -1,3 +1,19 @@
+export function getSafeLocalStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getSafeSessionStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.sessionStorage : null;
+  } catch {
+    return null;
+  }
+}
+
 export function readStorageValue(storage: Storage, key: string): string | null {
   try {
     return storage.getItem(key);

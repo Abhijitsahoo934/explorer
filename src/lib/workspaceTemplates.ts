@@ -13,7 +13,7 @@ import {
 import type { Folder, App } from '../types/explorer';
 import type { WorkspaceTemplate } from './explorerService';
 import { STORAGE_KEYS } from '../platform/storage/keys';
-import { readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
+import { getSafeLocalStorage, readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
 import { COMMUNITY_TEMPLATE_LIBRARY } from './communityTemplateLibrary';
 
 export const USER_TEMPLATE_STORAGE_KEY = STORAGE_KEYS.userTemplates;
@@ -456,8 +456,11 @@ export const CURATED_WORKSPACE_TEMPLATES: ReadonlyArray<WorkspaceTemplateDefinit
 export const WORKSPACE_TEMPLATES = CURATED_WORKSPACE_TEMPLATES;
 
 export const getStoredWorkspaceTemplates = (): WorkspaceTemplateDefinition[] => {
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return [];
+
   try {
-    const rawValue = readStorageValue(localStorage, USER_TEMPLATE_STORAGE_KEY);
+    const rawValue = readStorageValue(safeLocalStorage, USER_TEMPLATE_STORAGE_KEY);
     if (!rawValue) return [];
     const parsedValue = JSON.parse(rawValue) as StoredWorkspaceTemplate[];
     if (!Array.isArray(parsedValue)) return [];
@@ -497,17 +500,23 @@ export const getStoredWorkspaceTemplates = (): WorkspaceTemplateDefinition[] => 
 };
 
 export const saveWorkspaceTemplateDefinition = (template: WorkspaceTemplateDefinition) => {
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return;
+
   const existingTemplates = getStoredWorkspaceTemplates();
   writeStorageValue(
-    localStorage,
+    safeLocalStorage,
     USER_TEMPLATE_STORAGE_KEY,
     JSON.stringify([template, ...existingTemplates.filter((item) => item.id !== template.id)])
   );
 };
 
 export const deleteStoredWorkspaceTemplate = (templateId: string) => {
+  const safeLocalStorage = getSafeLocalStorage();
+  if (!safeLocalStorage) return;
+
   const nextTemplates = getStoredWorkspaceTemplates().filter((template) => template.id !== templateId);
-  writeStorageValue(localStorage, USER_TEMPLATE_STORAGE_KEY, JSON.stringify(nextTemplates));
+  writeStorageValue(safeLocalStorage, USER_TEMPLATE_STORAGE_KEY, JSON.stringify(nextTemplates));
 };
 
 const buildFolderAppMap = (apps: App[]) =>
