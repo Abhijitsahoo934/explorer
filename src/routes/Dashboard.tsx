@@ -710,8 +710,8 @@ export default function Dashboard() {
               </div>
 
               <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
-                <div className="grid h-full min-h-0 gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[28vh] overflow-hidden sm:max-h-[36vh] lg:max-h-[60vh]">
+                <div className="flex h-full min-h-0 flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="relative min-h-0 max-h-[24vh] overflow-hidden sm:max-h-[34vh] lg:max-h-[60vh]">
                   <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted lg:hidden">Choose a setup</p>
                   <div className="flex h-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
@@ -746,7 +746,7 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[54vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[60vh] md:p-7 lg:touch-auto">
+                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-60 sm:min-h-76 max-h-[41vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[54vh] md:p-7 lg:min-h-80 lg:max-h-[60vh] lg:touch-auto">
                   <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
@@ -797,7 +797,7 @@ export default function Dashboard() {
                     </div>
                     </motion.div>
 
-                    <div className="sticky bottom-0 mt-6 border-t border-border/70 bg-background/90 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
+                    <div className="hidden lg:block sticky bottom-0 mt-6 border-t border-border/70 bg-background/90 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
                       <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <Button
@@ -828,6 +828,34 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-background/90 to-transparent" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background/95 to-transparent" />
                 </SpotlightCard>
+                </div>
+
+                <div className="sticky bottom-0 z-20 -mx-3 border-t border-border/80 bg-card/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-2xl sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 lg:hidden">
+                  <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
+                  <div className="grid gap-3">
+                    <Button
+                      className="w-full min-h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent to-sky-500 hover:from-accent-hover hover:to-sky-600 text-white"
+                      loading={activeTemplateId === selectedTemplate.id}
+                      onClick={async () => {
+                        const installed = await handleTemplateLaunch(selectedTemplate.id);
+                        if (installed) {
+                          if (safeLocalStorage) {
+                            writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
+                          }
+                          setIsOnboardingOpen(false);
+                        }
+                      }}
+                    >
+                      Install {selectedTemplate.title}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full min-h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                      onClick={handleDismissOnboarding}
+                    >
+                      I’ll Set It Up Myself
+                    </Button>
+                  </div>
                 </div>
               </div>
               </motion.div>
