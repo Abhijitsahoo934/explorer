@@ -698,9 +698,9 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
+              <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
                 <div className="flex h-full min-h-0 flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[24vh] overflow-hidden sm:max-h-[34vh] lg:max-h-[60vh]">
+                <div className="relative min-h-0 max-h-[18vh] overflow-hidden sm:max-h-[26vh] lg:max-h-[60vh]">
                   <div className="mb-2 flex items-center justify-between gap-2 px-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
                     <div className="inline-flex items-center gap-1.5">
@@ -766,7 +766,7 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-60 sm:min-h-76 max-h-[46vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[54vh] md:p-7 lg:min-h-80 lg:max-h-[60vh] lg:touch-auto">
+                <SpotlightCard id="onboarding-template-details" className="relative flex-1 min-h-0 overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y md:p-7 lg:touch-auto">
                   <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
@@ -823,11 +823,20 @@ export default function Dashboard() {
                 </SpotlightCard>
                 </div>
 
-                <div className="shrink-0 border-t border-border/80 bg-card/95 px-3 py-3 backdrop-blur-2xl sm:px-6 md:px-8 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-                  <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                <div className="relative z-30 shrink-0 border-t border-border/80 bg-card/98 px-3 py-4 backdrop-blur-3xl sm:px-6 md:px-8 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lg shadow-black/10">
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, ease: MOTION_EASE_OUT }}
+                    className="space-y-4"
+                  >
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-accent font-black">Ready to install</p>
+                      <p className="text-[11px] text-muted font-semibold mt-1">One tap setup. Customize everything after.</p>
+                    </div>
+                    <div className="grid gap-2.5 sm:grid-cols-2">
                     <Button
-                      className="w-full min-h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent to-sky-500 hover:from-accent-hover hover:to-sky-600 text-white"
+                      className="w-full h-13 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent via-accent to-sky-500 hover:from-accent/90 hover:via-accent/90 hover:to-sky-500/90 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
                       loading={activeTemplateId === selectedTemplate.id}
                       onClick={async () => {
                         const installed = await handleTemplateLaunch(selectedTemplate.id);
@@ -839,16 +848,17 @@ export default function Dashboard() {
                         }
                       }}
                     >
-                      Install {selectedTemplate.title}
+                      {activeTemplateId === selectedTemplate.id ? 'Installing...' : `Install ${selectedTemplate.title}`}
                     </Button>
                     <Button
                       variant="ghost"
-                      className="w-full min-h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                      className="w-full h-13 rounded-2xl text-[11px] uppercase tracking-widest font-black hover:bg-card-hover active:scale-95"
                       onClick={handleDismissOnboarding}
                     >
-                      I’ll Set It Up Myself
+                      I'll Set It Up Later
                     </Button>
-                  </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
               </motion.div>
