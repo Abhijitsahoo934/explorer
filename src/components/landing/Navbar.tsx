@@ -1,11 +1,33 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrandLogo } from '../ui/BrandLogo';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [mobileMenuOpen]);
 
   const goTo = (path: string) => {
     setMobileMenuOpen(false);
@@ -20,6 +42,14 @@ export default function Navbar() {
         <div
           className="flex items-center gap-3 cursor-pointer group"
           onClick={() => goTo('/')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              goTo('/');
+            }
+          }}
         >
           <div className="rounded-2xl bg-linear-to-br from-accent/10 via-sky-400/10 to-background/65 p-1.5 border border-accent/15 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5">
             <BrandLogo className="h-9 w-9" />
@@ -58,22 +88,24 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card/50 text-foreground transition-all hover:bg-card-hover md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card/50 text-foreground transition-all hover:bg-card-hover active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/15 md:hidden"
             aria-label="Toggle navigation"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="landing-mobile-nav"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
           <button
             onClick={() => goTo('/auth')}
-            className="hidden md:block h-11 px-4 text-[11px] tracking-[0.16em] uppercase font-black text-muted hover:text-foreground transition-colors rounded-xl"
+            className="hidden md:block h-11 px-4 text-[11px] tracking-[0.16em] uppercase font-black text-muted hover:text-foreground transition-colors rounded-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10"
           >
             Sign In
           </button>
 
           <button
             onClick={() => goTo('/auth')}
-            className="hidden h-11 px-5 text-[11px] font-black uppercase tracking-[0.16em] bg-linear-to-r from-accent via-sky-500 to-indigo-500 text-white hover:-translate-y-0.5 hover:brightness-105 transition-all duration-300 rounded-2xl shadow-[0_16px_34px_-22px_rgba(11,102,255,0.55)] sm:inline-flex items-center gap-2"
+            className="hidden h-11 px-5 text-[11px] font-black uppercase tracking-[0.16em] bg-linear-to-r from-accent via-sky-500 to-indigo-500 text-white hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 transition-all duration-300 rounded-2xl shadow-[0_16px_34px_-22px_rgba(11,102,255,0.55)] focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-400/25 sm:inline-flex items-center gap-2"
           >
             Open Workspace
             <ArrowRight size={14} />
@@ -81,31 +113,51 @@ export default function Navbar() {
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="border-t border-border/70 bg-linear-to-b from-background/96 to-accent/3 px-4 py-4 backdrop-blur-2xl md:hidden">
-          <div className="flex flex-col gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-muted">
-            <a href="#product-preview" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
-              Product
-            </a>
-            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
-              Features
-            </a>
-            <a href="#use-cases" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
-              Use Cases
-            </a>
-            <button onClick={() => goTo('/learn')} className="rounded-xl px-3 py-3 text-left transition-colors hover:bg-card-hover hover:text-foreground">
-              Learn
-            </button>
-            <button onClick={() => goTo('/about-explorero')} className="rounded-xl px-3 py-3 text-left transition-colors hover:bg-card-hover hover:text-foreground">
-              About
-            </button>
-            <button onClick={() => goTo('/auth')} className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-5 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_34px_-22px_rgba(11,102,255,0.55)] transition-all duration-300 hover:brightness-105">
-              Open Workspace
-              <ArrowRight size={14} />
-            </button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close mobile menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 top-18 z-40 bg-black/35 backdrop-blur-sm md:hidden"
+            />
+            <motion.div
+              id="landing-mobile-nav"
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.99 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              className="relative z-50 border-t border-border/70 bg-linear-to-b from-background/96 to-accent/3 px-4 py-4 backdrop-blur-2xl md:hidden"
+            >
+              <div className="flex flex-col gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-muted">
+                <a href="#product-preview" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
+                  Product
+                </a>
+                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
+                  Features
+                </a>
+                <a href="#use-cases" onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-3 py-3 transition-colors hover:bg-card-hover hover:text-foreground">
+                  Use Cases
+                </a>
+                <button onClick={() => goTo('/learn')} className="rounded-xl px-3 py-3 text-left transition-colors hover:bg-card-hover hover:text-foreground">
+                  Learn
+                </button>
+                <button onClick={() => goTo('/about-explorero')} className="rounded-xl px-3 py-3 text-left transition-colors hover:bg-card-hover hover:text-foreground">
+                  About
+                </button>
+                <button onClick={() => goTo('/auth')} className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-accent via-sky-500 to-indigo-500 px-5 py-3 text-[11px] font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_34px_-22px_rgba(11,102,255,0.55)] transition-all duration-300 hover:brightness-105 active:scale-[0.99]">
+                  Open Workspace
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

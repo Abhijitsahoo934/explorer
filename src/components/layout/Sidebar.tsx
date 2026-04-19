@@ -109,11 +109,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         animate={{ width: desktopWidth }}
         transition={{ duration: isResizing ? 0 : 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(92vw,340px)] max-w-85 shrink-0 flex-col border-r border-border bg-sidebar/95 shadow-(--panel-shadow) backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex h-screen w-[min(92vw,340px)] max-w-85 shrink-0 flex-col border-r border-border/85 bg-sidebar/90 shadow-(--panel-shadow) backdrop-blur-2xl transition-all duration-300 lg:static lg:z-20 lg:w-auto lg:max-w-none lg:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:transform-none!"
         )}
       >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
         {/* DRAG RESIZE HANDLE */}
         <div
           onMouseDown={startResizing}
@@ -122,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
 
         {/* HEADER */}
-        <div className="flex h-20 items-center justify-between border-b border-border px-4 shrink-0 lg:px-5">
+        <div className="flex h-20 items-center justify-between border-b border-border/80 px-4 shrink-0 lg:px-5">
           <AnimatePresence>
             {!isCollapsed && (
               <motion.div 
@@ -141,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="mx-auto hidden shrink-0 rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground focus:outline-none lg:block"
+            className="mx-auto hidden shrink-0 rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 lg:block"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? <PanelLeft size={20} className="text-accent" /> : <PanelLeftClose size={20} />}
@@ -150,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={onMobileClose}
-            className="rounded-xl border border-border p-2 text-muted transition-all hover:bg-card-hover hover:text-foreground lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-border p-2 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95 lg:hidden"
             aria-label="Close sidebar"
           >
             <X size={18} />
@@ -158,11 +159,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* QUICK ACTIONS */}
-        <div className="p-4 space-y-3 border-b border-border shrink-0">
+        <div className="p-4 space-y-3 border-b border-border/80 shrink-0">
+          {!isCollapsed && (
+            <p className="px-1 text-[10px] uppercase tracking-[0.22em] text-muted font-black">Quick Actions</p>
+          )}
           <button
             onClick={goToDashboard}
             className={cn(
-              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden min-h-12",
+              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/70 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 active:scale-[0.99] overflow-hidden min-h-12",
               isCollapsed ? "px-0" : "px-4"
             )}
             title="Dashboard"
@@ -174,8 +178,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onAddApp}
             className={cn(
-              "w-full flex items-center justify-center gap-2 rounded-xl transition-all focus:outline-none overflow-hidden shadow-lg min-h-12",
-              isCollapsed ? "px-0 bg-accent text-white" : "px-4 bg-accent text-white hover:bg-accent-hover hover:shadow-[0_0_24px_rgba(99,102,241,0.28)]"
+              "w-full flex items-center justify-center gap-2 rounded-xl transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/25 active:scale-[0.99] overflow-hidden shadow-lg min-h-12",
+              isCollapsed ? "px-0 bg-linear-to-r from-accent to-sky-500 text-white" : "px-4 bg-linear-to-r from-accent to-sky-500 text-white hover:from-accent-hover hover:to-sky-600 hover:shadow-[0_0_24px_rgba(56,189,248,0.32)]"
             )}
             title="Add App"
           >
@@ -186,7 +190,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onAddFolder}
             className={cn(
-              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/60 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none overflow-hidden min-h-12",
+              "w-full flex items-center justify-center gap-2 rounded-xl bg-card/70 hover:bg-card-hover transition-colors border border-border text-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 active:scale-[0.99] overflow-hidden min-h-12",
               isCollapsed ? "px-0" : "px-4"
             )}
             title="New Folder"
@@ -222,11 +226,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* FOOTER / SETTINGS */}
-        <div className="p-3 border-t border-border shrink-0 space-y-1 bg-card/40">
+        <div className="p-3 border-t border-border/80 shrink-0 space-y-1 bg-card/45">
+          {!isCollapsed && <p className="px-4 pb-1 text-[10px] uppercase tracking-[0.22em] text-muted font-black">Account</p>}
           <button
             onClick={() => setIsSettingsOpen(true)}
             className={cn(
-              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all group overflow-hidden min-h-11",
+              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-foreground hover:bg-card-hover transition-all group overflow-hidden min-h-11 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 active:scale-[0.99]",
               isCollapsed ? "justify-center px-0" : "px-4"
             )}
             title="Settings"
@@ -238,7 +243,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={handleLogout}
             className={cn(
-              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-red-500 hover:bg-red-500/10 transition-all group overflow-hidden min-h-11",
+              "w-full flex items-center gap-3 rounded-xl text-muted hover:text-red-500 hover:bg-red-500/10 transition-all group overflow-hidden min-h-11 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500/20 active:scale-[0.99]",
               isCollapsed ? "justify-center px-0" : "px-4"
             )}
             title="Logout"

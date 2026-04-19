@@ -85,6 +85,24 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   }, []);
 
   useEffect(() => {
+    if (!showNotifications && !showProfile) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      setShowNotifications(false);
+      setShowProfile(false);
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [showNotifications, showProfile]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node) && !(event.target as Element).closest('#bell-btn')) {
         setShowNotifications(false);
@@ -133,12 +151,13 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
   return (
     <>
-      <header className="sticky top-0 z-100 flex h-16 shrink-0 items-center justify-between border-b border-border bg-sidebar/80 px-3 backdrop-blur-2xl transition-all duration-300 sm:px-4 md:px-6 lg:px-8">
+      <header className="sticky top-0 z-100 flex h-16 shrink-0 items-center justify-between border-b border-border/80 bg-sidebar/72 px-3 backdrop-blur-2xl transition-all duration-300 sm:px-4 md:px-6 lg:px-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent" />
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onOpenSidebar}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card/50 text-muted transition-all hover:bg-card-hover hover:text-foreground lg:hidden"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card/50 text-muted transition-all hover:bg-card-hover hover:text-foreground active:scale-95 lg:hidden"
             aria-label="Open navigation"
           >
             <Menu size={18} />
@@ -152,7 +171,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                 setShowProfile(false);
                 openCommandPalette();
               }}
-              className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card/50 py-2.5 pl-10 pr-3 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/30 hover:bg-card-hover focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:pl-11 sm:pr-16"
+              className="flex h-11 w-full items-center gap-3 rounded-2xl border border-border bg-card/55 py-2.5 pl-10 pr-3 text-left text-sm text-muted shadow-sm transition-all hover:border-accent/35 hover:bg-card-hover hover:shadow-[0_14px_30px_-24px_rgba(37,99,235,0.65)] focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:pl-11 sm:pr-16"
             >
               <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted transition-all duration-300 group-hover:text-accent sm:left-4">
                 <Search size={18} strokeWidth={2} />
@@ -168,10 +187,13 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
           </div>
         </div>
 
-        <div className="relative ml-2 flex items-center gap-1 border-l border-border/50 pl-2 sm:ml-4 sm:gap-2 sm:pl-4 lg:ml-6 lg:pl-6">
+        <div className="relative ml-2 flex items-center gap-1.5 border-l border-border/40 pl-2 sm:ml-4 sm:gap-2 sm:pl-4 lg:ml-6 lg:pl-6">
+          <div className="hidden items-center gap-1 rounded-full border border-border bg-card/40 px-2 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-muted md:inline-flex">
+            Live
+          </div>
           <button
             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-            className="rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground sm:p-2.5"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-transparent p-2 text-muted transition-all hover:border-border hover:bg-card-hover hover:text-foreground active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:h-10.5 sm:w-10.5"
             aria-label="Toggle theme"
           >
             {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -183,7 +205,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
               setShowProfile(false);
               setShowNotifications((value) => !value);
             }}
-            className={`relative rounded-xl p-2 transition-all sm:p-2.5 ${showNotifications ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-card-hover hover:text-foreground'}`}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-xl p-2 transition-all active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/10 sm:h-10.5 sm:w-10.5 ${showNotifications ? 'bg-accent/10 text-accent ring-1 ring-accent/25' : 'text-muted hover:bg-card-hover hover:text-foreground'}`}
             aria-label="Notifications"
           >
             <Bell size={18} />
@@ -194,11 +216,11 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             {showNotifications && (
               <motion.div
                 ref={notifDropdownRef}
-                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
+                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
                 transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, ease: 'easeOut' }}
-                className="fixed left-3 right-3 top-18 z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-14 sm:top-[calc(100%+16px)] sm:w-90 sm:max-w-[calc(100vw-48px)]"
+                className="fixed left-3 right-3 top-18 z-50 origin-top-right rounded-2xl border border-border bg-card/95 p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-14 sm:top-[calc(100%+16px)] sm:w-90 sm:max-w-[calc(100vw-48px)]"
               >
                 <div className="flex items-center justify-between gap-3 px-3 py-2">
                   <div>
@@ -220,10 +242,10 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                       <button
                         key={notification.id}
                         onClick={() => handleMarkAsRead(notification.id)}
-                        className={`w-full rounded-2xl border px-4 py-3 text-left transition-all ${
+                        className={`w-full rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
                           notification.is_read
-                            ? 'border-border bg-background/50 text-muted'
-                            : 'border-accent/20 bg-accent/5 text-foreground'
+                            ? 'border-border bg-background/50 text-muted hover:bg-background/75'
+                            : 'border-accent/20 bg-accent/5 text-foreground hover:border-accent/35 hover:bg-accent/10'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -257,7 +279,7 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
               setShowNotifications(false);
               setShowProfile((value) => !value);
             }}
-            className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 sm:ml-2"
+            className="ml-1 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-accent to-accent-hover text-xs font-black uppercase tracking-wide text-white shadow-lg transition-all hover:scale-105 active:scale-95 hover:shadow-[0_12px_28px_-16px_rgba(37,99,235,0.75)] focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 sm:ml-2"
             aria-label="Profile"
           >
             {userInitials || <User size={16} strokeWidth={3} />}
@@ -267,11 +289,11 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             {showProfile && (
               <motion.div
                 ref={profileDropdownRef}
-                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
+                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
                 transition={{ duration: prefersReducedMotion ? 0.12 : 0.18, ease: 'easeOut' }}
-                className="fixed left-3 right-3 top-18 z-50 rounded-2xl border border-border bg-card p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+16px)] sm:w-64"
+                className="fixed left-3 right-3 top-18 z-50 origin-top-right rounded-2xl border border-border bg-card/95 p-2 shadow-premium backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+16px)] sm:w-64"
               >
                 <div className="mb-2 rounded-xl bg-background/50 p-3">
                   <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-muted">User Instance</p>

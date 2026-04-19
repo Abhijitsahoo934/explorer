@@ -25,9 +25,14 @@ import { getUserFirstName } from '../lib/authProfile';
 import { Seo } from '../components/system/Seo';
 import { isFounderUser } from '../lib/accessControl';
 import type { WorkspaceTemplateDefinition } from '../lib/workspaceTemplates';
+import { getMediaQueryList, subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.onboardingDismissed;
 const safeLocalStorage = getSafeLocalStorage();
+const MOTION_EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const MOTION_SPRING_PANEL = { type: 'spring' as const, stiffness: 280, damping: 24 };
+const MOTION_SPRING_CARD = { type: 'spring' as const, stiffness: 240, damping: 26 };
+const MOTION_STAGGER = { staggerChildren: 0.09, delayChildren: 0.08 };
 
 const safeScrollToTop = (element: HTMLElement) => {
   try {
@@ -64,6 +69,7 @@ export default function Dashboard() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(WORKSPACE_TEMPLATES[0]?.id ?? '');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isTouchOptimizedUI, setIsTouchOptimizedUI] = useState(false);
   const onboardingDialogRef = useRef<HTMLDivElement | null>(null);
   const onboardingCloseButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -74,6 +80,15 @@ export default function Dashboard() {
     if (hour < 12) setGreeting({ text: 'Good morning', icon: Sunrise });
     else if (hour < 18) setGreeting({ text: 'Good afternoon', icon: Sun });
     else setGreeting({ text: 'Good evening', icon: Moon });
+  }, []);
+
+  useEffect(() => {
+    const media = getMediaQueryList('(pointer: coarse), (max-width: 1024px)');
+    const apply = () => setIsTouchOptimizedUI(media?.matches ?? false);
+    apply();
+
+    const unsubscribe = subscribeMediaQuery(media, apply);
+    return unsubscribe;
   }, []);
 
   const fetchDashboardData = async () => {
@@ -154,13 +169,13 @@ export default function Dashboard() {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+      transition: MOTION_STAGGER,
     }
   };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+    show: { opacity: 1, y: 0, transition: { ...MOTION_SPRING_CARD } }
   };
 
   const handleTemplateLaunch = async (templateId: string) => {
@@ -309,6 +324,14 @@ export default function Dashboard() {
     WORKSPACE_TEMPLATES.find((template) => template.id === selectedTemplateId) ??
     WORKSPACE_TEMPLATES[0] ??
     fallbackTemplate;
+  const selectedTemplateFolderCount = selectedTemplate.template.folders.length;
+  const selectedTemplateAppCount = selectedTemplate.template.folders.reduce(
+    (total, folder) => total + folder.apps.length,
+    0
+  );
+  const onboardingProgress = WORKSPACE_TEMPLATES.length > 0
+    ? ((selectedTemplateIndex + 1) / WORKSPACE_TEMPLATES.length) * 100
+    : 0;
   const userName = getUserFirstName(user);
   const featuredTemplates = useMemo(() => WORKSPACE_TEMPLATES.slice(0, 3), []);
 
@@ -535,7 +558,7 @@ export default function Dashboard() {
                             key={site.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 + (idx * 0.1), type: "spring" }}
+                            transition={{ ...MOTION_SPRING_CARD, delay: 0.14 + (idx * 0.07) }}
                           >
                             <SpotlightCard className="p-5 bg-card border-border hover:bg-card hover:border-accent/30 transition-all duration-300 flex flex-col h-full group hover:shadow-premium hover:-translate-y-1 cursor-pointer">
                               <div className="flex items-center gap-3 mb-6">
@@ -569,6 +592,7 @@ export default function Dashboard() {
                     ) : (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                        transition={{ ...MOTION_SPRING_CARD }}
                         className="p-12 text-center border-2 border-dashed border-border rounded-3xl bg-card/30 flex flex-col items-center justify-center gap-4 hover:bg-card/50 hover:border-accent/30 transition-colors group cursor-pointer"
                         onClick={() => setIsAppModalOpen(true)}
                       >
@@ -613,29 +637,38 @@ export default function Dashboard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: MOTION_EASE_OUT }}
               className="absolute inset-0 bg-black/50 backdrop-blur-md"
               onClick={handleDismissOnboarding}
             />
 
-            <div className="relative flex min-h-dvh items-start justify-center overflow-y-auto overscroll-contain p-3 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 sm:pt-6 md:p-6 md:pt-10">
+            <div className="relative flex min-h-dvh items-start justify-center overflow-y-auto overscroll-contain p-2 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 sm:pt-6 md:p-6 md:pt-10">
               <motion.div
                 ref={onboardingDialogRef}
                 initial={{ opacity: 0, y: 24, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 16, scale: 0.96 }}
-                transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                className="relative my-auto flex w-full max-w-5xl max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-3xl border border-border bg-card/95 shadow-premium backdrop-blur-3xl sm:max-h-[min(92vh,860px)] sm:rounded-4xl"
+                transition={MOTION_SPRING_PANEL}
+                className="relative my-auto flex w-full max-w-5xl max-h-[calc(100dvh-0.5rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card/95 shadow-premium backdrop-blur-3xl sm:max-h-[min(92vh,860px)] sm:rounded-4xl"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="onboarding-modal-title"
                 aria-describedby="onboarding-modal-description"
               >
+              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-1.5 bg-background/70">
+                <motion.div
+                  className="h-full bg-linear-to-r from-accent/70 via-accent to-sky-400/70"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.max(6, onboardingProgress)}%` }}
+                  transition={{ ...MOTION_SPRING_CARD }}
+                />
+              </div>
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute -top-16 left-20 w-56 h-56 rounded-full bg-accent/15 blur-[120px]" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-sky-400/10 blur-[140px]" />
               </div>
 
-              <div className="relative z-10 p-4 sm:p-6 md:p-8 border-b border-border flex items-start justify-between gap-4 sm:gap-6">
+              <div className="relative z-10 border-b border-border p-4 sm:p-6 md:p-8 flex items-start justify-between gap-4 sm:gap-6">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-[0.22em] font-black text-accent mb-4">
                     <Sparkles size={12} />
@@ -644,11 +677,26 @@ export default function Dashboard() {
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted font-black mb-3">
                     Template {selectedTemplateIndex + 1} of {WORKSPACE_TEMPLATES.length}
                   </p>
-                  <h2 id="onboarding-modal-title" className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-foreground">Let’s build your workspace in 30 seconds</h2>
-                  <p id="onboarding-modal-description" className="text-sm md:text-base text-muted mt-2 sm:mt-3 max-w-2xl leading-relaxed">
+                  <h2 id="onboarding-modal-title" className="text-[2rem] leading-[1.05] sm:text-3xl md:text-4xl font-black tracking-tight text-foreground">Let’s build your workspace in 30 seconds</h2>
+                  <p id="onboarding-modal-description" className="text-sm md:text-base text-muted mt-3 max-w-2xl leading-relaxed">
                     Pick the operating setup closest to your role. We will create a starter workspace that already feels useful, structured, and premium.
                   </p>
-                  <p className="text-[11px] text-muted/80 mt-3 font-semibold tracking-wide">Use arrow keys to preview templates, press Esc to close.</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
+                      {selectedTemplateFolderCount} folders
+                    </span>
+                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
+                      {selectedTemplateAppCount} apps
+                    </span>
+                    <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
+                      {selectedTemplate.source}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted/80 mt-3 font-semibold tracking-wide">
+                    {isTouchOptimizedUI
+                      ? 'Swipe templates to compare, then tap one to preview details.'
+                      : 'Use arrow keys to preview templates, press Esc to close.'}
+                  </p>
                 </div>
 
                 <button
@@ -664,7 +712,8 @@ export default function Dashboard() {
               <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 sm:p-6 md:p-8">
                 <div className="grid h-full min-h-0 gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
                 <div className="relative min-h-0 max-h-[28vh] overflow-hidden sm:max-h-[36vh] lg:max-h-[60vh]">
-                  <div className="flex h-full gap-3 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
+                  <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted lg:hidden">Choose a setup</p>
+                  <div className="flex h-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
                       <button
                         id={`onboarding-template-option-${template.id}`}
@@ -673,17 +722,21 @@ export default function Dashboard() {
                         aria-pressed={selectedTemplateId === template.id}
                         className={`w-full text-left rounded-[1.25rem] sm:rounded-3xl border px-3 py-3 sm:px-4 sm:py-4 transition-all ${
                           selectedTemplateId === template.id
-                            ? 'border-accent/25 bg-accent/10 shadow-sm'
+                            ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
                             : 'border-border bg-background/60 hover:bg-card-hover'
-                        } min-w-60 sm:min-w-75 lg:min-w-0`}
+                        } min-w-[82vw] max-w-[82vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
                             <template.icon size={16} className="text-accent sm:w-4.5 sm:h-4.5" />
                           </div>
-                          <div>
-                            <p className="text-sm font-black text-foreground">{template.title}</p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-black text-foreground truncate">{template.title}</p>
+                              {selectedTemplateId === template.id && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
+                            </div>
                             <p className="text-xs text-muted mt-1">{template.template.folders.length} folders preloaded</p>
+                            <p className="text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
                           </div>
                         </div>
                       </button>
@@ -693,13 +746,13 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[52vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[60vh] md:p-7 lg:touch-auto">
+                <SpotlightCard id="onboarding-template-details" className="relative h-full min-h-70 sm:min-h-80 max-h-[54vh] overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y sm:max-h-[60vh] md:p-7 lg:touch-auto">
                   <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      transition={{ duration: 0.2, ease: MOTION_EASE_OUT }}
                     >
                     <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                       <div>
@@ -708,10 +761,19 @@ export default function Dashboard() {
                         </div>
                         <h3 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
                         <p className="text-sm text-muted mt-3 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <span className="inline-flex items-center rounded-full border border-border bg-card/75 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
+                            Audience: {selectedTemplate.audience}
+                          </span>
+                          <span className="inline-flex items-center rounded-full border border-border bg-card/75 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
+                            Category: {selectedTemplate.category}
+                          </span>
+                        </div>
                       </div>
                       <div className="rounded-2xl border border-border bg-card/70 px-4 py-3 md:min-w-37.5">
                         <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Outcome</p>
                         <p className="text-sm font-bold text-foreground mt-2">Structured from day one</p>
+                        <p className="text-xs text-muted mt-2">{selectedTemplateFolderCount} folders · {selectedTemplateAppCount} ready-to-use apps</p>
                       </div>
                     </div>
 
@@ -735,10 +797,11 @@ export default function Dashboard() {
                     </div>
                     </motion.div>
 
-                    <div className="sticky bottom-0 mt-6 border-t border-border/70 bg-background/85 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
+                    <div className="sticky bottom-0 mt-6 border-t border-border/70 bg-background/90 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
+                      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <Button
-                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
+                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent to-sky-500 hover:from-accent-hover hover:to-sky-600 text-white"
                           loading={activeTemplateId === selectedTemplate.id}
                           onClick={async () => {
                             const installed = await handleTemplateLaunch(selectedTemplate.id);
