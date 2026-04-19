@@ -700,80 +700,81 @@ export default function Dashboard() {
 
               <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
                 <div className="flex flex-col gap-2.5 sm:gap-3 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[15vh] overflow-hidden rounded-[1.25rem] border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-[22vh] lg:max-h-[60vh]">
-                  <div className="mb-2 flex items-center justify-between gap-2 px-1">
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-2 px-1">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
-                      <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe or use arrows below</p>
+                      <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe cards or tap buttons</p>
                     </div>
-                    <span className="rounded-full border border-border bg-background/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
+                    <span className="rounded-full border border-border bg-background/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
                       {selectedTemplateIndex + 1}/{Math.max(WORKSPACE_TEMPLATES.length, 1)}
                     </span>
                   </div>
-                  <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-2xl border border-border/70 bg-background/65 px-2.5 py-2 shadow-sm">
+
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5 rounded-2xl border border-border/80 bg-card/75 px-2.5 py-2.5 shadow-sm backdrop-blur">
                     <button
                       type="button"
                       onClick={() => moveTemplateSelection(-1)}
-                      className="inline-flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
+                      className="inline-flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-[10px] font-black uppercase tracking-[0.16em] text-foreground shadow-sm transition-all hover:bg-card-hover hover:shadow-md active:scale-95"
                       aria-label="Previous template"
                     >
-                      <ChevronLeft size={15} />
-                      <span className="hidden sm:inline">Prev</span>
+                      <ChevronLeft size={16} />
+                      <span>Prev</span>
                     </button>
-                    <div className="flex items-center justify-center">
-                      <span className="inline-flex items-center rounded-full border border-border bg-background/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm sm:hidden">
-                        Swipe
-                      </span>
-                      <div className="hidden h-1.5 w-18 overflow-hidden rounded-full bg-border/60 sm:block sm:w-22">
+
+                    <div className="h-1.5 w-20 overflow-hidden rounded-full bg-border/60 sm:w-24">
                       <motion.div
                         className="h-full rounded-full bg-linear-to-r from-accent to-sky-400"
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.max(6, onboardingProgress)}%` }}
                         transition={{ ...MOTION_SPRING_CARD }}
                       />
-                      </div>
                     </div>
+
                     <button
                       type="button"
                       onClick={() => moveTemplateSelection(1)}
-                      className="inline-flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm transition-all hover:bg-card-hover hover:text-foreground hover:shadow-md active:scale-95"
+                      className="inline-flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-[10px] font-black uppercase tracking-[0.16em] text-foreground shadow-sm transition-all hover:bg-card-hover hover:shadow-md active:scale-95"
                       aria-label="Next template"
                     >
-                      <span className="hidden sm:inline">Next</span>
-                      <ChevronRight size={15} />
+                      <span>Next</span>
+                      <ChevronRight size={16} />
                     </button>
                   </div>
-                  <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
-                    {WORKSPACE_TEMPLATES.map((template) => (
-                      <button
-                        id={`onboarding-template-option-${template.id}`}
-                        key={template.id}
-                        onClick={() => setSelectedTemplateId(template.id)}
-                        aria-pressed={selectedTemplateId === template.id}
-                        className={`w-full h-20 text-left rounded-[1.125rem] sm:rounded-3xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all shadow-[0_1px_0_rgba(255,255,255,0.35)_inset] ${
-                          selectedTemplateId === template.id
-                            ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
-                            : 'border-border bg-background/60 hover:bg-card-hover'
-                        } min-w-[76vw] max-w-[76vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
-                      >
-                        <div className="flex h-full items-center gap-3">
-                          <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
-                            <template.icon size={15} className="text-accent sm:w-4.5 sm:h-4.5" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-black text-foreground truncate">{template.title}</p>
-                              {selectedTemplateId === template.id && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
+
+                  <div className="relative min-h-0 max-h-[10.4rem] overflow-hidden rounded-[1.25rem] border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-50 lg:max-h-[60vh]">
+                    <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
+                      {WORKSPACE_TEMPLATES.map((template) => (
+                        <button
+                          id={`onboarding-template-option-${template.id}`}
+                          key={template.id}
+                          onClick={() => setSelectedTemplateId(template.id)}
+                          aria-pressed={selectedTemplateId === template.id}
+                          className={`w-full h-20 text-left rounded-[1.125rem] sm:rounded-3xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all shadow-[0_1px_0_rgba(255,255,255,0.35)_inset] ${
+                            selectedTemplateId === template.id
+                              ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
+                              : 'border-border bg-background/60 hover:bg-card-hover'
+                          } min-w-[76vw] max-w-[76vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
+                        >
+                          <div className="flex h-full items-center gap-3">
+                            <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
+                              <template.icon size={15} className="text-accent sm:w-4.5 sm:h-4.5" />
                             </div>
-                            <p className="text-xs text-muted mt-1 truncate">{template.template.folders.length} folders preloaded</p>
-                            <p className="hidden sm:block text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-black text-foreground truncate">{template.title}</p>
+                                {selectedTemplateId === template.id && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
+                              </div>
+                              <p className="text-xs text-muted mt-1 truncate">{template.template.folders.length} folders preloaded</p>
+                              <p className="hidden sm:block text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
+                            </div>
                           </div>
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-linear-to-b from-card/95 to-transparent lg:hidden" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                   </div>
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-linear-to-b from-card/95 to-transparent lg:hidden" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
                 <SpotlightCard id="onboarding-template-details" className="relative flex-1 min-h-0 overflow-visible border-border bg-background/70 p-3 custom-scrollbar overscroll-contain md:p-5 lg:p-7">
