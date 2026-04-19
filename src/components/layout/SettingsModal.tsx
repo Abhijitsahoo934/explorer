@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { getErrorMessage } from '../../lib/errorMessage';
 import { APP_LOCAL_STORAGE_KEYS, APP_SESSION_STORAGE_KEYS } from '../../platform/storage/keys';
 import { clearStorageKeys, getSafeLocalStorage, getSafeSessionStorage } from '../../platform/storage/browserStorage';
-import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -30,8 +30,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setActiveTab('appearance');
     setFeedback(null);
 
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const applyMotionPreference = () => setReducedMotion(media.matches);
+    const media = getMediaQueryList('(prefers-reduced-motion: reduce)');
+    const applyMotionPreference = () => setReducedMotion(media?.matches ?? false);
     applyMotionPreference();
 
     const handleEsc = (event: KeyboardEvent) => {

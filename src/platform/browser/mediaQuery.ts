@@ -3,10 +3,30 @@ type LegacyMediaQueryList = MediaQueryList & {
   removeListener?: (listener: (this: MediaQueryList, ev: MediaQueryListEvent) => void) => void;
 };
 
+export function getMediaQueryList(query: string): MediaQueryList | null {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return null;
+  }
+
+  try {
+    return window.matchMedia(query);
+  } catch {
+    return null;
+  }
+}
+
+export function matchesMediaQuery(query: string, fallback = false): boolean {
+  return getMediaQueryList(query)?.matches ?? fallback;
+}
+
 export function subscribeMediaQuery(
-  mediaQuery: MediaQueryList,
+  mediaQuery: MediaQueryList | null,
   listener: (event?: MediaQueryListEvent) => void
 ): () => void {
+  if (!mediaQuery) {
+    return () => {};
+  }
+
   const wrappedListener = (event?: MediaQueryListEvent) => listener(event);
 
   if (typeof mediaQuery.addEventListener === 'function') {

@@ -9,7 +9,7 @@ import { useCommandPalette } from '../../hooks/useCommandPalette';
 import { useAuth } from '../../hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '../../lib/authProfile';
 import { logger } from '../../platform/observability/logger';
-import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 import { lazyWithRetry } from '../../lib/lazyWithRetry';
 
 const SettingsModal = lazyWithRetry(
@@ -81,10 +81,8 @@ export const Topbar: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const apply = () => setPrefersReducedMotion(motionMedia.matches);
+    const motionMedia = getMediaQueryList('(prefers-reduced-motion: reduce)');
+    const apply = () => setPrefersReducedMotion(motionMedia?.matches ?? false);
     apply();
 
     const unsubscribe = subscribeMediaQuery(motionMedia, apply);

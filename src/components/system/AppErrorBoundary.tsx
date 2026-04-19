@@ -10,18 +10,21 @@ interface AppErrorBoundaryProps {
 interface AppErrorBoundaryState {
   hasError: boolean;
   errorToken: string;
+  errorMessage: string;
 }
 
 export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorBoundaryState> {
   state: AppErrorBoundaryState = {
     hasError: false,
     errorToken: '',
+    errorMessage: '',
   };
 
   static getDerivedStateFromError(error: Error): AppErrorBoundaryState {
     return {
       hasError: true,
       errorToken: `${Date.now()}-${error.name || 'runtime-error'}`,
+      errorMessage: error.message || error.name || 'Unknown runtime error',
     };
   }
 
@@ -38,7 +41,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   }
 
   handleTryAgain = () => {
-    this.setState({ hasError: false, errorToken: '' });
+    this.setState({ hasError: false, errorToken: '', errorMessage: '' });
   };
 
   handleReload = () => {
@@ -63,6 +66,14 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
             <p className="text-sm text-muted leading-relaxed">
               The app has been stopped to protect your session and data. Refresh the page, and if the problem repeats, review your latest changes before deployment.
             </p>
+            {this.state.errorMessage && (
+              <div className="mt-4 rounded-2xl border border-border bg-background/70 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-black">Runtime reason</p>
+                <p className="mt-2 break-words text-xs font-medium leading-relaxed text-foreground/80">
+                  {this.state.errorMessage}
+                </p>
+              </div>
+            )}
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"

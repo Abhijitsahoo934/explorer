@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import type { CommandPaletteItem } from '../../lib/commandPaletteUtils';
 import { cn } from '../../lib/utils';
-import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 const MAX_RENDERED_ITEMS_DEFAULT = 80;
 const MAX_RENDERED_ITEMS_ACTIVE_FILTER = 120;
@@ -91,14 +91,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const compactMedia = window.matchMedia('(max-width: 768px)');
-    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const compactMedia = getMediaQueryList('(max-width: 768px)');
+    const motionMedia = getMediaQueryList('(prefers-reduced-motion: reduce)');
 
     const apply = () => {
-      setIsCompactViewport(compactMedia.matches);
-      setPrefersReducedMotion(motionMedia.matches);
+      setIsCompactViewport(compactMedia?.matches ?? false);
+      setPrefersReducedMotion(motionMedia?.matches ?? false);
     };
 
     apply();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { cn } from '../../lib/utils';
-import { subscribeMediaQuery } from '../../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../../platform/browser/mediaQuery';
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -20,10 +20,8 @@ export function SpotlightCard({
   const mouseY = useMotionValue(0);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const media = window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)');
-    const apply = () => setInteractiveSpotlight(!media.matches);
+    const media = getMediaQueryList('(pointer: coarse), (prefers-reduced-motion: reduce)');
+    const apply = () => setInteractiveSpotlight(!(media?.matches ?? true));
     apply();
     const unsubscribe = subscribeMediaQuery(media, apply);
     return unsubscribe;

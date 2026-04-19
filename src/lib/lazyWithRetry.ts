@@ -1,5 +1,11 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
-import { getSafeSessionStorage } from '../platform/storage/browserStorage';
+import {
+  getSafeSessionStorage,
+  readStorageValue,
+  safeStorageHasValue,
+  writeStorageValue,
+  removeStorageValue,
+} from '../platform/storage/browserStorage';
 
 const RETRY_STORAGE_KEY = 'explorer:lazy-retry';
 
@@ -23,14 +29,14 @@ function isChunkLoadError(error: unknown) {
 export function lazyWithRetry<T extends ComponentType<any>>(
   importer: () => Promise<{ default: T }>,
   importKey: string
-) : LazyExoticComponent<T> {
+): LazyExoticComponent<T> {
   return lazy(async () => {
     try {
       const module = await importer();
       const safeSessionStorage = getSafeSessionStorage();
 
       if (safeSessionStorage) {
-        safeSessionStorage.removeItem(getRetryKey(importKey));
+        removeStorageValue(safeSessionStorage, getRetryKey(importKey));
       }
 
       return module;
@@ -38,10 +44,12 @@ export function lazyWithRetry<T extends ComponentType<any>>(
       const safeSessionStorage = getSafeSessionStorage();
       if (safeSessionStorage && isChunkLoadError(error)) {
         const retryKey = getRetryKey(importKey);
-        const hasRetried = safeSessionStorage.getItem(retryKey) === '1';
+        const hasRetried =
+          safeStorageHasValue(safeSessionStorage, retryKey, '1') ||
+          readStorageValue(safeSessionStorage, retryKey) === '1';
 
         if (!hasRetried) {
-          safeSessionStorage.setItem(retryKey, '1');
+          writeStorageValue(safeSessionStorage, retryKey, '1');
           window.location.reload();
           return new Promise<never>(() => {});
         }

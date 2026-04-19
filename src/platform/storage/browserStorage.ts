@@ -56,3 +56,11 @@ export function clearStorageKeys(storage: Storage, keys: readonly string[]): num
 
   return removed;
 }
+
+export function safeStorageHasValue(storage: Storage, key: string, expectedValue: string): boolean {
+  try {
+    return storage.getItem(key) === expectedValue;
+  } catch {
+    return false;
+  }
+}

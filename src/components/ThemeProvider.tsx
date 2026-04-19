@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '../platform/storage/keys';
 import { getSafeLocalStorage, readStorageValue, writeStorageValue } from '../platform/storage/browserStorage';
-import { subscribeMediaQuery } from '../platform/browser/mediaQuery';
+import { getMediaQueryList, subscribeMediaQuery } from '../platform/browser/mediaQuery';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -40,13 +40,13 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = getMediaQueryList('(prefers-color-scheme: dark)');
     const applyTheme = (nextTheme: Theme) => {
       root.classList.remove('light', 'dark');
 
       const effectiveTheme =
         nextTheme === 'system'
-          ? (mediaQuery.matches ? 'dark' : 'light')
+          ? (mediaQuery?.matches ? 'dark' : 'light')
           : nextTheme;
 
       root.classList.add(effectiveTheme);
