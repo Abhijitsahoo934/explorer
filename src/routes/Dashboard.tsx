@@ -698,9 +698,9 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
-                <div className="flex min-h-full flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="relative min-h-0 max-h-[18vh] overflow-hidden sm:max-h-[26vh] lg:max-h-[60vh]">
+              <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
+                <div className="flex flex-col gap-2.5 sm:gap-3 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="relative min-h-0 max-h-[15vh] overflow-hidden sm:max-h-[22vh] lg:max-h-[60vh]">
                   <div className="mb-2 flex items-center justify-between gap-2 px-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
                     <div className="inline-flex items-center gap-1.5">
@@ -733,22 +733,22 @@ export default function Dashboard() {
                       transition={{ ...MOTION_SPRING_CARD }}
                     />
                   </div>
-                  <div className="flex h-full snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
+                  <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
                     {WORKSPACE_TEMPLATES.map((template) => (
                       <button
                         id={`onboarding-template-option-${template.id}`}
                         key={template.id}
                         onClick={() => setSelectedTemplateId(template.id)}
                         aria-pressed={selectedTemplateId === template.id}
-                        className={`w-full h-24 text-left rounded-[1.25rem] sm:rounded-3xl border px-3 py-3 sm:px-4 sm:py-3 transition-all ${
+                        className={`w-full h-20 text-left rounded-[1.125rem] sm:rounded-3xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all ${
                           selectedTemplateId === template.id
                             ? 'border-accent/35 bg-accent/12 shadow-sm ring-1 ring-accent/25'
                             : 'border-border bg-background/60 hover:bg-card-hover'
-                        } min-w-[82vw] max-w-[82vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
+                        } min-w-[76vw] max-w-[76vw] snap-start sm:min-w-75 sm:max-w-none lg:min-w-0`}
                       >
                         <div className="flex h-full items-center gap-3">
-                          <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
-                            <template.icon size={16} className="text-accent sm:w-4.5 sm:h-4.5" />
+                          <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-linear-to-br ${template.accent} border border-border flex items-center justify-center`}>
+                            <template.icon size={15} className="text-accent sm:w-4.5 sm:h-4.5" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
@@ -766,7 +766,7 @@ export default function Dashboard() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/95 to-transparent lg:hidden" />
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative flex-1 overflow-y-auto border-border bg-background/70 p-4 custom-scrollbar overscroll-contain touch-pan-y md:p-7 lg:touch-auto">
+                <SpotlightCard id="onboarding-template-details" className="relative flex-1 min-h-0 overflow-visible border-border bg-background/70 p-3 custom-scrollbar overscroll-contain md:p-5 lg:p-7">
                   <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
@@ -774,14 +774,14 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2, ease: MOTION_EASE_OUT }}
                     >
-                    <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                       <div>
-                        <div className={`w-14 h-14 rounded-[1.25rem] bg-linear-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-5`}>
-                          <selectedTemplate.icon size={22} className="text-accent" />
+                        <div className={`w-12 h-12 rounded-[1.125rem] bg-linear-to-br ${selectedTemplate.accent} border border-border flex items-center justify-center mb-4`}>
+                          <selectedTemplate.icon size={20} className="text-accent" />
                         </div>
-                        <h3 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
-                        <p className="text-sm text-muted mt-3 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <h3 className="text-lg font-black text-foreground tracking-tight sm:text-2xl">{selectedTemplate.title}</h3>
+                        <p className="text-sm text-muted mt-2 max-w-xl leading-relaxed">{selectedTemplate.subtitle}</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
                           <span className="inline-flex items-center rounded-full border border-border bg-card/75 px-2.5 py-1 text-[10px] uppercase tracking-widest font-black text-muted">
                             Audience: {selectedTemplate.audience}
                           </span>
@@ -797,14 +797,14 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="mt-8 grid gap-4 md:grid-cols-2">
+                    <div className="mt-5 grid gap-3 md:grid-cols-2">
                       {selectedTemplate.template.folders.map((folder) => (
-                        <div key={folder.name} className="rounded-[1.25rem] border border-border bg-card/70 p-4">
+                        <div key={folder.name} className="rounded-[1.125rem] border border-border bg-card/70 p-3.5">
                           <div className="flex items-center justify-between gap-3">
                             <p className="text-sm font-black text-foreground">{folder.name}</p>
                             <span className="text-[10px] uppercase tracking-widest text-muted font-black">{folder.apps.length} apps</span>
                           </div>
-                          <div className="mt-4 space-y-2">
+                          <div className="mt-3 space-y-2">
                             {folder.apps.map((app) => (
                               <div key={app.name} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2">
                                 <span className="text-sm text-foreground font-medium">{app.name}</span>
@@ -823,7 +823,7 @@ export default function Dashboard() {
                 </SpotlightCard>
                 </div>
 
-                <div className="relative z-30 shrink-0 border-t border-border/80 bg-card/98 px-3 py-4 backdrop-blur-3xl sm:px-6 md:px-8 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lg shadow-black/10">
+                <div className="relative z-30 shrink-0 border-t border-border/80 bg-card/98 px-3 py-3.5 backdrop-blur-3xl sm:px-6 md:px-8 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg shadow-black/10">
                   <motion.div
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -832,31 +832,31 @@ export default function Dashboard() {
                   >
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-accent font-black">Ready to install</p>
-                      <p className="text-[11px] text-muted font-semibold mt-1">One tap setup. Customize everything after.</p>
+                      <p className="text-[11px] text-muted font-semibold mt-1">One tap setup. Customize after install.</p>
                     </div>
                     <div className="grid gap-2.5 sm:grid-cols-2">
-                    <Button
-                      className="w-full h-13 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent via-accent to-sky-500 hover:from-accent/90 hover:via-accent/90 hover:to-sky-500/90 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
-                      loading={activeTemplateId === selectedTemplate.id}
-                      onClick={async () => {
-                        const installed = await handleTemplateLaunch(selectedTemplate.id);
-                        if (installed) {
-                          if (safeLocalStorage) {
-                            writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
+                      <Button
+                        className="w-full h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent via-accent to-sky-500 hover:from-accent/90 hover:via-accent/90 hover:to-sky-500/90 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                        loading={activeTemplateId === selectedTemplate.id}
+                        onClick={async () => {
+                          const installed = await handleTemplateLaunch(selectedTemplate.id);
+                          if (installed) {
+                            if (safeLocalStorage) {
+                              writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
+                            }
+                            setIsOnboardingOpen(false);
                           }
-                          setIsOnboardingOpen(false);
-                        }
-                      }}
-                    >
-                      {activeTemplateId === selectedTemplate.id ? 'Installing...' : `Install ${selectedTemplate.title}`}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full h-13 rounded-2xl text-[11px] uppercase tracking-widest font-black hover:bg-card-hover active:scale-95"
-                      onClick={handleDismissOnboarding}
-                    >
-                      I'll Set It Up Later
-                    </Button>
+                        }}
+                      >
+                        {activeTemplateId === selectedTemplate.id ? 'Installing...' : `Install ${selectedTemplate.title}`}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black hover:bg-card-hover active:scale-95"
+                        onClick={handleDismissOnboarding}
+                      >
+                        I'll Set It Up Later
+                      </Button>
                     </div>
                   </motion.div>
                 </div>
