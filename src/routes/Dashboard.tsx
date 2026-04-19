@@ -698,7 +698,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="relative z-10 flex-1 min-h-0 overflow-hidden p-3 pb-34 sm:p-6 sm:pb-40 md:p-8 md:pb-44 lg:pb-8">
+              <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
                 <div className="flex h-full min-h-0 flex-col gap-3 sm:gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
                 <div className="relative min-h-0 max-h-[24vh] overflow-hidden sm:max-h-[34vh] lg:max-h-[60vh]">
                   <div className="mb-2 flex items-center justify-between gap-2 px-1">
@@ -817,42 +817,15 @@ export default function Dashboard() {
                     </div>
                     </motion.div>
 
-                    <div className="hidden lg:block sticky bottom-0 mt-6 border-t border-border/70 bg-background/90 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur-sm">
-                      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <Button
-                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent to-sky-500 hover:from-accent-hover hover:to-sky-600 text-white"
-                          loading={activeTemplateId === selectedTemplate.id}
-                          onClick={async () => {
-                            const installed = await handleTemplateLaunch(selectedTemplate.id);
-                            if (installed) {
-                              if (safeLocalStorage) {
-                                writeStorageValue(safeLocalStorage, ONBOARDING_STORAGE_KEY, 'true');
-                              }
-                              setIsOnboardingOpen(false);
-                            }
-                          }}
-                        >
-                          Install {selectedTemplate.title}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          className="w-full sm:w-auto min-h-12 px-6 rounded-2xl text-[11px] uppercase tracking-widest font-black"
-                          onClick={handleDismissOnboarding}
-                        >
-                          I’ll Set It Up Myself
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-background/90 to-transparent" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background/95 to-transparent" />
                 </SpotlightCard>
                 </div>
 
-                <div className="absolute inset-x-0 bottom-0 z-30 border-t border-border/80 bg-card/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-2xl sm:px-6 md:px-8 lg:hidden">
+                <div className="shrink-0 border-t border-border/80 bg-card/95 px-3 py-3 backdrop-blur-2xl sm:px-6 md:px-8 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
                   <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted font-black">One tap setup. You can edit everything after install.</p>
-                  <div className="grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <Button
                       className="w-full min-h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent to-sky-500 hover:from-accent-hover hover:to-sky-600 text-white"
                       loading={activeTemplateId === selectedTemplate.id}
