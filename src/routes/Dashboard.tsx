@@ -698,10 +698,10 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-6 md:p-8 custom-scrollbar overscroll-contain">
-                <div className="flex flex-col gap-2.5 sm:gap-3 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2 px-1">
+              <div className="relative z-10 flex-1 min-h-0 flex flex-col p-2.5 sm:p-6 md:p-8 lg:p-6">
+                <div className="flex-1 min-h-0 flex flex-col gap-4 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+                <div className="space-y-2.5 lg:flex lg:flex-col lg:min-h-0">
+                  <div className="flex items-center justify-between gap-2 px-1 shrink-0">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">Choose a setup</p>
                       <p className="mt-1 text-[10px] font-semibold text-muted/70 sm:hidden">Swipe cards or tap buttons</p>
@@ -742,8 +742,8 @@ export default function Dashboard() {
                     </button>
                   </div>
 
-                  <div className="relative min-h-0 max-h-[10.4rem] overflow-hidden rounded-[1.25rem] border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-50 lg:max-h-[60vh]">
-                    <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:touch-auto">
+                  <div className="relative min-h-0 max-h-[10.4rem] overflow-hidden rounded-3xl border border-border/70 bg-card/45 p-2 shadow-sm sm:max-h-50 lg:flex-1 lg:max-h-none lg:flex lg:flex-col">
+                    <div className="flex h-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden px-1 pb-1.5 custom-scrollbar overscroll-contain touch-pan-x lg:block lg:space-y-3 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-2 lg:pb-6 lg:touch-auto">
                       {WORKSPACE_TEMPLATES.map((template) => (
                         <button
                           id={`onboarding-template-option-${template.id}`}
@@ -763,7 +763,6 @@ export default function Dashboard() {
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2">
                                 <p className="text-sm font-black text-foreground truncate">{template.title}</p>
-                                {selectedTemplateId === template.id && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
                               </div>
                               <p className="text-xs text-muted mt-1 truncate">{template.template.folders.length} folders preloaded</p>
                               <p className="hidden sm:block text-[10px] uppercase tracking-widest font-black text-muted/80 mt-1 truncate">{template.audience}</p>
@@ -777,7 +776,8 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <SpotlightCard id="onboarding-template-details" className="relative flex-1 min-h-0 overflow-visible border-border bg-background/70 p-3 custom-scrollbar overscroll-contain md:p-5 lg:p-7">
+                <div id="onboarding-template-details" className="relative flex-1 min-h-0 flex flex-col overflow-hidden border border-border/80 bg-card/60 lg:rounded-[2rem] shadow-sm">
+                  <div className="flex-1 min-h-0 overflow-y-auto p-4 custom-scrollbar lg:p-8 lg:pr-8 overscroll-contain">
                   <div className="flex flex-col">
                     <motion.div
                       key={selectedTemplate.id}
@@ -808,18 +808,18 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="mt-5 grid gap-3 md:grid-cols-2">
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
                       {selectedTemplate.template.folders.map((folder) => (
-                        <div key={folder.name} className="rounded-[1.125rem] border border-border bg-card/70 p-3.5">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="text-sm font-black text-foreground">{folder.name}</p>
-                            <span className="text-[10px] uppercase tracking-widest text-muted font-black">{folder.apps.length} apps</span>
+                        <div key={folder.name} className="flex flex-col rounded-[1.5rem] border border-border/80 bg-background/60 p-4 shadow-sm hover:border-border transition-colors">
+                          <div className="flex items-center justify-between gap-3 mb-4">
+                            <p className="text-sm font-black text-foreground truncate">{folder.name}</p>
+                            <span className="shrink-0 rounded-full bg-card px-2.5 py-1 text-[10px] uppercase tracking-widest text-muted font-bold border border-border/50">{folder.apps.length} apps</span>
                           </div>
-                          <div className="mt-3 space-y-2">
+                          <div className="space-y-2 flex-1 content-start">
                             {folder.apps.map((app) => (
-                              <div key={app.name} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2">
-                                <span className="text-sm text-foreground font-medium">{app.name}</span>
-                                <span className="text-[10px] uppercase tracking-widest text-muted font-black">ready</span>
+                              <div key={app.name} className="flex items-center justify-between rounded-xl border border-border/40 bg-card/60 px-3 py-2 shadow-xs hover:border-border/60 transition-colors">
+                                <span className="text-xs text-foreground font-semibold truncate pr-2">{app.name}</span>
+                                <span className="shrink-0 text-[9px] uppercase tracking-widest text-accent font-bold">ready</span>
                               </div>
                             ))}
                           </div>
@@ -829,25 +829,45 @@ export default function Dashboard() {
                     </motion.div>
 
                   </div>
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-background/90 to-transparent" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background/95 to-transparent" />
-                </SpotlightCard>
+                  </div>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-linear-to-b from-card/80 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-card/80 to-transparent" />
+                </div>
                 </div>
 
-                <div className="relative z-30 shrink-0 border-t border-border/80 bg-card/98 px-3 py-3.5 backdrop-blur-3xl sm:px-6 md:px-8 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg shadow-black/10">
+                <div className="relative z-30 shrink-0 border-t border-border/50 bg-background/90 px-4 py-4 backdrop-blur-3xl sm:px-6 md:px-8 lg:px-10 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:py-5 shadow-[0_-16px_40px_-24px_rgba(0,0,0,0.2)]">
                   <motion.div
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, ease: MOTION_EASE_OUT }}
-                    className="space-y-4"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full"
                   >
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-accent font-black">Ready to install</p>
-                      <p className="text-[11px] text-muted font-semibold mt-1">One tap setup. Customize after install.</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-5 flex-1">
+                      <div>
+                        <p className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] font-black text-accent">
+                          <Sparkles size={12} /> Ready to install
+                        </p>
+                        <p className="text-[11px] text-muted font-semibold mt-1 hidden lg:block">One tap setup. Customize after install.</p>
+                      </div>
+                      <div className="hidden md:flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-border/80 bg-card/60 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
+                          {selectedTemplateFolderCount} folders
+                        </span>
+                        <span className="rounded-full border border-border/80 bg-card/60 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted shadow-sm">
+                          {selectedTemplateAppCount} apps
+                        </span>
+                      </div>
                     </div>
-                    <div className="grid gap-2.5 sm:grid-cols-2">
+                    <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0 mt-4 sm:mt-0 justify-end">
                       <Button
-                        className="w-full h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-linear-to-r from-accent via-accent to-sky-500 hover:from-accent/90 hover:via-accent/90 hover:to-sky-500/90 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                        variant="ghost"
+                        className="flex-1 sm:flex-none sm:w-[150px] lg:w-[180px] h-12 rounded-2xl border border-border/80 bg-card/50 text-[11px] uppercase tracking-widest font-black text-foreground hover:bg-card hover:border-border transition-all active:scale-95 shadow-sm"
+                        onClick={handleDismissOnboarding}
+                      >
+                        I'll Set It Up Later
+                      </Button>
+                      <Button
+                        className="flex-1 sm:flex-none sm:w-[220px] lg:w-[260px] h-12 rounded-[1.25rem] text-[11px] uppercase tracking-widest font-black bg-accent hover:bg-accent/90 text-white shadow-[0_8px_20px_-8px_rgba(var(--accent),0.6)] hover:shadow-[0_12px_24px_-8px_rgba(var(--accent),0.8)] transition-all active:scale-95 border border-white/10"
                         loading={activeTemplateId === selectedTemplate.id}
                         onClick={async () => {
                           const installed = await handleTemplateLaunch(selectedTemplate.id);
@@ -860,13 +880,6 @@ export default function Dashboard() {
                         }}
                       >
                         {activeTemplateId === selectedTemplate.id ? 'Installing...' : `Install ${selectedTemplate.title}`}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="w-full h-12 rounded-2xl text-[11px] uppercase tracking-widest font-black hover:bg-card-hover active:scale-95"
-                        onClick={handleDismissOnboarding}
-                      >
-                        I'll Set It Up Later
                       </Button>
                     </div>
                   </motion.div>

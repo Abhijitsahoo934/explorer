@@ -87,16 +87,15 @@ export default function Hero() {
 
         <h1 className="mb-6 text-4xl font-black leading-[0.92] tracking-tighter text-foreground sm:text-5xl md:text-7xl lg:text-8xl">
           <div className="overflow-hidden pb-2">
-            <div className="hero-title-line">Browse Like</div>
+            <div className="hero-title-line">YOUR DIGITAL WORLD</div>
           </div>
           <div className="overflow-hidden">
-            <div className="hero-title-line bg-linear-to-r from-accent via-sky-500 to-cyan-500 bg-clip-text text-transparent">A File System.</div>
+            <div className="hero-title-line bg-linear-to-r from-accent via-sky-500 to-cyan-500 bg-clip-text text-transparent"> ONE WORKSPACE</div>
           </div>
         </h1>
 
         <p className="hero-subtitle mx-auto mb-8 max-w-3xl text-base text-muted leading-relaxed sm:mb-10 sm:text-lg md:text-xl">
-          Explorer turns scattered tabs into a clear workspace. Group tools into folders, launch in seconds,
-          and carry the same structure across every browser and device.
+          Explorer turns scattered tabs into a clear workspace. Group tools into folders, Organize tools, links, tabs and resources into one clean system.
         </p>
 
         <div className="z-30 mb-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:items-center md:flex-row md:justify-center md:gap-4">
